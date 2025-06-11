@@ -3,152 +3,448 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Figure Tracker</title>
+  <title>Figure Tracker - Toji Theme</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
       font-family: 'Roboto', system-ui, sans-serif;
-      background-color: #f5f5f5;
-      color: #333;
-      line-height: 1.6;
+      background-color: #1c2526; /* Toji's dark green-gray */
+      color: #e0e0e0;
+      overflow-x: hidden;
     }
-    main {
-      max-width: 980px;
-      margin: 0 auto;
-      padding: 2rem 1rem;
+    .layout {
+      display: flex;
+      flex-direction: row;
+    }
+    @media (max-width: 767px) {
+      .layout {
+        flex-direction: column;
+      }
+    }
+    nav {
+      width: 250px;
       min-height: 100vh;
+      background-color: #0c0c0c; /* Toji's black */
+      padding: 2rem 1rem;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+      position: fixed;
+      top: 0;
+      left: 0;
+      transform: translateX(0);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+      overflow-y: auto;
     }
-    .search-container {
-      margin-bottom: 2rem;
+    nav.hidden {
+      transform: translateX(-100%);
+    }
+    #navToggle {
+      display: none;
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      background: #333;
+      color: #fff;
+      border: none;
+      padding: 10px;
+      z-index: 1100;
+      cursor: pointer;
+    }
+    @media (max-width: 767px) {
+      #navToggle {
+        display: block;
+      }
+    }
+    nav h2 {
+      color: #fff;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    nav ul, .tree-view {
+      list-style: none;
+      padding: 0;
+    }
+    nav li, .tree-view label {
+      margin: 0.5rem 0;
+      display: block;
+    }
+    nav a {
+      color: #8b0000; /* Toji's muted red */
+      text-decoration: none;
+      font-size: 1.05rem;
+    }
+    nav a:hover {
+      color: #4b0082; /* Toji's purple accent */
+    }
+    .tree-toggle {
+      display: none;
+    }
+    .tree-toggle:checked + label + .tree-children {
+      display: block;
+    }
+    .tree-toggle:checked + label::before {
+      content: '▼ ';
+    }
+    .tree-toggle:not(:checked) + label::before {
+      content: '▶ ';
+    }
+    .tree-children {
+      margin-left: 1.5rem;
+      display: none;
     }
     #searchBox {
       width: 100%;
       padding: 0.5rem;
-      border: 1px solid #ccc;
+      margin-bottom: 1rem;
+      border: 1px solid #333;
       border-radius: 5px;
-      font-size: 1rem;
+      background-color: #1a3c34; /* Toji's dark green */
+      color: #e0e0e0;
+    }
+    main {
+      flex: 1;
+      padding: 2rem;
+      margin-left: 250px;
+      max-width: 900px;
+      border-left: 1px solid #333;
+      border-right: 1px solid #333;
+      min-height: 100vh;
+      margin-right: auto;
+      margin-left: auto;
+    }
+    @media (max-width: 767px) {
+      main {
+        margin-left: 0;
+        padding-top: 60px;
+        border-left: none;
+        border-right: none;
+      }
     }
     .banner {
-      margin: 2rem 0;
+      margin: 2rem auto;
       max-width: 100%;
     }
     .banner img {
       width: 100%;
       height: auto;
-      max-height: 300px;
+      max-height: 350px;
       object-fit: cover;
-      border-radius: 8px;
+      border-radius: 10px;
       loading: lazy;
     }
     section {
-      margin-bottom: 3rem;
-      padding-top: 1rem;
+      margin-bottom: 4rem;
+      border-top: 1px solid #333;
+      padding-top: 2rem;
     }
     section h1 {
-      font-size: 2.5rem;
-      font-weight: 700;
-      margin-bottom: 1.5rem;
-      border-bottom: 2px solid #e0e0e0;
+      font-size: 2rem;
+      border-bottom: 2px solid #8b0000; /* Toji's red */
       padding-bottom: 0.5rem;
+      margin-bottom: 2rem;
     }
     .figure-card {
-      margin-bottom: 2rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid #e0e0e0;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 3rem;
+      border-bottom: 1px solid #444;
+      padding-bottom: 1.5rem;
     }
-    .figure-card h2 {
-      font-size: 1.5rem;
-      margin: 0 0 0.5rem;
-    }
-    .figure-card p {
-      margin: 0.3rem 0;
-      font-size: 1rem;
-    }
-    .figure-card a {
-      color: #007bff;
-      text-decoration: none;
-    }
-    .figure-card a:hover {
-      text-decoration: underline;
+    @media (min-width: 768px) {
+      .figure-card {
+        flex-direction: row;
+        align-items: flex-start;
+      }
     }
     .figure-image {
-      max-width: 100%;
-      margin-bottom: 1rem;
+      flex-shrink: 0;
+      width: 100%;
+      max-width: 300px;
     }
     .figure-image img {
       width: 100%;
-      max-width: 300px;
       height: auto;
       border-radius: 8px;
       loading: lazy;
     }
-    @media (min-width: 768px) {
-      .figure-card {
-        display: flex;
-        gap: 1.5rem;
-      }
-      .figure-image {
-        max-width: 300px;
-      }
+    .figure-info {
+      flex: 1;
+    }
+    .figure-info h2 {
+      font-size: 1.25rem;
+      margin: 0 0 0.5rem 0;
+      color: #4b0082; /* Toji's purple */
+    }
+    .figure-info p {
+      margin: 0.2rem 0;
+      font-size: 0.95rem;
+    }
+    .figure-info a {
+      color: #8b0000; /* Toji's red */
+      text-decoration: none;
+    }
+    .figure-info a:hover {
+      color: #4b0082; /* Toji's purple */
     }
   </style>
   <script>
     function searchFigures() {
       const input = document.getElementById('searchBox').value.toLowerCase();
       document.querySelectorAll('.figure-card').forEach(card => {
-        card.style.display = card.textContent.toLowerCase().includes(input) ? '' : 'none';
+        card.style.display = card.textContent.toLowerCase().includes(input) ? 'flex' : 'none';
       });
     }
+
+    function toggleNav() {
+      const nav = document.getElementById('sidebar');
+      nav.classList.toggle('hidden');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Mobile nav toggle
+      if (window.innerWidth <= 767) {
+        document.getElementById('sidebar').classList.add('hidden');
+      }
+
+      // Persist checkbox states
+      const checkboxes = document.querySelectorAll('.tree-toggle');
+      const banner = document.getElementById('mainBanner');
+
+      function loadCheckboxStates() {
+        checkboxes.forEach(cb => {
+          const isChecked = localStorage.getItem(cb.id) === 'true';
+          cb.checked = isChecked;
+          const sectionId = cb.id.replace('Toggle', '');
+          const section = document.getElementById(sectionId);
+          if (section) {
+            section.style.display = isChecked ? 'block' : 'none';
+          }
+        });
+      }
+
+      function saveCheckboxStates() {
+        checkboxes.forEach(cb => {
+          localStorage.setItem(cb.id, cb.checked);
+        });
+      }
+
+      function updateBanner() {
+        const selected = Array.from(checkboxes)
+          .filter(cb => cb.checked)
+          .map(cb => cb.nextSibling.textContent.trim().toLowerCase().replace(/[^a-z0-9]/g, ''));
+
+        if (selected.length === 1) {
+          banner.src = `./images/banners/${selected[0]}.jpg`;
+        } else {
+          banner.src = './images/banners/default.jpg';
+        }
+      }
+
+      checkboxes.forEach(cb => {
+        cb.addEventListener('change', () => {
+          const sectionId = cb.id.replace('Toggle', '');
+          const section = document.getElementById(sectionId);
+          if (section) {
+            section.style.display = cb.checked ? 'block' : 'none';
+          }
+          saveCheckboxStates();
+          updateBanner();
+        });
+      });
+
+      loadCheckboxStates();
+      updateBanner();
+    });
   </script>
 </head>
 <body>
-  <main>
-    <div class="search-container">
+  <button id="navToggle" onclick="toggleNav()">☰ Menu</button>
+  <div class="layout">
+    <nav id="sidebar">
+      <h2>My Figures</h2>
       <input type="text" id="searchBox" placeholder="Search figures..." oninput="searchFigures()">
-    </div>
-    <div class="banner">
-      <picture>
-        <source srcset="images/banners/default.jpg" type="image/jpg">
-        <img src="images/banners/default.jpg" alt="Figure Tracker Banner" loading="lazy">
-      </picture>
-    </div>
-    <section>
-      <h1>Bleach Figures</h1>
-      <div class="figure-card">
-        <div class="figure-image">
-          <picture>
-            <source srcset="images/Bleach/UlquiorraStirringSouls.jpg" type="image/jpg">
-            <img src="images/Bleach/UlquiorraStirringSouls.jpg" alt="Ulquiorra Figure" loading="lazy">
-          </picture>
+      <div class="tree-view">
+        <input type="checkbox" id="animeToggle" class="tree-toggle" checked>
+        <label for="animeToggle">Anime</label>
+        <div class="tree-children">
+          <input type="checkbox" id="BleachToggle" class="tree-toggle" checked>
+          <label for="BleachToggle">Bleach</label>
+          <div class="tree-children">
+            <label><input type="checkbox" id="BleachSubToggle" checked>Bleach Figures</label>
+          </div>
+          <input type="checkbox" id="HaikyuToggle" class="tree-toggle" checked>
+          <label for="HaikyuToggle">Haikyu!!</label>
+          <div class="tree-children">
+            <label><input type="checkbox" id="HaikyuSubToggle" checked>Haikyu Figures</label>
+          </div>
+          <input type="checkbox" id="JujutsuKaisenToggle" class="tree-toggle" checked>
+          <label for="JujutsuKaisenToggle">Jujutsu Kaisen</label>
+          <div class="tree-children">
+            <label><input type="checkbox" id="JujutsuKaisenSubToggle" checked>Jujutsu Kaisen Figures</label>
+          </div>
+          <input type="checkbox" id="NarutoToggle" class="tree-toggle" checked>
+          <label for="NarutoToggle">Naruto</label>
+          <div class="tree-children">
+            <label><input type="checkbox" id="NarutoSubToggle" checked>Naruto Figures</label>
+          </div>
+          <input type="checkbox" id="DemonSlayerToggle" class="tree-toggle" checked>
+          <label for="DemonSlayerToggle">Demon Slayer</label>
+          <div class="tree-children">
+            <label><input type="checkbox" id="DemonSlayerSubToggle" checked>Demon Slayer Figures</label>
+          </div>
         </div>
-        <div class="figure-info">
-          <h2>Ulquiorra</h2>
-          <p><strong>Set:</strong> 一番くじ BLEACH Stirring Souls vol.3</p>
-          <p><strong>Released:</strong> August 2025</p>
-          <p><strong>Description:</strong> This Ulquiorra figure captures his iconic second release form, with intricate details on his wings and sword. A must-have for Bleach collectors.</p>
-          <a href="https://1kuji.com/products/bleach6" target="_blank">Buy / View Listing</a>
+        <input type="checkbox" id="gamingToggle" class="tree-toggle" checked>
+        <label for="gamingToggle">Gaming</label>
+        <div class="tree-children">
+          <input type="checkbox" id="ZeldaToggle" class="tree-toggle" checked>
+          <label for="ZeldaToggle">Zelda</label>
+          <div class="tree-children">
+            <label><input type="checkbox" id="ZeldaSubToggle" checked>Zelda Figures</label>
+          </div>
+          <input type="checkbox" id="FinalFantasyToggle" class="tree-toggle" checked>
+          <label for="FinalFantasyToggle">Final Fantasy</label>
+          <div class="tree-children">
+            <label><input type="checkbox" id="FinalFantasySubToggle" checked>Final Fantasy Figures</label>
+          </div>
+        </div>
+        <input type="checkbox" id="purchasedToggle" class="tree-toggle" checked>
+        <label for="purchasedToggle">Purchased</label>
+        <div class="tree-children">
+          <input type="checkbox" id="RecentPurchasesToggle" class="tree-toggle" checked>
+          <label for="RecentPurchasesToggle">Recent Purchases</label>
+          <div class="tree-children">
+            <label><input type="checkbox" id="RecentPurchasesSubToggle" checked>Recent Figures</label>
+          </div>
         </div>
       </div>
-    </section>
-    <section>
-      <h1>Haikyu!! Figures</h1>
-      <div class="figure-card">
-        <div class="figure-image">
-          <picture>
-            <source srcset="images/Haikyu/Hinata_10th_Anniversary.jpg" type="image/jpg">
-            <img src="images/Haikyu/Hinata_10th_Anniversary.jpg" alt="Hinata Figure" loading="lazy">
-          </picture>
-        </div>
-        <div class="figure-info">
-          <h2>Hinata Shoyo</h2>
-          <p><strong>Set:</strong> 10th Anniversary Memorial Kuji</p>
-          <p><strong>Released:</strong> June 14, 2025</p>
-          <p><strong>Description:</strong> Celebrating Haikyu!!’s 10th anniversary, this Hinata figure showcases his dynamic volleyball pose.</p>
-          <a href="https://1kuji.com/products/haikyu28_02" target="_blank">Buy / View Listing</a>
-        </div>
+    </nav>
+    <main>
+      <div class="banner">
+        <img id="mainBanner" src="./images/banners/default.jpg" alt="Banner" loading="lazy">
       </div>
-    </section>
-  </main>
+      <section id="Bleach">
+        <h1>Bleach</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/Bleach/placeholder.jpg" alt="Placeholder">
+          </div>
+          <div class="figure-info">
+            <h2>Bleach Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="Haikyu">
+        <h1>Haikyu!!</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/Haikyu/placeholder.jpg" alt="Placeholder">
+          </div>
+          <div class="figure-info">
+            <h2>Haikyu Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="JujutsuKaisen">
+        <h1>Jujutsu Kaisen</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/JujutsuKaisen/placeholder.jpg" alt="Placeholder">
+          </div>
+          <div class="figure-info">
+            <h2>Jujutsu Kaisen Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="Naruto">
+        <h1>Naruto</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/Naruto/placeholder.jpg" alt="Placeholder">
+          </div>
+          <div class="figure-info">
+            <h2>Naruto Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="DemonSlayer">
+        <h1>Demon Slayer</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/DemonSlayer/placeholder.jpg" alt="Placeholder">
+          </div>
+          <div class="figure-info">
+            <h2>Demon Slayer Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="Zelda">
+        <h1>Zelda</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/Zelda/placeholder.jpg" alt="Placeholder">
+          </div>
+          <div class="figure-info">
+            <h2>Zelda Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="FinalFantasy">
+        <h1>Final Fantasy</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/FinalFantasy/placeholder.jpg" alt="Placeholder">
+          </div>
+          <div class="figure-info">
+            <h2>Final Fantasy Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="RecentPurchases">
+        <h1>Recent Purchases</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/RecentPurchases/placeholder.jpg" alt="Placeholder">
+          </div>
+          <div class="figure-info">
+            <h2>Recent Purchase Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
 </body>
 </html>
