@@ -3,24 +3,100 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Figure Tracker</title>
+  <title>Figure Tracker - Toji Theme</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
-      font-family: 'Roboto', system-ui, sans-serif; /* Matches Wix’s common font */
-      background-color: #f5f5f5; /* Light background like Wix defaults */
-      color: #333;
+      font-family: 'Roboto', system-ui, sans-serif;
+      background-color: #1c2526; /* Toji's dark green-gray */
+      color: #e0e0e0;
       line-height: 1.6;
     }
     main {
-      max-width: 980px; /* Wix’s typical content width */
+      max-width: 980px;
       margin: 0 auto;
       padding: 2rem 1rem;
       min-height: 100vh;
+      border-left: 1px solid #333; /* Vertical lines */
+      border-right: 1px solid #333;
+    }
+    @media (max-width: 767px) {
+      main {
+        border-left: none;
+        border-right: none;
+        padding: 1rem;
+      }
+    }
+    .search-container {
+      max-width: 300px; /* Upper left corner */
+      margin-bottom: 1.5rem;
+    }
+    #searchBox {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #8b0000; /* Toji's red */
+      border-radius: 5px;
+      background-color: #0c0c0c; /* Toji's black */
+      color: #e0e0e0;
+      font-size: 1rem;
+    }
+    .tree-view {
+      margin-bottom: 2rem;
+      background-color: #0c0c0c; /* Toji's black */
+      padding: 1rem;
+      border: 1px solid #8b0000; /* Text box border like piratesoftware.sucks */
+      border-radius: 5px;
+    }
+    .tree-view h2 {
+      color: #fff;
+      font-size: 1.5rem;
+      margin: 0 0 1rem;
+      border-bottom: 1px solid #8b0000;
+      padding-bottom: 0.5rem;
+    }
+    .tree-toggle {
+      display: none;
+    }
+    .tree-toggle:checked + label + .tree-children {
+      display: block;
+    }
+    .tree-toggle:checked + label {
+      color: #4b0082; /* Toji's purple when active */
+    }
+    .tree-sub-toggle:checked + label {
+      color: #4b0082; /* Toji's purple when active */
+    }
+    .tree-view label {
+      color: #8b0000; /* Toji's red */
+      font-size: 1.05rem;
+      cursor: pointer;
+      display: block;
+      padding: 0.5rem;
+      border: 1px solid #8b0000; /* Box border for each category */
+      border-radius: 4px;
+      margin: 0.3rem 0;
+      transition: background-color 0.2s;
+    }
+    .tree-view label:hover {
+      background-color: #1a3c34; /* Toji's dark green */
+      color: #fff;
+    }
+    .tree-children {
+      margin-left: 1.5rem;
+      display: none;
+    }
+    .tree-children label {
+      border: 1px solid #8b0000; /* Subcategory borders */
+      font-size: 1rem;
     }
     .banner {
       margin: 2rem 0;
       max-width: 100%;
+      display: none; /* Hidden unless a single section is active */
+    }
+    .banner.active {
+      display: block;
     }
     .banner img {
       width: 100%;
@@ -28,37 +104,36 @@
       max-height: 300px;
       object-fit: cover;
       border-radius: 8px;
+      loading: lazy;
     }
     section {
       margin-bottom: 3rem;
       padding-top: 1rem;
+      display: none; /* Hidden by default, shown via JS */
+    }
+    section.active {
+      display: block;
     }
     section h1 {
       font-size: 2.5rem;
       font-weight: 700;
       margin-bottom: 1.5rem;
-      border-bottom: 2px solid #e0e0e0;
+      border-bottom: 2px solid #8b0000; /* Toji's red */
       padding-bottom: 0.5rem;
     }
     .figure-card {
       margin-bottom: 2rem;
       padding-bottom: 1rem;
-      border-bottom: 1px solid #e0e0e0;
+      border-bottom: 1px solid #444;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
     }
-    .figure-card h2 {
-      font-size: 1.5rem;
-      margin: 0 0 0.5rem;
-    }
-    .figure-card p {
-      margin: 0.3rem 0;
-      font-size: 1rem;
-    }
-    .figure-card a {
-      color: #007bff;
-      text-decoration: none;
-    }
-    .figure-card a:hover {
-      text-decoration: underline;
+    @media (min-width: 768px) {
+      .figure-card {
+        flex-direction: row;
+        align-items: flex-start;
+      }
     }
     .figure-image {
       max-width: 100%;
@@ -69,51 +144,363 @@
       max-width: 300px;
       height: auto;
       border-radius: 8px;
+      loading: lazy;
     }
-    @media (min-width: 768px) {
-      .figure-card {
-        display: flex;
-        gap: 1.5rem;
-      }
-      .figure-image {
-        max-width: 300px;
-      }
+    .figure-info {
+      flex: 1;
+    }
+    .figure-info h2 {
+      font-size: 1.5rem;
+      margin: 0 0 0.5rem;
+      color: #4b0082; /* Toji's purple */
+    }
+    .figure-info p {
+      margin: 0.3rem 0;
+      font-size: 1rem;
+    }
+    .figure-info a {
+      color: #8b0000; /* Toji's red */
+      text-decoration: none;
+    }
+    .figure-info a:hover {
+      color: #4b0082; /* Toji's purple */
     }
   </style>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const checkboxes = document.querySelectorAll('.tree-toggle');
+      const subCheckboxes = document.querySelectorAll('.tree-sub-toggle');
+      const banner = document.getElementById('mainBanner');
+      const sections = document.querySelectorAll('section');
+
+      // Load saved states from localStorage
+      function loadStates() {
+        checkboxes.forEach(cb => {
+          const isChecked = localStorage.getItem(cb.id) === 'true';
+          cb.checked = isChecked;
+        });
+        subCheckboxes.forEach(cb => {
+          const isChecked = localStorage.getItem(cb.id) === 'true';
+          cb.checked = isChecked;
+          const sectionId = cb.id.replace('SubToggle', '');
+          const section = document.getElementById(sectionId);
+          if (section) {
+            section.classList.toggle('active', isChecked);
+          }
+        });
+        updateBanner();
+      }
+
+      // Save checkbox states to localStorage
+      function saveStates() {
+        checkboxes.forEach(cb => localStorage.setItem(cb.id, cb.checked));
+        subCheckboxes.forEach(cb => localStorage.setItem(cb.id, cb.checked));
+      }
+
+      // Update banner based on active section
+      function updateBanner() {
+        const activeSub = Array.from(subCheckboxes)
+          .filter(cb => cb.checked)
+          .map(cb => cb.nextSibling.textContent.trim().toLowerCase().replace(/[^a-z0-9]/g, ''));
+
+        if (activeSub.length === 1) {
+          banner.src = `./images/banners/${activeSub[0]}.jpg`;
+          banner.parentElement.classList.add('active');
+        } else {
+          banner.parentElement.classList.remove('active');
+        }
+      }
+
+      // Filter sections based on sub-checkboxes
+      subCheckboxes.forEach(cb => {
+        cb.addEventListener('change', () => {
+          const sectionId = cb.id.replace('SubToggle', '');
+          const section = document.getElementById(sectionId);
+          if (section) {
+            section.classList.toggle('active', cb.checked);
+          }
+          saveStates();
+          updateBanner();
+        });
+      });
+
+      // Search function
+      function searchFigures() {
+        const input = document.getElementById('searchBox').value.toLowerCase();
+        document.querySelectorAll('.figure-card').forEach(card => {
+          const isVisible = card.textContent.toLowerCase().includes(input);
+          card.style.display = isVisible ? '' : 'none';
+        });
+      }
+
+      document.getElementById('searchBox').addEventListener('input', searchFigures);
+
+      // Initialize states
+      loadStates();
+    });
+  </script>
 </head>
 <body>
   <main>
-    <div class="banner">
-      <img src="images/banners/default.jpg" alt="Figure Tracker Banner">
+    <div class="search-container">
+      <input type="text" id="searchBox" placeholder="Search figures...">
     </div>
-    <section>
+    <div class="tree-view">
+      <h2>My Figures</h2>
+      <input type="checkbox" id="animeToggle" class="tree-toggle" checked>
+      <label for="animeToggle">Anime</label>
+      <div class="tree-children">
+        <input type="checkbox" id="AirGearSubToggle" class="tree-sub-toggle" checked>
+        <label for="AirGearSubToggle">Air Gear</label>
+        <input type="checkbox" id="AttackOnTitanSubToggle" class="tree-sub-toggle" checked>
+        <label for="AttackOnTitanSubToggle">Attack on Titan</label>
+        <input type="checkbox" id="BerserkSubToggle" class="tree-sub-toggle" checked>
+        <label for="BerserkSubToggle">Berserk</label>
+        <input type="checkbox" id="BleachSubToggle" class="tree-sub-toggle" checked>
+        <label for="BleachSubToggle">Bleach</label>
+        <input type="checkbox" id="BlueLockSubToggle" class="tree-sub-toggle" checked>
+        <label for="BlueLockSubToggle">Blue Lock</label>
+        <input type="checkbox" id="ChainsawManSubToggle" class="tree-sub-toggle" checked>
+        <label for="ChainsawManSubToggle">Chainsaw Man</label>
+        <input type="checkbox" id="CodeGeassSubToggle" class="tree-sub-toggle" checked>
+        <label for="CodeGeassSubToggle">Code Geass</label>
+        <input type="checkbox" id="DeathNoteSubToggle" class="tree-sub-toggle" checked>
+        <label for="DeathNoteSubToggle">Death Note</label>
+        <input type="checkbox" id="DemonSlayerSubToggle" class="tree-sub-toggle" checked>
+        <label for="DemonSlayerSubToggle">Demon Slayer</label>
+        <input type="checkbox" id="DragonBallZSubToggle" class="tree-sub-toggle" checked>
+        <label for="DragonBallZSubToggle">Dragon Ball Z</label>
+        <input type="checkbox" id="FireForceSubToggle" class="tree-sub-toggle" checked>
+        <label for="FireForceSubToggle">FireForce</label>
+        <input type="checkbox" id="FullmetalAlchemistSubToggle" class="tree-sub-toggle" checked>
+        <label for="FullmetalAlchemistSubToggle">Fullmetal Alchemist</label>
+        <input type="checkbox" id="GurrenLagannSubToggle" class="tree-sub-toggle" checked>
+        <label for="GurrenLagannSubToggle">Gurren Lagann</label>
+        <input type="checkbox" id="HaikyuSubToggle" class="tree-sub-toggle" checked>
+        <label for="HaikyuSubToggle">Haikyu!!</label>
+        <input type="checkbox" id="HellsParadiseSubToggle" class="tree-sub-toggle" checked>
+        <label for="HellsParadiseSubToggle">Hell's Paradise</label>
+        <input type="checkbox" id="HunterXHunterSubToggle" class="tree-sub-toggle" checked>
+        <label for="HunterXHunterSubToggle">Hunter x Hunter</label>
+        <input type="checkbox" id="JujutsuKaisenSubToggle" class="tree-sub-toggle" checked>
+        <label for="JujutsuKaisenSubToggle">Jujutsu Kaisen</label>
+        <input type="checkbox" id="KaijuNo8SubToggle" class="tree-sub-toggle" checked>
+        <label for="KaijuNo8SubToggle">Kaiju No.8</label>
+        <input type="checkbox" id="KatekyoHitmanRebornSubToggle" class="tree-sub-toggle" checked>
+        <label for="KatekyoHitmanRebornSubToggle">Katekyo Hitman Reborn!</label>
+        <input type="checkbox" id="KurokoNoBasketSubToggle" class="tree-sub-toggle" checked>
+        <label for="KurokoNoBasketSubToggle">Kuroko no Basket</label>
+        <input type="checkbox" id="MashleSubToggle" class="tree-sub-toggle" checked>
+        <label for="MashleSubToggle">Mashle</label>
+        <input type="checkbox" id="MobPsycho100SubToggle" class="tree-sub-toggle" checked>
+        <label for="MobPsycho100SubToggle">Mob Psycho 100</label>
+        <input type="checkbox" id="NarutoSubToggle" class="tree-sub-toggle" checked>
+        <label for="NarutoSubToggle">Naruto</label>
+        <input type="checkbox" id="OnePieceSubToggle" class="tree-sub-toggle" checked>
+        <label for="OnePieceSubToggle">One Piece</label>
+        <input type="checkbox" id="OnePunchManSubToggle" class="tree-sub-toggle" checked>
+        <label for="OnePunchManSubToggle">One-Punch Man</label>
+        <input type="checkbox" id="SakamotoDaysSubToggle" class="tree-sub-toggle" checked>
+        <label for="SakamotoDaysSubToggle">Sakamoto Days</label>
+        <input type="checkbox" id="ShangriLaFrontierSubToggle" class="tree-sub-toggle" checked>
+        <label for="ShangriLaFrontierSubToggle">Shangri-La Frontier</label>
+        <input type="checkbox" id="SoloLevelingSubToggle" class="tree-sub-toggle" checked>
+        <label for="SoloLevelingSubToggle">Solo Leveling</label>
+        <input type="checkbox" id="SoulEaterSubToggle" class="tree-sub-toggle" checked>
+        <label for="SoulEaterSubToggle">Soul Eater</label>
+        <input type="checkbox" id="TheGodOfHighSchoolSubToggle" class="tree-sub-toggle" checked>
+        <label for="TheGodOfHighSchoolSubToggle">The God of High School</label>
+        <input type="checkbox" id="TokyoGhoulSubToggle" class="tree-sub-toggle" checked>
+        <label for="TokyoGhoulSubToggle">Tokyo Ghoul</label>
+        <input type="checkbox" id="TokyoRevengersSubToggle" class="tree-sub-toggle" checked>
+        <label for="TokyoRevengersSubToggle">Tokyo Revengers</label>
+        <input type="checkbox" id="TowerOfGodSubToggle" class="tree-sub-toggle" checked>
+        <label for="TowerOfGodSubToggle">Tower of God</label>
+        <input type="checkbox" id="UndeadUnluckSubToggle" class="tree-sub-toggle" checked>
+        <label for="UndeadUnluckSubToggle">Undead Unluck</label>
+        <input type="checkbox" id="VinlandSagaSubToggle" class="tree-sub-toggle" checked>
+        <label for="VinlandSagaSubToggle">Vinland Saga</label>
+        <input type="checkbox" id="WindBreakerSubToggle" class="tree-sub-toggle" checked>
+        <label for="WindBreakerSubToggle">Wind Breaker</label>
+        <input type="checkbox" id="YuYuHakushoSubToggle" class="tree-sub-toggle" checked>
+        <label for="YuYuHakushoSubToggle">Yu Yu Hakusho</label>
+      </div>
+      <input type="checkbox" id="gamesToggle" class="tree-toggle" checked>
+      <label for="gamesToggle">Games</label>
+      <div class="tree-children">
+        <input type="checkbox" id="ZeldaSubToggle" class="tree-sub-toggle" checked>
+        <label for="ZeldaSubToggle">Zelda</label>
+        <input type="checkbox" id="FinalFantasySubToggle" class="tree-sub-toggle" checked>
+        <label for="FinalFantasySubToggle">Final Fantasy</label>
+      </div>
+      <input type="checkbox" id="purchasedToggle" class="tree-toggle" checked>
+      <label for="purchasedToggle">Purchased</label>
+      <div class="tree-children">
+        <input type="checkbox" id="RecentPurchasesSubToggle" class="tree-sub-toggle" checked>
+        <label for="RecentPurchasesSubToggle">Recent Purchases</label>
+      </div>
+    </div>
+    <div class="banner" id="mainBannerContainer">
+      <img id="mainBanner" src="./images/banners/default.jpg" alt="Figure Tracker Banner" loading="lazy">
+    </div>
+    <section id="AirGear">
+      <h1>Air Gear Figures</h1>
+      <div class="figure-card">
+        <div class="figure-image">
+          <img src="./images/AirGear/placeholder.jpg" alt="Placeholder" loading="lazy">
+        </div>
+        <div class="figure-info">
+          <h2>Air Gear Figure</h2>
+          <p><strong>Set:</strong> [Placeholder Set]</p>
+          <p><strong>Released:</strong> [Placeholder Date]</p>
+          <p><strong>Description:</strong> [Placeholder Description]</p>
+          <a href="#" target="_blank">Buy / View Listing</a>
+        </div>
+      </div>
+    </section>
+    <section id="AttackOnTitan">
+      <h1>Attack on Titan Figures</h1>
+      <div class="figure-card">
+        <div class="figure-image">
+          <img src="./images/AttackOnTitan/placeholder.jpg" alt="Placeholder" loading="lazy">
+        </div>
+        <div class="figure-info">
+          <h2>Attack on Titan Figure</h2>
+          <p><strong>Set:</strong> [Placeholder Set]</p>
+          <p><strong>Released:</strong> [Placeholder Date]</p>
+          <p><strong>Description:</strong> [Placeholder Description]</p>
+          <a href="#" target="_blank">Buy / View Listing</a>
+        </div>
+      </div>
+    </section>
+    <section id="Berserk">
+      <h1>Berserk Figures</h1>
+      <div class="figure-card">
+        <div class="figure-image">
+          <img src="./images/Berserk/placeholder.jpg" alt="Placeholder" loading="lazy">
+        </div>
+        <div class="figure-info">
+          <h2>Berserk Figure</h2>
+          <p><strong>Set:</strong> [Placeholder Set]</p>
+          <p><strong>Released:</strong> [Placeholder Date]</p>
+          <p><strong>Description:</strong> [Placeholder Description]</p>
+          <a href="#" target="_blank">Buy / View Listing</a>
+        </div>
+      </div>
+    </section>
+    <section id="Bleach">
       <h1>Bleach Figures</h1>
       <div class="figure-card">
         <div class="figure-image">
-          <img src="images/Bleach/UlquiorraStirringSouls.jpg" alt="Ulquiorra Figure">
+          <img src="./images/Bleach/UlquiorraStirringSouls.jpg" alt="Ulquiorra Figure" loading="lazy">
         </div>
         <div class="figure-info">
           <h2>Ulquiorra</h2>
           <p><strong>Set:</strong> 一番くじ BLEACH Stirring Souls vol.3</p>
           <p><strong>Released:</strong> August 2025</p>
+          <p><strong>Description:</strong> [Placeholder Description]</p>
           <a href="https://1kuji.com/products/bleach6" target="_blank">Buy / View Listing</a>
         </div>
       </div>
-    </section>
-    <section>
-      <h1>Haikyu!! Figures</h1>
       <div class="figure-card">
         <div class="figure-image">
-          <img src="images/Haikyu/Hinata_10th_Anniversary.jpg" alt="Hinata Figure">
+          <img src="./images/Bleach/placeholder.jpg" alt="Placeholder" loading="lazy">
         </div>
         <div class="figure-info">
-          <h2>Hinata Shoyo</h2>
-          <p><strong>Set:</strong> 10th Anniversary Memorial Kuji</p>
-          <p><strong>Released:</strong> June 14, 2025</p>
-          <a href="https://1kuji.com/products/haikyu28_02" target="_blank">Buy / View Listing</a>
+          <h2>Bleach Figure 2</h2>
+          <p><strong>Set:</strong> [Placeholder Set]</p>
+          <p><strong>Released:</strong> [Placeholder Date]</p>
+          <p><strong>Description:</strong> [Placeholder Description]</p>
+          <a href="#" target="_blank">Buy / View Listing</a>
         </div>
       </div>
     </section>
-  </main>
-</body>
-</html>
+    <section id="BlueLock">
+      <h1>Blue Lock Figures</h1>
+      <div class="figure-card">
+        <div class="figure-image">
+          <img src="./images/BlueLock/placeholder.jpg" alt="Placeholder" loading="lazy">
+        </div>
+        <div class="figure-info">
+          <h2>Blue Lock Figure</h2>
+          <p><strong>Set:</strong> [Placeholder Set]</p>
+          <p><strong>Released:</strong> [Placeholder Date]</p>
+          <p><strong>Description:</strong> [Placeholder Description]</p>
+          <a href="#" target="_blank">Buy / View Listing</a>
+        </div>
+      </div>
+    </section>
+    <section id="ChainsawMan">
+      <h1>Chainsaw Man Figures</h1>
+      <div class="figure-card">
+        <div class="figure-image">
+          <img src="./images/ChainsawMan/placeholder.jpg" alt="Placeholder" loading="lazy">
+        </div>
+        <div class="figure-info">
+          <h2>Chainsaw Man Figure</h2>
+          <p><strong>Set:</strong> [Placeholder Set]</p>
+          <p><strong>Released:</strong> [Placeholder Date]</p>
+          <p><strong>Description:</strong> [Placeholder Description]</p>
+          <a href="#" target="_blank">Buy / View Listing</a>
+        </div>
+      </div>
+    </section>
+    <section id="CodeGeass">
+      <h1>Code Geass Figures</h1>
+      <div class="figure-card">
+        <div class="figure-image">
+          <img src="./images/CodeGeass/placeholder.jpg" alt="Placeholder" loading="lazy">
+        </div>
+        <div class="figure-info">
+          <h2>Code Geass Figure</h2>
+          <p><strong>Set:</strong> [Placeholder Set]</p>
+          <p><strong>Released:</strong> [Placeholder Date]</p>
+          <p><strong>Description:</strong> [Placeholder Description]</p>
+          <a href="#" target="_blank">Buy / View Listing</a>
+        </div>
+      </div>
+    </section>
+    <section id="DeathNote">
+      <h1>Death Note Figures</h1>
+      <div class="figure-card">
+        <div class="figure-image">
+          <img src="./images/DeathNote/placeholder.jpg" alt="Placeholder" loading="lazy">
+        </div>
+        <div class="figure-info">
+          <h2>Death Note Figure</h2>
+          <p><strong>Set:</strong> [Placeholder Set]</p>
+          <p><strong>Released:</strong> [Placeholder Date]</p>
+          <p><strong>Description:</strong> [Placeholder Description]</p>
+          <a href="#" target="_blank">Buy / View Listing</a>
+        </div>
+      </div>
+    </section>
+    <section id="DemonSlayer">
+      <h1>Demon Slayer Figures</h1>
+      <div class="figure-card">
+        <div class="figure-image">
+          <img src="./images/DemonSlayer/placeholder.jpg" alt="Placeholder" loading="lazy">
+        </div>
+        <div class="figure-info">
+          <h2>Demon Slayer Figure</h2>
+          <p><strong>Set:</strong> [Placeholder Set]</p>
+          <p><strong>Released:</strong> [Placeholder Date]</p>
+          <p><strong>Description:</strong> [Placeholder Description]</p>
+          <a href="#" target="_blank">Buy / View Listing</a>
+        </div>
+      </div>
+    </section>
+    <section id="DragonBallZ">
+      <h1>Dragon Ball Z Figures</h1>
+      <div class="figure-card">
+        <div class="figure-image">
+          <img src="./images/DragonBallZ/placeholder.jpg" alt="Placeholder" loading="lazy">
+        </div>
+        <div class="figure-info">
+          <h2>Dragon Ball Z Figure</h2>
+          <p><strong>Set:</strong> [Placeholder Set]</p>
+          <p><strong>Released:</strong> [Placeholder Date]</p>
+          <p><strong>Description:</strong> [Placeholder Description]</p>
+          <a href="#" target="_blank">Buy / View Listing</a>
+        </div>
+      </div>
