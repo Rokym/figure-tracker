@@ -135,6 +135,8 @@
       flex-direction: column;
       gap: 1rem;
       margin-bottom: 3rem;
+      border-bottom: 1px solid #444;
+      padding-bottom: 1.5rem;
     }
     @media (min-width: 768px) {
       .figure-card {
@@ -178,14 +180,34 @@
         card.style.display = card.innerText.toLowerCase().includes(input) ? 'flex' : 'none';
       });
     }
+
     function toggleNav() {
       const nav = document.getElementById('sidebar');
       nav.classList.toggle('hidden');
     }
+
     document.addEventListener('DOMContentLoaded', () => {
       if (window.innerWidth <= 767) {
         document.getElementById('sidebar').classList.add('hidden');
       }
+
+      const checkboxes = document.querySelectorAll('.tree-children input[type="checkbox"]');
+      const banner = document.getElementById('mainBanner');
+
+      function updateBanner() {
+        const selected = Array.from(checkboxes)
+          .filter(cb => cb.checked)
+          .map(cb => cb.nextSibling.textContent.trim().toLowerCase().replace(/[^a-z0-9]/g, ''));
+
+        if (selected.length === 1) {
+          banner.src = `images/banners/${selected[0]}.jpg`;
+        } else {
+          banner.src = 'images/banners/default.jpg';
+        }
+      }
+
+      checkboxes.forEach(cb => cb.addEventListener('change', updateBanner));
+      updateBanner();
     });
   </script>
 </head>
@@ -207,13 +229,13 @@
     </nav>
     <main>
       <div class="banner">
-        <img src="images/Bleach/Bleach_Title.jpg">
+        <img id="mainBanner" src="images/banners/default.jpg">
       </div>
       <section id="Bleach">
         <h1>Bleach</h1>
         <div class="figure-card">
           <div class="figure-image">
-            <img src="images/Bleach/Ulquiorra-Stirring-Souls.jpg">
+            <img src="images/bleach/Ulquiorra-Stirring-Souls.jpg">
           </div>
           <div class="figure-info">
             <h2>Ulquiorra</h2>
