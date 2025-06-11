@@ -3,35 +3,142 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Figure Tracker</title>
+  <title>Figure Tracker - Dark Theme</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
       font-family: 'Roboto', system-ui, sans-serif;
-      background-color: #f5f5f5;
-      color: #333;
+      background-color: #1a1a1a; /* Dark gray */
+      color: #e0e0e0;
       line-height: 1.6;
     }
-    main {
-      max-width: 980px;
-      margin: 0 auto;
-      padding: 2rem 1rem;
+    .layout {
+      display: flex;
+      flex-direction: row;
+    }
+    @media (max-width: 767px) {
+      .layout {
+        flex-direction: column;
+      }
+    }
+    nav {
+      width: 250px;
       min-height: 100vh;
+      background-color: #000; /* Black sidebar */
+      padding: 1rem;
+      position: fixed;
+      top: 0;
+      left: 0;
+      transform: translateX(0);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+      overflow-y: auto;
+    }
+    nav.hidden {
+      transform: translateX(-100%);
+    }
+    #navToggle {
+      display: none;
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      background: #333;
+      color: #fff;
+      border: none;
+      padding: 10px;
+      z-index: 1100;
+      cursor: pointer;
+    }
+    @media (max-width: 767px) {
+      #navToggle {
+        display: block;
+      }
+      nav {
+        transform: translateX(-100%);
+      }
+      nav.active {
+        transform: translateX(0);
+      }
     }
     .search-container {
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
     }
     #searchBox {
       width: 100%;
       padding: 0.5rem;
-      border: 1px solid #ccc;
+      border: 1px solid #333;
       border-radius: 5px;
+      background-color: #1a1a1a;
+      color: #e0e0e0;
       font-size: 1rem;
+    }
+    .tree-view h2 {
+      color: #fff;
+      font-size: 1.5rem;
+      margin: 0 0 1rem;
+      border-bottom: 1px solid #007bff; /* Blue highlight */
+    }
+    .tree-view ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .tree-view li {
+      margin: 0.3rem 0;
+    }
+    .tree-view a {
+      color: #e0e0e0;
+      text-decoration: none;
+      font-size: 1.05rem;
+      display: block;
+      padding: 0.5rem;
+      border-radius: 4px;
+      transition: background-color 0.2s, color 0.2s, border 0.2s;
+    }
+    .tree-view a:hover {
+      color: #007bff;
+    }
+    .tree-view a.active {
+      background-color: #444; /* Dark gray box */
+      border: 1px solid #007bff;
+      color: #007bff;
+    }
+    .tree-children {
+      margin-left: 1.5rem;
+      display: none;
+    }
+    .tree-children.active {
+      display: block;
+    }
+    .tree-parent.active > a {
+      color: #007bff;
+    }
+    main {
+      flex: 1;
+      padding: 2rem;
+      margin-left: 250px;
+      max-width: 980px;
+      border-left: 1px solid #333; /* Vertical lines */
+      border-right: 1px solid #333;
+      min-height: 100vh;
+      margin-right: auto;
+    }
+    @media (max-width: 767px) {
+      main {
+        margin-left: 0;
+        padding-top: 60px;
+        border-left: none;
+        border-right: none;
+      }
     }
     .banner {
       margin: 2rem 0;
       max-width: 100%;
+      display: none; /* Hidden unless a single section is active */
+    }
+    .banner.active {
+      display: block;
     }
     .banner img {
       width: 100%;
@@ -44,33 +151,32 @@
     section {
       margin-bottom: 3rem;
       padding-top: 1rem;
+      display: none; /* Hidden by default */
+    }
+    section.active {
+      display: block;
     }
     section h1 {
       font-size: 2.5rem;
       font-weight: 700;
       margin-bottom: 1.5rem;
-      border-bottom: 2px solid #e0e0e0;
+      border-bottom: 2px solid #007bff; /* Blue highlight */
       padding-bottom: 0.5rem;
+      color: #fff;
     }
     .figure-card {
       margin-bottom: 2rem;
       padding-bottom: 1rem;
-      border-bottom: 1px solid #e0e0e0;
+      border-bottom: 1px solid #444;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
     }
-    .figure-card h2 {
-      font-size: 1.5rem;
-      margin: 0 0 0.5rem;
-    }
-    .figure-card p {
-      margin: 0.3rem 0;
-      font-size: 1rem;
-    }
-    .figure-card a {
-      color: #007bff;
-      text-decoration: none;
-    }
-    .figure-card a:hover {
-      text-decoration: underline;
+    @media (min-width: 768px) {
+      .figure-card {
+        flex-direction: row;
+        align-items: flex-start;
+      }
     }
     .figure-image {
       max-width: 100%;
@@ -83,72 +189,813 @@
       border-radius: 8px;
       loading: lazy;
     }
-    @media (min-width: 768px) {
-      .figure-card {
-        display: flex;
-        gap: 1.5rem;
-      }
-      .figure-image {
-        max-width: 300px;
-      }
+    .figure-info {
+      flex: 1;
+    }
+    .figure-info h2 {
+      font-size: 1.5rem;
+      margin: 0 0 0.5rem;
+      color: #e0e0e0;
+    }
+    .figure-info p {
+      margin: 0.3rem 0;
+      font-size: 1rem;
+    }
+    .figure-info a {
+      color: #007bff;
+      text-decoration: none;
+    }
+    .figure-info a:hover {
+      text-decoration: underline;
     }
   </style>
   <script>
-    function searchFigures() {
-      const input = document.getElementById('searchBox').value.toLowerCase();
-      document.querySelectorAll('.figure-card').forEach(card => {
-        card.style.display = card.textContent.toLowerCase().includes(input) ? '' : 'none';
+    document.addEventListener('DOMContentLoaded', () => {
+      const navLinks = document.querySelectorAll('.tree-view a');
+      const sections = document.querySelectorAll('section');
+      const banner = document.getElementById('mainBanner');
+      const parentLinks = document.querySelectorAll('.tree-parent > a');
+      const subLists = document.querySelectorAll('.tree-children');
+
+      // Load active link from localStorage
+      function loadState() {
+        const activeId = localStorage.getItem('activeNav');
+        if (activeId) {
+          const activeLink = document.querySelector(`a[href="#${activeId}"]`);
+          if (activeLink) {
+            activateLink(activeLink);
+          }
+        }
+      }
+
+      // Save active link to localStorage
+      function saveState(id) {
+        localStorage.setItem('activeNav', id);
+      }
+
+      // Activate a link and update UI
+      function activateLink(link) {
+        // Remove active state from all links
+        navLinks.forEach(l => l.classList.remove('active'));
+        sections.forEach(s => s.classList.remove('active'));
+        subLists.forEach(sl => sl.classList.remove('active'));
+        parentLinks.forEach(pl => pl.parentElement.classList.remove('active'));
+
+        // Add active state to clicked link and its section
+        link.classList.add('active');
+        const sectionId = link.getAttribute('href').slice(1);
+        const section = document.getElementById(sectionId);
+        if (section) {
+          section.classList.add('active');
+        }
+
+        // Show banner for subcategories
+        if (link.closest('.tree-children')) {
+          banner.src = `./images/banners/${sectionId.toLowerCase()}.jpg`;
+          banner.parentElement.classList.add('active');
+        } else {
+          banner.parentElement.classList.remove('active');
+        }
+
+        // Expand parent category
+        const parentLi = link.closest('.tree-parent');
+        if (parentLi) {
+          parentLi.classList.add('active');
+          const subList = parentLi.querySelector('.tree-children');
+          if (subList) {
+            subList.classList.add('active');
+          }
+        }
+
+        saveState(sectionId);
+      }
+
+      // Handle nav link clicks
+      navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          activateLink(link);
+        });
       });
-    }
+
+      // Search function
+      function searchFigures() {
+        const input = document.getElementById('searchBox').value.toLowerCase();
+        document.querySelectorAll('.figure-card').forEach(card => {
+          const isVisible = card.textContent.toLowerCase().includes(input);
+          card.style.display = isVisible ? '' : 'none';
+        });
+      }
+
+      document.getElementById('searchBox').addEventListener('input', searchFigures);
+
+      // Mobile nav toggle
+      document.getElementById('navToggle').addEventListener('click', () => {
+        document.getElementById('sidebar').classList.toggle('active');
+      });
+
+      // Initialize state
+      loadState();
+    });
   </script>
 </head>
 <body>
-  <main>
-    <div class="search-container">
-      <input type="text" id="searchBox" placeholder="Search figures..." oninput="searchFigures()">
-    </div>
-    <div class="banner">
-      <picture>
-        <source srcset="images/banners/default.jpg" type="image/jpg">
-        <img src="images/banners/default.jpg" alt="Figure Tracker Banner" loading="lazy">
-      </picture>
-    </div>
-    <section>
-      <h1>Bleach Figures</h1>
-      <div class="figure-card">
-        <div class="figure-image">
-          <picture>
-            <source srcset="images/Bleach/UlquiorraStirringSouls.jpg" type="image/jpg">
-            <img src="images/Bleach/UlquiorraStirringSouls.jpg" alt="Ulquiorra Figure" loading="lazy">
-          </picture>
-        </div>
-        <div class="figure-info">
-          <h2>Ulquiorra</h2>
-          <p><strong>Set:</strong> 一番くじ BLEACH Stirring Souls vol.3</p>
-          <p><strong>Released:</strong> August 2025</p>
-          <p><strong>Description:</strong> This Ulquiorra figure captures his iconic second release form, with intricate details on his wings and sword. A must-have for Bleach collectors.</p>
-          <a href="https://1kuji.com/products/bleach6" target="_blank">Buy / View Listing</a>
-        </div>
+  <button id="navToggle">☰ Menu</button>
+  <div class="layout">
+    <nav id="sidebar">
+      <div class="search-container">
+        <input type="text" id="searchBox" placeholder="Search figures...">
       </div>
-    </section>
-    <section>
-      <h1>Haikyu!! Figures</h1>
-      <div class="figure-card">
-        <div class="figure-image">
-          <picture>
-            <source srcset="images/Haikyu/Hinata_10th_Anniversary.jpg" type="image/jpg">
+      <div class="tree-view">
+        <h2>My Figures</h2>
+        <ul>
+          <li class="tree-parent">
+            <a href="#anime">Anime</a>
+            <ul class="tree-children">
+              <li><a href="#AirGear">Air Gear</a></li>
+              <li><a href="#AttackOnTitan">Attack on Titan</a></li>
+              <li><a href="#Berserk">Berserk</a></li>
+              <li><a href="#Bleach">Bleach</a></li>
+              <li><a href="#BlueLock">Blue Lock</a></li>
+              <li><a href="#ChainsawMan">Chainsaw Man</a></li>
+              <li><a href="#CodeGeass">Code Geass</a></li>
+              <li><a href="#DeathNote">Death Note</a></li>
+              <li><a href="#DemonSlayer">Demon Slayer</a></li>
+              <li><a href="#DragonBallZ">Dragon Ball Z</a></li>
+              <li><a href="#FireForce">FireForce</a></li>
+              <li><a href="#FullmetalAlchemist">Fullmetal Alchemist</a></li>
+              <li><a href="#GurrenLagann">Gurren Lagann</a></li>
+              <li><a href="#Haikyu">Haikyu!!</a></li>
+              <li><a href="#HellsParadise">Hell's Paradise</a></li>
+              <li><a href="#HunterXHunter">Hunter x Hunter</a></li>
+              <li><a href="#JujutsuKaisen">Jujutsu Kaisen</a></li>
+              <li><a href="#KaijuNo8">Kaiju No.8</a></li>
+              <li><a href="#KatekyoHitmanReborn">Katekyo Hitman Reborn!</a></li>
+              <li><a href="#KurokoNoBasket">Kuroko no Basket</a></li>
+              <li><a href="#Mashle">Mashle</a></li>
+              <li><a href="#MobPsycho100">Mob Psycho 100</a></li>
+              <li><a href="#Naruto">Naruto</a></li>
+              <li><a href="#OnePiece">One Piece</a></li>
+              <li><a href="#OnePunchMan">One-Punch Man</a></li>
+              <li><a href="#SakamotoDays">Sakamoto Days</a></li>
+              <li><a href="#ShangriLaFrontier">Shangri-La Frontier</a></li>
+              <li><a href="#SoloLeveling">Solo Leveling</a></li>
+              <li><a href="#SoulEater">Soul Eater</a></li>
+              <li><a href="#TheGodOfHighSchool">The God of High School</a></li>
+              <li><a href="#TokyoGhoul">Tokyo Ghoul</a></li>
+              <li><a href="#TokyoRevengers">Tokyo Revengers</a></li>
+              <li><a href="#TowerOfGod">Tower of God</a></li>
+              <li><a href="#UndeadUnluck">Undead Unluck</a></li>
+              <li><a href="#VinlandSaga">Vinland Saga</a></li>
+              <li><a href="#WindBreaker">Wind Breaker</a></li>
+              <li><a href="#YuYuHakusho">Yu Yu Hakusho</a></li>
+            </ul>
+          </li>
+          <li class="tree-parent">
+            <a href="#games">Games</a>
+            <ul class="tree-children">
+              <li><a href="#Zelda">Zelda</a></li>
+              <li><a href="#FinalFantasy">Final Fantasy</a></li>
+            </ul>
+          </li>
+          <li class="tree-parent">
+            <a href="#purchased">Purchased</a>
+            <ul class="tree-children">
+              <li><a href="#RecentPurchases">Recent Purchases</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <main>
+      <div class="banner" id="mainBannerContainer">
+        <img id="mainBanner" src="./images/banners/default.jpg" alt="Figure Tracker Banner" loading="lazy">
+      </div>
+      <section id="AirGear">
+        <h1>Air Gear Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/AirGear/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>Air Gear Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="AttackOnTitan">
+        <h1>Attack on Titan Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/AttackOnTitan/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>Attack on Titan Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="Berserk">
+        <h1>Berserk Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/Berserk/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>Berserk Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="Bleach">
+        <h1>Bleach Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/Bleach/UlquiorraStirringSouls.jpg" alt="Ulquiorra Figure" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>Ulquiorra</h2>
+            <p><strong>Set:</strong> 一番くじ BLEACH Stirring Souls vol.3</p>
+            <p><strong>Released:</strong> August 2025</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="https://1kuji.com/products/bleach6" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/Bleach/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>Bleach Figure 2</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="BlueLock">
+        <h1>Blue Lock Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/BlueLock/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>Blue Lock Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="ChainsawMan">
+        <h1>Chainsaw Man Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/ChainsawMan/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>Chainsaw Man Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="CodeGeass">
+        <h1>Code Geass Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/CodeGeass/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>Code Geass Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="DeathNote">
+        <h1>Death Note Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/DeathNote/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>Death Note Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="DemonSlayer">
+        <h1>Demon Slayer Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/DemonSlayer/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>Demon Slayer Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="DragonBallZ">
+        <h1>Dragon Ball Z Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/DragonBallZ/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>Dragon Ball Z Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="FireForce">
+        <h1>FireForce Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/FireForce/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>FireForce Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="FullmetalAlchemist">
+        <h1>Fullmetal Alchemist Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/FullmetalAlchemist/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>Fullmetal Alchemist Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="GurrenLagann">
+        <h1>Gurren Lagann Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/GurrenLagann/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>Gurren Lagann Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="Haikyu">
+        <h1>Haikyu!! Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
             <img src="images/Haikyu/Hinata_10th_Anniversary.jpg" alt="Hinata Figure" loading="lazy">
-          </picture>
+          </div>
+          <div class="figure-info">
+            <h2>Hinata Shoyo</h2>
+            <p><strong>Set:</strong> 10th Anniversary Memorial Kuji</p>
+            <p><strong>Released:</strong> June 14, 2025</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="https://1kuji.com/products/haikyu28_02" target="_blank">Buy / View Listing</a>
+          </div>
         </div>
-        <div class="figure-info">
-          <h2>Hinata Shoyo</h2>
-          <p><strong>Set:</strong> 10th Anniversary Memorial Kuji</p>
-          <p><strong>Released:</strong> June 14, 2025</p>
-          <p><strong>Description:</strong> Celebrating Haikyu!!’s 10th anniversary, this Hinata figure showcases his dynamic volleyball pose.</p>
-          <a href="https://1kuji.com/products/haikyu28_02" target="_blank">Buy / View Listing</a>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/Haikyu/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>Haikyu Figure 2</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
         </div>
-      </div>
-    </section>
-  </main>
+      </section>
+      <section id="HellsParadise">
+        <h1>Hell's Paradise Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/HellsParadise/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>Hell's Paradise Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="HunterXHunter">
+        <h1>Hunter x Hunter Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/HunterXHunter/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>Hunter x Hunter Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="JujutsuKaisen">
+        <h1>Jujutsu Kaisen Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/JujutsuKaisen/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>Jujutsu Kaisen Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="KaijuNo8">
+        <h1>Kaiju No.8 Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/KaijuNo8/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>Kaiju No.8 Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="KatekyoHitmanReborn">
+        <h1>Katekyo Hitman Reborn! Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/KatekyoHitmanReborn/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>Katekyo Hitman Reborn Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="KurokoNoBasket">
+        <h1>Kuroko no Basket Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/KurokoNoBasket/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>Kuroko no Basket Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="Mashle">
+        <h1>Mashle Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/Mashle/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>Mashle Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="MobPsycho100">
+        <h1>Mob Psycho 100 Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/MobPsycho100/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>Mob Psycho 100 Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="Naruto">
+        <h1>Naruto Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/Naruto/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>Naruto Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="OnePiece">
+        <h1>One Piece Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/OnePiece/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>One Piece Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="OnePunchMan">
+        <h1>One-Punch Man Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/OnePunchMan/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>One-Punch Man Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="SakamotoDays">
+        <h1>Sakamoto Days Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/SakamotoDays/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>Sakamoto Days Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="ShangriLaFrontier">
+        <h1>Shangri-La Frontier Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/ShangriLaFrontier/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>Shangri-La Frontier Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="SoloLeveling">
+        <h1>Solo Leveling Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/SoloLeveling/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>Solo Leveling Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="SoulEater">
+        <h1>Soul Eater Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/SoulEater/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>Soul Eater Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="TheGodOfHighSchool">
+        <h1>The God of High School Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/TheGodOfHighSchool/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>The God of High School Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="TokyoGhoul">
+        <h1>Tokyo Ghoul Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/TokyoGhoul/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>Tokyo Ghoul Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="TokyoRevengers">
+        <h1>Tokyo Revengers Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/TokyoRevengers/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>Tokyo Revengers Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="TowerOfGod">
+        <h1>Tower of God Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/TowerOfGod/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>Tower of God Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="UndeadUnluck">
+        <h1>Undead Unluck Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/UndeadUnluck/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>Undead Unluck Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="VinlandSaga">
+        <h1>Vinland Saga Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/VinlandSaga/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>Vinland Saga Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="WindBreaker">
+        <h1>Wind Breaker Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/WindBreaker/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>Wind Breaker Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="YuYuHakusho">
+        <h1>Yu Yu Hakusho Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/YuYuHakusho/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>Yu Yu Hakusho Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="Zelda">
+        <h1>Zelda Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/Zelda/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>Zelda Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="FinalFantasy">
+        <h1>Final Fantasy Figures</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/FinalFantasy/placeholder.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>Final Fantasy Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+      <section id="RecentPurchases">
+        <h1>Recent Purchases</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="./images/RecentPurchases/default.jpg" alt="Placeholder" loading="lazy">
+          </div>
+          <div class="figure-info">
+            <h2>Recent Purchase Figure</h2>
+            <p><strong>Set:</strong> [Placeholder Set]</p>
+            <p><strong>Released:</strong> [Placeholder Date]</p>
+            <p><strong>Description:</strong> [Placeholder Description]</p>
+            <a href="#" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
 </body>
 </html>
