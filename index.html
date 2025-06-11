@@ -59,12 +59,13 @@
       font-size: 1.5rem;
       margin-bottom: 1rem;
     }
-    nav ul {
+    nav ul, .tree-view {
       list-style: none;
       padding: 0;
     }
-    nav li {
+    nav li, .tree-view label {
       margin: 0.5rem 0;
+      display: block;
     }
     nav a {
       color: #aaa;
@@ -74,14 +75,12 @@
     nav a:hover {
       color: #fff;
     }
-    .tree-view label {
-      display: flex;
-      align-items: center;
-      font-size: 0.95rem;
-      margin-bottom: 0.3rem;
+    .tree-children {
+      margin-left: 1rem;
+      display: none;
     }
-    .tree-view input[type="checkbox"] {
-      margin-right: 0.5rem;
+    .tree-toggle:checked + label + .tree-children {
+      display: block;
     }
     #searchBox {
       width: 100%;
@@ -94,10 +93,12 @@
       flex: 1;
       padding: 2rem;
       margin-left: 250px;
-      max-width: 800px;
+      max-width: 900px;
       border-left: 1px solid #333;
       border-right: 1px solid #333;
       min-height: 100vh;
+      margin-right: auto;
+      margin-left: auto;
     }
     @media (max-width: 767px) {
       main {
@@ -181,6 +182,11 @@
       const nav = document.getElementById('sidebar');
       nav.classList.toggle('hidden');
     }
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.innerWidth <= 767) {
+        document.getElementById('sidebar').classList.add('hidden');
+      }
+    });
   </script>
 </head>
 <body>
@@ -190,57 +196,46 @@
       <h2>My Figures</h2>
       <input type="text" id="searchBox" placeholder="Search figures..." oninput="searchFigures()">
       <div class="tree-view">
-        <label><input type="checkbox" checked onclick="document.getElementById('Anime').style.display = this.checked ? 'block' : 'none'"> Anime</label>
-        <label><input type="checkbox" onclick="document.getElementById('Games').style.display = this.checked ? 'block' : 'none'"> Games</label>
-        <label><input type="checkbox" onclick="document.getElementById('Purchased').style.display = this.checked ? 'block' : 'none'"> Purchased</label>
+        <input type="checkbox" id="animeToggle" class="tree-toggle">
+        <label for="animeToggle">Anime</label>
+        <div class="tree-children">
+          <label><input type="checkbox" onclick="document.getElementById('Bleach').style.display = this.checked ? 'block' : 'none'" checked> Bleach</label>
+          <label><input type="checkbox" onclick="document.getElementById('Haikyu').style.display = this.checked ? 'block' : 'none'" checked> Haikyu!!</label>
+          <!-- Add more anime categories here following the pattern above -->
+        </div>
       </div>
     </nav>
     <main>
       <div class="banner">
-        <img src="images/bleach/Bleach_Title.jpg">
+        <img src="images/Bleach/Bleach_title.jpg">
       </div>
-
-      <section id="Anime">
-        <h1>Anime</h1>
-        <section id="Bleach">
-          <h1>Bleach</h1>
-          <div class="figure-card">
-            <div class="figure-image">
-              <img src="images/bleach/Ulquiorra-Stirring-Souls.jpg">
-            </div>
-            <div class="figure-info">
-              <h2>Ulquiorra</h2>
-              <p><strong>Set:</strong> 一番くじ BLEACH Stirring Souls vol.3</p>
-              <p><strong>Released:</strong> August 2025</p>
-              <a href="https://1kuji.com/products/bleach6" target="_blank">Buy / View Listing</a>
-            </div>
+      <section id="Bleach">
+        <h1>Bleach</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="images/bleach/Ulquiorra-Stirring-Souls.jpg">
           </div>
-        </section>
-
-        <section id="Haikyu">
-          <h1>Haikyu!!</h1>
-          <div class="figure-card">
-            <div class="figure-image">
-              <img src="images/Haikyu/Hinata_10th_Anniversary.jpg">
-            </div>
-            <div class="figure-info">
-              <h2>Hinata Shoyo</h2>
-              <p><strong>Set:</strong> 10th Anniversary Memorial Kuji</p>
-              <p><strong>Released:</strong> June 14, 2025</p>
-              <a href="https://1kuji.com/products/haikyu28_02" target="_blank">Buy / View Listing</a>
-            </div>
+          <div class="figure-info">
+            <h2>Ulquiorra</h2>
+            <p><strong>Set:</strong> 一番くじ BLEACH Stirring Souls vol.3</p>
+            <p><strong>Released:</strong> August 2025</p>
+            <a href="https://1kuji.com/products/bleach6" target="_blank">Buy / View Listing</a>
           </div>
-        </section>
+        </div>
       </section>
-
-      <section id="Games" style="display:none">
-        <h1>Games</h1>
-        <p>No game-related figures added yet.</p>
-      </section>
-
-      <section id="Purchased" style="display:none">
-        <h1>Purchased</h1>
-        <p>No purchased figures yet.</p>
+      <section id="Haikyu">
+        <h1>Haikyu!!</h1>
+        <div class="figure-card">
+          <div class="figure-image">
+            <img src="images/Haikyu/Hinata_10th_Anniversary.jpg">
+          </div>
+          <div class="figure-info">
+            <h2>Hinata Shoyo</h2>
+            <p><strong>Set:</strong> 10th Anniversary Memorial Kuji</p>
+            <p><strong>Released:</strong> June 14, 2025</p>
+            <a href="https://1kuji.com/products/haikyu28_02" target="_blank">Buy / View Listing</a>
+          </div>
+        </div>
       </section>
     </main>
   </div>
