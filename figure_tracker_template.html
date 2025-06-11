@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Figure Collection Tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #111;
+      color: #fff;
+      margin: 0;
+      padding: 2rem;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .tabs {
+      list-style: none;
+      display: flex;
+      justify-content: center;
+      padding: 0;
+      margin-bottom: 2rem;
+    }
+    .tabs li {
+      margin: 0 1rem;
+      cursor: pointer;
+      padding: 0.5rem 1rem;
+      background: #333;
+      border-radius: 5px;
+    }
+    .tabs li:hover {
+      background: #555;
+    }
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+    }
+    .card {
+      background-color: #222;
+      border-radius: 10px;
+      overflow: hidden;
+      transition: transform 0.2s;
+    }
+    .card:hover {
+      transform: scale(1.03);
+    }
+    .card img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .card-content {
+      padding: 1rem;
+    }
+    .card-content h2 {
+      font-size: 1.2rem;
+      margin: 0 0 0.5rem 0;
+    }
+    .card-content p {
+      font-size: 0.9rem;
+      margin: 0.2rem 0;
+    }
+    .card-content a {
+      display: inline-block;
+      margin-top: 0.5rem;
+      color: #0af;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Figure Collection Tracker</h1>
+  <ul class="tabs">
+    <li onclick="showTab('wishlist')">Wishlist</li>
+    <li onclick="showTab('purchased')">Purchased</li>
+  </ul>
+  <div id="wishlist" class="gallery">
+    <div class="card" data-status="wishlist" data-anime="Bleach">
+      <a href="https://1kuji.com/products/bleach6" target="_blank">
+        <img src="/mnt/data/78c035a7-e286-4d53-af2f-55488869a2e8.png" alt="Ulquiorra Figure">
+      </a>
+      <div class="card-content">
+        <h2>Ulquiorra</h2>
+        <p><strong>Anime:</strong> Bleach</p>
+        <p><strong>Set:</strong> 一番くじ BLEACH Stirring Souls vol.3</p>
+        <p><strong>Release:</strong> August 2025</p>
+        <a href="https://1kuji.com/products/bleach6" target="_blank">Buy / View Listing</a>
+      </div>
+    </div>
+  </div>
+  <div id="purchased" class="gallery" style="display:none;">
+    <!-- Add purchased figures here -->
+  </div>
+  <script>
+    function showTab(id) {
+      document.querySelectorAll('.gallery').forEach(g => g.style.display = 'none');
+      document.getElementById(id).style.display = 'grid';
+    }
+  </script>
+</body>
+</html>
