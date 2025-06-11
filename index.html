@@ -4,19 +4,30 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Figure Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
-      font-family: 'Roboto', system-ui, sans-serif; /* Matches Wix’s common font */
-      background-color: #f5f5f5; /* Light background like Wix defaults */
+      font-family: 'Roboto', system-ui, sans-serif;
+      background-color: #f5f5f5;
       color: #333;
       line-height: 1.6;
     }
     main {
-      max-width: 980px; /* Wix’s typical content width */
+      max-width: 980px;
       margin: 0 auto;
       padding: 2rem 1rem;
       min-height: 100vh;
+    }
+    .search-container {
+      margin-bottom: 2rem;
+    }
+    #searchBox {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 1rem;
     }
     .banner {
       margin: 2rem 0;
@@ -28,6 +39,7 @@
       max-height: 300px;
       object-fit: cover;
       border-radius: 8px;
+      loading: lazy;
     }
     section {
       margin-bottom: 3rem;
@@ -69,6 +81,7 @@
       max-width: 300px;
       height: auto;
       border-radius: 8px;
+      loading: lazy;
     }
     @media (min-width: 768px) {
       .figure-card {
@@ -80,22 +93,40 @@
       }
     }
   </style>
+  <script>
+    function searchFigures() {
+      const input = document.getElementById('searchBox').value.toLowerCase();
+      document.querySelectorAll('.figure-card').forEach(card => {
+        card.style.display = card.textContent.toLowerCase().includes(input) ? '' : 'none';
+      });
+    }
+  </script>
 </head>
 <body>
   <main>
+    <div class="search-container">
+      <input type="text" id="searchBox" placeholder="Search figures..." oninput="searchFigures()">
+    </div>
     <div class="banner">
-      <img src="images/banners/default.jpg" alt="Figure Tracker Banner">
+      <picture>
+        <source srcset="images/banners/default.webp" type="image/webp">
+        <img src="images/banners/default.jpg" alt="Figure Tracker Banner" loading="lazy">
+      </picture>
     </div>
     <section>
       <h1>Bleach Figures</h1>
       <div class="figure-card">
         <div class="figure-image">
-          <img src="images/Bleach/UlquiorraStirringSouls.jpg" alt="Ulquiorra Figure">
+          <picture>
+            <source srcset="images/Bleach/UlquiorraStirringSouls.webp" type="image/webp">
+            <img src="images/Bleach/UlquiorraStirringSouls.jpg" alt="Ulquiorra Figure" loading="lazy">
+          </picture>
         </div>
         <div class="figure-info">
           <h2>Ulquiorra</h2>
           <p><strong>Set:</strong> 一番くじ BLEACH Stirring Souls vol.3</p>
           <p><strong>Released:</strong> August 2025</p>
+          <p><strong>Description:</strong> This Ulquiorra figure captures his iconic second release form, with intricate details on his wings and sword. A must-have for Bleach collectors.</p>
           <a href="https://1kuji.com/products/bleach6" target="_blank">Buy / View Listing</a>
         </div>
       </div>
@@ -104,12 +135,16 @@
       <h1>Haikyu!! Figures</h1>
       <div class="figure-card">
         <div class="figure-image">
-          <img src="images/Haikyu/Hinata_10th_Anniversary.jpg" alt="Hinata Figure">
+          <picture>
+            <source srcset="images/Haikyu/Hinata_10th_Anniversary.webp" type="image/webp">
+            <img src="images/Haikyu/Hinata_10th_Anniversary.jpg" alt="Hinata Figure" loading="lazy">
+          </picture>
         </div>
         <div class="figure-info">
           <h2>Hinata Shoyo</h2>
           <p><strong>Set:</strong> 10th Anniversary Memorial Kuji</p>
           <p><strong>Released:</strong> June 14, 2025</p>
+          <p><strong>Description:</strong> Celebrating Haikyu!!’s 10th anniversary, this Hinata figure showcases his dynamic volleyball pose.</p>
           <a href="https://1kuji.com/products/haikyu28_02" target="_blank">Buy / View Listing</a>
         </div>
       </div>
