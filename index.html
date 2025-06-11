@@ -35,14 +35,18 @@
     }
     .gallery {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 2rem;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1.5rem;
+      max-width: 1200px;
+      margin: 0 auto;
     }
     .card {
-      background-color: #222;
+      background-color: #1a1a1a;
+      border: 1px solid #333;
       border-radius: 10px;
       overflow: hidden;
-      transition: transform 0.2s;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+      transition: transform 0.2s ease-in-out;
     }
     .card:hover {
       transform: scale(1.03);
@@ -69,6 +73,9 @@
       color: #0af;
       text-decoration: none;
     }
+    .card-content a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
@@ -81,7 +88,6 @@
     <div class="card" data-status="wishlist" data-anime="Bleach">
       <a href="https://1kuji.com/products/bleach6" target="_blank">
         <img src="images/Ulquiorra-Stirring-Souls.jpg" alt="Ulquiorra Figure">
-        
       </a>
       <div class="card-content">
         <h2>Ulquiorra</h2>
@@ -91,10 +97,25 @@
         <a href="https://1kuji.com/products/bleach6" target="_blank">Buy / View Listing</a>
       </div>
     </div>
+
+    <div class="card" data-status="wishlist" data-anime="Haikyu!!">
+      <a href="https://1kuji.com/products/haikyu28_02" target="_blank">
+        <img src="images/Hinata_10th_Anniversary.jpg" alt="Hinata Figure">
+      </a>
+      <div class="card-content">
+        <h2>Hinata Shoyo</h2>
+        <p><strong>Anime:</strong> Haikyu!!</p>
+        <p><strong>Set:</strong> 10th Anniversary Memorial Kuji</p>
+        <p><strong>Release:</strong> Check Product Page</p>
+        <a href="https://1kuji.com/products/haikyu28_02" target="_blank">Buy / View Listing</a>
+      </div>
+    </div>
   </div>
+
   <div id="purchased" class="gallery" style="display:none;">
     <!-- Add purchased figures here -->
   </div>
+
   <script>
     function showTab(id) {
       document.querySelectorAll('.gallery').forEach(g => g.style.display = 'none');
