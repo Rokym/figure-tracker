@@ -4,262 +4,151 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Figure Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
-      font-family: system-ui, sans-serif;
-      background-color: #0c0c0c;
-      color: #e0e0e0;
-      overflow-x: hidden;
+      font-family: 'Roboto', system-ui, sans-serif;
+      background-color: #f5f5f5;
+      color: #333;
+      line-height: 1.6;
     }
-    .layout {
-      display: flex;
-      flex-direction: row;
-    }
-    @media (max-width: 767px) {
-      .layout {
-        flex-direction: column;
-      }
-    }
-    nav {
-      width: 250px;
-      min-height: 100vh;
-      background-color: #121212;
+    main {
+      max-width: 980px;
+      margin: 0 auto;
       padding: 2rem 1rem;
-      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
-      position: fixed;
-      top: 0;
-      left: 0;
-      transform: translateX(0);
-      transition: transform 0.3s ease;
-      z-index: 1000;
-      overflow-y: auto;
+      min-height: 100vh;
     }
-    nav.hidden {
-      transform: translateX(-100%);
-    }
-    #navToggle {
-      display: none;
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      background: #333;
-      color: #fff;
-      border: none;
-      padding: 10px;
-      z-index: 1100;
-    }
-    @media (max-width: 767px) {
-      #navToggle {
-        display: block;
-      }
-    }
-    nav h2 {
-      color: #fff;
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
-    }
-    nav ul, .tree-view {
-      list-style: none;
-      padding: 0;
-    }
-    nav li, .tree-view label {
-      margin: 0.5rem 0;
-      display: block;
-    }
-    nav a {
-      color: #aaa;
-      text-decoration: none;
-      font-size: 1.05rem;
-    }
-    nav a:hover {
-      color: #fff;
-    }
-    .tree-children {
-      margin-left: 1rem;
-      display: none;
-    }
-    .tree-toggle:checked + label + .tree-children {
-      display: block;
+    .search-container {
+      margin-bottom: 2rem;
     }
     #searchBox {
       width: 100%;
       padding: 0.5rem;
-      margin-bottom: 1rem;
-      border: none;
+      border: 1px solid #ccc;
       border-radius: 5px;
-    }
-    main {
-      flex: 1;
-      padding: 2rem;
-      margin-left: 250px;
-      max-width: 900px;
-      border-left: 1px solid #333;
-      border-right: 1px solid #333;
-      min-height: 100vh;
-      margin-right: auto;
-      margin-left: auto;
-    }
-    @media (max-width: 767px) {
-      main {
-        margin-left: 0;
-        padding-top: 60px;
-        border-left: none;
-        border-right: none;
-      }
+      font-size: 1rem;
     }
     .banner {
-      margin: 2rem auto;
+      margin: 2rem 0;
       max-width: 100%;
     }
     .banner img {
       width: 100%;
       height: auto;
-      max-height: 350px;
+      max-height: 300px;
       object-fit: cover;
-      border-radius: 10px;
+      border-radius: 8px;
+      loading: lazy;
     }
     section {
-      margin-bottom: 4rem;
-      border-top: 1px solid #333;
-      padding-top: 2rem;
+      margin-bottom: 3rem;
+      padding-top: 1rem;
     }
     section h1 {
-      font-size: 2rem;
-      border-bottom: 2px solid #333;
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid #e0e0e0;
       padding-bottom: 0.5rem;
-      margin-bottom: 2rem;
     }
     .figure-card {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      margin-bottom: 3rem;
-      border-bottom: 1px solid #444;
-      padding-bottom: 1.5rem;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #e0e0e0;
     }
-    @media (min-width: 768px) {
-      .figure-card {
-        flex-direction: row;
-        align-items: flex-start;
-      }
+    .figure-card h2 {
+      font-size: 1.5rem;
+      margin: 0 0 0.5rem;
+    }
+    .figure-card p {
+      margin: 0.3rem 0;
+      font-size: 1rem;
+    }
+    .figure-card a {
+      color: #007bff;
+      text-decoration: none;
+    }
+    .figure-card a:hover {
+      text-decoration: underline;
     }
     .figure-image {
-      flex-shrink: 0;
-      width: 100%;
-      max-width: 300px;
+      max-width: 100%;
+      margin-bottom: 1rem;
     }
     .figure-image img {
       width: 100%;
+      max-width: 300px;
       height: auto;
       border-radius: 8px;
+      loading: lazy;
     }
-    .figure-info {
-      flex: 1;
-    }
-    .figure-info h2 {
-      font-size: 1.25rem;
-      margin: 0 0 0.5rem 0;
-    }
-    .figure-info p {
-      margin: 0.2rem 0;
-      font-size: 0.95rem;
-    }
-    .figure-info a {
-      color: #0af;
-      text-decoration: none;
-    }
-    .figure-info a:hover {
-      text-decoration: underline;
+    @media (min-width: 768px) {
+      .figure-card {
+        display: flex;
+        gap: 1.5rem;
+      }
+      .figure-image {
+        max-width: 300px;
+      }
     }
   </style>
   <script>
     function searchFigures() {
       const input = document.getElementById('searchBox').value.toLowerCase();
       document.querySelectorAll('.figure-card').forEach(card => {
-        card.style.display = card.innerText.toLowerCase().includes(input) ? 'flex' : 'none';
+        card.style.display = card.textContent.toLowerCase().includes(input) ? '' : 'none';
       });
     }
-
-    function toggleNav() {
-      const nav = document.getElementById('sidebar');
-      nav.classList.toggle('hidden');
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      if (window.innerWidth <= 767) {
-        document.getElementById('sidebar').classList.add('hidden');
-      }
-
-      const checkboxes = document.querySelectorAll('.tree-children input[type="checkbox"]');
-      const banner = document.getElementById('mainBanner');
-
-      function updateBanner() {
-        const selected = Array.from(checkboxes)
-          .filter(cb => cb.checked)
-          .map(cb => cb.nextSibling.textContent.trim().toLowerCase().replace(/[^a-z0-9]/g, ''));
-
-        if (selected.length === 1) {
-          banner.src = `images/banners/${selected[0]}.jpg`;
-        } else {
-          banner.src = 'images/banners/default.jpg';
-        }
-      }
-
-      checkboxes.forEach(cb => cb.addEventListener('change', updateBanner));
-      updateBanner();
-    });
   </script>
 </head>
 <body>
-  <button id="navToggle" onclick="toggleNav()">☰ Menu</button>
-  <div class="layout">
-    <nav id="sidebar">
-      <h2>My Figures</h2>
+  <main>
+    <div class="search-container">
       <input type="text" id="searchBox" placeholder="Search figures..." oninput="searchFigures()">
-      <div class="tree-view">
-        <input type="checkbox" id="animeToggle" class="tree-toggle">
-        <label for="animeToggle">Anime</label>
-        <div class="tree-children">
-          <label><input type="checkbox" onclick="document.getElementById('Bleach').style.display = this.checked ? 'block' : 'none'" checked> Bleach</label>
-          <label><input type="checkbox" onclick="document.getElementById('Haikyu').style.display = this.checked ? 'block' : 'none'" checked> Haikyu!!</label>
-          <!-- Add more anime categories here following the pattern above -->
+    </div>
+    <div class="banner">
+      <picture>
+        <source srcset="images/banners/default.webp" type="image/webp">
+        <img src="images/banners/default.jpg" alt="Figure Tracker Banner" loading="lazy">
+      </picture>
+    </div>
+    <section>
+      <h1>Bleach Figures</h1>
+      <div class="figure-card">
+        <div class="figure-image">
+          <picture>
+            <source srcset="images/Bleach/UlquiorraStirringSouls.webp" type="image/webp">
+            <img src="images/Bleach/UlquiorraStirringSouls.jpg" alt="Ulquiorra Figure" loading="lazy">
+          </picture>
+        </div>
+        <div class="figure-info">
+          <h2>Ulquiorra</h2>
+          <p><strong>Set:</strong> 一番くじ BLEACH Stirring Souls vol.3</p>
+          <p><strong>Released:</strong> August 2025</p>
+          <p><strong>Description:</strong> This Ulquiorra figure captures his iconic second release form, with intricate details on his wings and sword. A must-have for Bleach collectors.</p>
+          <a href="https://1kuji.com/products/bleach6" target="_blank">Buy / View Listing</a>
         </div>
       </div>
-    </nav>
-    <main>
-      <div class="banner">
-        <img id="mainBanner" src="images/banners/default.jpg">
+    </section>
+    <section>
+      <h1>Haikyu!! Figures</h1>
+      <div class="figure-card">
+        <div class="figure-image">
+          <picture>
+            <source srcset="images/Haikyu/Hinata_10th_Anniversary.webp" type="image/webp">
+            <img src="images/Haikyu/Hinata_10th_Anniversary.jpg" alt="Hinata Figure" loading="lazy">
+          </picture>
+        </div>
+        <div class="figure-info">
+          <h2>Hinata Shoyo</h2>
+          <p><strong>Set:</strong> 10th Anniversary Memorial Kuji</p>
+          <p><strong>Released:</strong> June 14, 2025</p>
+          <p><strong>Description:</strong> Celebrating Haikyu!!’s 10th anniversary, this Hinata figure showcases his dynamic volleyball pose.</p>
+          <a href="https://1kuji.com/products/haikyu28_02" target="_blank">Buy / View Listing</a>
+        </div>
       </div>
-      <section id="Bleach">
-        <h1>Bleach</h1>
-        <div class="figure-card">
-          <div class="figure-image">
-            <img src="images/Bleach/UlquiorraStirringSouls.jpg">
-          </div>
-          <div class="figure-info">
-            <h2>Ulquiorra</h2>
-            <p><strong>Set:</strong> 一番くじ BLEACH Stirring Souls vol.3</p>
-            <p><strong>Released:</strong> August 2025</p>
-            <a href="https://1kuji.com/products/bleach6" target="_blank">Buy / View Listing</a>
-          </div>
-        </div>
-      </section>
-      <section id="Haikyu">
-        <h1>Haikyu!!</h1>
-        <div class="figure-card">
-          <div class="figure-image">
-            <img src="images/Haikyu/Hinata_10th_Anniversary.jpg">
-          </div>
-          <div class="figure-info">
-            <h2>Hinata Shoyo</h2>
-            <p><strong>Set:</strong> 10th Anniversary Memorial Kuji</p>
-            <p><strong>Released:</strong> June 14, 2025</p>
-            <a href="https://1kuji.com/products/haikyu28_02" target="_blank">Buy / View Listing</a>
-          </div>
-        </div>
-      </section>
-    </main>
-  </div>
+    </section>
+  </main>
 </body>
 </html>
