@@ -1,135 +1,819 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Sets up the page to use standard text encoding and scale on phones -->
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Title shown in the browser tab -->
-    <title>Figure Tracker</title>
-    <!-- Basic CSS styling to make the page look good -->
-    <style>
-        /* Makes the page use a clean font and layout */
-        body { 
-            display: flex; /* Sidebar and main content side by side */
-            font-family: Arial, sans-serif; /* Nice readable font */
-            margin: 0; /* No extra space around the page */
-        }
-        /* Styles the sidebar (menu) */
-        .sidebar { 
-            width: 250px; /* Wider to fit long series names */
-            background: #f4f4f4; /* Light gray background */
-            padding: 20px; /* Space inside */
-        }
-        /* Removes bullet points from lists */
-        .sidebar ul { 
-            list-style: none; 
-            padding: 0; 
-        }
-        /* Adds space between sidebar items and makes them clickable */
-        .sidebar li { 
-            margin: 10px 0; 
-            cursor: pointer; /* Hand icon when hovering */
-        }
-        /* Indents sub-items (like Air Gear under Anime) */
-        .sidebar ul ul { 
-            padding-left: 20px; 
-        }
-        /* Styles the main content area */
-        .main { 
-            flex-grow: 1; /* Takes up remaining space */
-            padding: 20px; /* Space inside */
-        }
-        /* Styles each figure box */
-        .figure { 
-            display: flex; /* Image and details side by side */
-            margin-bottom: 20px; /* Space between figures */
-            border: 1px solid #ddd; /* Light border */
-            padding: 10px; /* Space inside */
-        }
-        /* Styles figure images */
-        .figure img { 
-            width: 100px; /* Fixed width */
-            height: auto; /* Keeps proportions */
-            margin-right: 20px; /* Space to the right */
-        }
-        /* Styles figure details */
-        .figure-details h3 { 
-            margin: 0 0 10px; /* Space below name */
-        }
-        .figure-details p { 
-            margin: 5px 0; /* Space between lines */
-        }
-    </style>
+  <!-- === HEAD SECTION === -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Figure Tracker - Dark Theme</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* Your existing CSS remains unchanged */
+    body {
+      margin: 0;
+      font-family: 'Roboto', system-ui, sans-serif;
+      background-color: #1a1a1a;
+      color: #e0e0e0;
+      line-height: 1.6;
+      position: relative;
+    }
+    .layout {
+      display: flex;
+      flex-direction: row;
+    }
+    @media (max-width: 767px) {
+      .layout {
+        flex-direction: column;
+      }
+    }
+    nav {
+      width: 250px;
+      min-height: 100vh;
+      background-color: #000;
+      padding: 1rem;
+      position: fixed;
+      top: 0;
+      left: 0;
+      transform: translateX(0);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+      overflow-y: auto;
+      max-height: 100vh;
+    }
+    nav.hidden {
+      transform: translateX(-100%);
+    }
+    #navToggle {
+      display: none;
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      background: #333;
+      color: #fff;
+      border: none;
+      padding: 10px;
+      z-index: 1100;
+      cursor: pointer;
+    }
+    @media (max-width: 767px) {
+      #navToggle {
+        display: block;
+      }
+      nav {
+        transform: translateX(-100%);
+        max-height: 100vh;
+      }
+      nav.active {
+        transform: translateX(0);
+      }
+    }
+    .search-container {
+      margin-bottom: 1.5rem;
+    }
+    #searchBox {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #333;
+      border-radius: 5px;
+      background-color: #1a1a1a;
+      color: #e0e0e0;
+      font-size: 1rem;
+    }
+    details {
+      margin-bottom: 1rem;
+    }
+    summary {
+      background-color: #131211;
+      color: #949393;
+      padding: 0.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      list-style: none;
+    }
+    summary:hover {
+      background-color: #1d1d1d;
+    }
+    details[open] summary {
+      background-color: #2a2a2a;
+      color: #f1f1f1;
+    }
+    .tree-view ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 0 1rem;
+    }
+    .tree-view li {
+      margin: 0.3rem 0;
+    }
+    .tree-view a {
+      color: #e0e0e0;
+      text-decoration: none;
+      font-size: 1rem;
+      display: block;
+      padding: 0.5rem;
+      border-radius: 4px;
+      transition: background-color 0.2s;
+    }
+    .tree-view a:hover {
+      color: #666;
+    }
+    .tree-view a.active {
+      background-color: #1d1d1d;
+      color: #e0e0e0;
+    }
+    main {
+      flex: 1;
+      padding: 2rem;
+      margin-left: 260px;
+      max-width: 1400px;
+      border-left: 1px solid #333;
+      border-right: 1px solid #333;
+      min-height: 100vh;
+      margin-right: auto;
+    }
+    @media (max-width: 767px) {
+      main {
+        margin-left: 0;
+        padding-top: 60px;
+        border-left: none;
+        border-right: none;
+      }
+    }
+    .banner {
+      margin: 1.5rem 0;
+      max-width: 100%;
+      max-height: 150px;
+      overflow: hidden;
+      display: none;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    .banner.active {
+      display: block;
+    }
+    .banner img {
+      width: 100%;
+      height: 150px;
+      object-fit: contain;
+      border-radius: 8px;
+      loading: lazy;
+    }
+    @media (max-width: 767px) {
+      .banner img {
+        height: 100px;
+      }
+    }
+    section {
+      margin-bottom: 2rem;
+      padding-top: 1rem;
+      display: none;
+    }
+    section.active {
+      display: block;
+    }
+    section h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      border-bottom: 2px solid #666;
+      padding-bottom: 0.5rem;
+      color: #fff;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    section h1::after {
+      content: ' (' attr(data-count) ')';
+      font-size: 1.2rem;
+      color: #949393;
+      margin-left: 0.5rem;
+    }
+    .figure-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.2rem;
+    }
+    @media (max-width: 767px) {
+      .figure-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    .figure-card {
+      padding-bottom: 0.8rem;
+      border-bottom: 1px solid #444;
+      transition: transform 0.2s;
+    }
+    .figure-card:hover {
+      transform: translateY(-2px);
+    }
+    .figure-image {
+      max-width: 100%;
+    }
+    .figure-image img {
+      width: 100%;
+      max-width: 200px;
+      height: auto;
+      border-radius: 6px;
+      loading: lazy;
+    }
+    .figure-info {
+      margin-top: 0.4rem;
+    }
+    .figure-info h2 {
+      font-size: 1.4rem;
+      margin: 0 0 0.4rem;
+      color: #e0e0e0;
+    }
+    .figure-info p {
+      margin: 0.2rem 0;
+      font-size: 0.9rem;
+    }
+    .figure-info a {
+      color: #666;
+      text-decoration: none;
+    }
+    .figure-info a:hover {
+      text-decoration: underline;
+    }
+    .show-more {
+      margin-top: 0.8rem;
+      padding: 0.4rem 0.8rem;
+      background-color: #333;
+      border: none;
+      color: #e0e0e0;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .show-more:hover {
+      background-color: #444;
+    }
+    .no-figures {
+      text-align: center;
+      font-style: italic;
+      color: #949393;
+    }
+  </style>
 </head>
 <body>
-    <!-- Sidebar with menu -->
-    <div class="sidebar">
-        <!-- Menu title -->
-        <h2>☰ Menu</h2>
-        <ul>
-            <!-- Anime category with all your series -->
-            <li>📁 Anime
-                <ul>
-                    <li data-series="AirGear">Air Gear</li>
-                    <li data-series="AttackOnTitan">Attack on Titan</li>
-                    <li data-series="Berserk">Berserk</li>
-                    <li data-series="Bleach">Bleach</li>
-                    <li data-series="BlueLock">Blue Lock</li>
-                    <li data-series="ChainsawMan">Chainsaw Man</li>
-                    <li data-series="CodeGeass">Code Geass</li>
-                    <li data-series="DeathNote">Death Note</li>
-                    <li data-series="DemonSlayer">Demon Slayer</li>
-                    <li data-series="DragonBallZ">Dragon Ball Z</li>
-                    <li data-series="FireForce">Fire Force</li>
-                    <li data-series="FullmetalAlchemist">Fullmetal Alchemist</li>
-                    <li data-series="GurrenLagann">Gurren Lagann</li>
-                    <li data-series="Haikyu">Haikyu!!</li>
-                    <li data-series="HellsParadise">Hell's Paradise</li>
-                    <li data-series="HunterXHunter">Hunter x Hunter</li>
-                    <li data-series="JujutsuKaisen">Jujutsu Kaisen</li>
-                    <li data-series="KaijuNo8">Kaiju No.8</li>
-                    <li data-series="KatekyoHitmanReborn">Katekyo Hitman Reborn!</li>
-                    <li data-series="KurokoNoBasket">Kuroko no Basket</li>
-                    <li data-series="Mashle">Mashle</li>
-                    <li data-series="MobPsycho100">Mob Psycho 100</li>
-                    <li data-series="Naruto">Naruto</li>
-                    <li data-series="OnePiece">One Piece</li>
-                    <li data-series="OnePunchMan">One-Punch Man</li>
-                    <li data-series="SakamotoDays">Sakamoto Days</li>
-                    <li data-series="ShangriLaFrontier">Shangri-La Frontier</li>
-                    <li data-series="SoloLeveling">Solo Leveling</li>
-                    <li data-series="SoulEater">Soul Eater</li>
-                    <li data-series="TheGodOfHighSchool">The God of High School</li>
-                    <li data-series="TokyoGhoul">Tokyo Ghoul</li>
-                    <li data-series="TokyoRevengers">Tokyo Revengers</li>
-                    <li data-series="TowerOfGod">Tower of God</li>
-                    <li data-series="UndeadUnluck">Undead Unluck</li>
-                    <li data-series="VinlandSaga">Vinland Saga</li>
-                    <li data-series="WindBreaker">Wind Breaker</li>
-                    <li data-series="YuYuHakusho">Yu Yu Hakusho</li>
-                </ul>
-            </li>
-            <!-- Games category -->
-            <li>📁 Games
-                <ul>
-                    <li data-series="Zelda">Zelda</li>
-                    <li data-series="FinalFantasy">Final Fantasy</li>
-                </ul>
-            </li>
-            <!-- Purchased category -->
-            <li data-series="Purchased">📁 Purchased</li>
-            <!-- AKASHI category -->
-            <li data-series="AKASHI">📁 AKASHI</li>
-        </ul>
-    </div>
-    <!-- Main content area -->
-    <div class="main">
-        <!-- Title that changes based on selection -->
-        <h2 id="category-title">Select a Series</h2>
-        <!-- Placeholder where figures will appear -->
-        <div id="figure-list"></div>
-    </div>
-    <!-- Links to JavaScript file -->
-    <script src="script.js"></script>
+  <button id="navToggle">☰ Menu</button>
+  <div class="layout">
+    <nav id="sidebar">
+      <div class="search-container">
+        <input type="text" id="searchBox" placeholder="Search figures...">
+      </div>
+      <div class="tree-view">
+        <details>
+          <summary>📁 Anime</summary>
+          <ul>
+            <li><a href="#AirGear">Air Gear</a></li>
+            <li><a href="#AttackOnTitan">Attack on Titan</a></li>
+            <li><a href="#Berserk">Berserk</a></li>
+            <li><a href="#Bleach">Bleach</a></li>
+            <li><a href="#BlueLock">Blue Lock</a></li>
+            <li><a href="#ChainsawMan">Chainsaw Man</a></li>
+            <li><a href="#CodeGeass">Code Geass</a></li>
+            <li><a href="#DeathNote">Death Note</a></li>
+            <li><a href="#DemonSlayer">Demon Slayer</a></li>
+            <li><a href="#DragonBallZ">Dragon Ball Z</a></li>
+            <li><a href="#FireForce">Fire Force</a></li>
+            <li><a href="#FullmetalAlchemist">Fullmetal Alchemist</a></li>
+            <li><a href="#GurrenLagann">Gurren Lagann</a></li>
+            <li><a href="#Haikyu">Haikyu!!</a></li>
+            <li><a href="#HellsParadise">Hell's Paradise</a></li>
+            <li><a href="#HunterXHunter">Hunter x Hunter</a></li>
+            <li><a href="#JujutsuKaisen">Jujutsu Kaisen</a></li>
+            <li><a href="#KaijuNo8">Kaiju No.8</a></li>
+            <li><a href="#KatekyoHitmanReborn">Katekyo Hitman Reborn!</a></li>
+            <li><a href="#KurokoNoBasket">Kuroko no Basket</a></li>
+            <li><a href="#Mashle">Mashle</a></li>
+            <li><a href="#MobPsycho100">Mob Psycho 100</a></li>
+            <li><a href="#Naruto">Naruto</a></li>
+            <li><a href="#OnePiece">One Piece</a></li>
+            <li><a href="#OnePunchMan">One-Punch Man</a></li>
+            <li><a href="#SakamotoDays">Sakamoto Days</a></li>
+            <li><a href="#ShangriLaFrontier">Shangri-La Frontier</a></li>
+            <li><a href="#SoloLeveling">Solo Leveling</a></li>
+            <li><a href="#SoulEater">Soul Eater</a></li>
+            <li><a href="#TheGodOfHighSchool">The God of High School</a></li>
+            <li><a href="#TokyoGhoul">Tokyo Ghoul</a></li>
+            <li><a href="#TokyoRevengers">Tokyo Revengers</a></li>
+            <li><a href="#TowerOfGod">Tower of God</a></li>
+            <li><a href="#UndeadUnluck">Undead Unluck</a></li>
+            <li><a href="#VinlandSaga">Vinland Saga</a></li>
+            <li><a href="#WindBreaker">Wind Breaker</a></li>
+            <li><a href="#YuYuHakusho">Yu Yu Hakusho</a></li>
+          </ul>
+        </details>
+        <details>
+          <summary>📁 Games</summary>
+          <ul>
+            <li><a href="#Zelda">Zelda</a></li>
+            <li><a href="#FinalFantasy">Final Fantasy</a></li>
+          </ul>
+        </details>
+        <details>
+          <summary>📁 Purchased</summary>
+          <ul>
+            <li><a href="#RecentPurchases">Recent Purchases</a></li>
+          </ul>
+        </details>
+        <details>
+          <summary>📁 AKASHI</summary>
+          <ul>
+            <li><a href="#AKASHI">Wishlist</a></li>
+          </ul>
+        </details>
+      </div>
+    </nav>
+    <main>
+      <div class="banner" id="mainBannerContainer">
+        <img id="mainBanner" src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/default.jpg" alt="Figure Tracker Banner" loading="lazy">
+      </div>
+      <section id="AirGear">
+        <h1>Air Gear Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="AttackOnTitan">
+        <h1>Attack on Titan Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="Berserk">
+        <h1>Berserk Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="Bleach">
+        <h1>Bleach Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="BlueLock">
+        <h1>Blue Lock Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="ChainsawMan">
+        <h1>Chainsaw Man Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="CodeGeass">
+        <h1>Code Geass Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="DeathNote">
+        <h1>Death Note Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="DemonSlayer">
+        <h1>Demon Slayer Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="DragonBallZ">
+        <h1>Dragon Ball Z Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="FireForce">
+        <h1>Fire Force Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="FullmetalAlchemist">
+        <h1>Fullmetal Alchemist Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="GurrenLagann">
+        <h1>Gurren Lagann Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="Haikyu">
+        <h1>Haikyu!! Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="HellsParadise">
+        <h1>Hell's Paradise Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="HunterXHunter">
+        <h1>Hunter x Hunter Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="JujutsuKaisen">
+        <h1>Jujutsu Kaisen Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="KaijuNo8">
+        <h1>Kaiju No.8 Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="KatekyoHitmanReborn">
+        <h1>Katekyo Hitman Reborn! Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="KurokoNoBasket">
+        <h1>Kuroko no Basket Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="Mashle">
+        <h1>Mashle Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="MobPsycho100">
+        <h1>Mob Psycho 100 Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="Naruto">
+        <h1>Naruto Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="OnePiece">
+        <h1>One Piece Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="OnePunchMan">
+        <h1>One-Punch Man Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="SakamotoDays">
+        <h1>Sakamoto Days Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="ShangriLaFrontier">
+        <h1>Shangri-La Frontier Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="SoloLeveling">
+        <h1>Solo Leveling Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="SoulEater">
+        <h1>Soul Eater Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="TheGodOfHighSchool">
+        <h1>The God of High School Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="TokyoGhoul">
+        <h1>Tokyo Ghoul Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="TokyoRevengers">
+        <h1>Tokyo Revengers Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="TowerOfGod">
+        <h1>Tower of God Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="UndeadUnluck">
+        <h1>Undead Unluck Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="VinlandSaga">
+        <h1>Vinland Saga Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="WindBreaker">
+        <h1>Wind Breaker Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="YuYuHakusho">
+        <h1>Yu Yu Hakusho Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="Zelda">
+        <h1>Zelda Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="FinalFantasy">
+        <h1>Final Fantasy Figures</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="RecentPurchases">
+        <h1>Recent Purchases</h1>
+        <div class="figure-grid"></div>
+      </section>
+      <section id="AKASHI">
+        <h1>Wishlist</h1>
+        <div class="figure-grid"></div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // Embedded JSON data (replace with fetch if hosted)
+    const figuresData = {
+      "AirGear": [
+        {
+          "name": "Simca",
+          "set": "Creators' Labo - #013 (Yamato)",
+          "released": "10/2007",
+          "image": "https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Air%20Gear/simca.jpg",
+          "link": "https://www.ebay.com/sch/i.html?_nkw=Air+Gear+-+Simca+-+Creators%27+Labo+-+%23013+%28Yamato%29&_sacat=0&_from=R40&_trksid=p4432023.m570.l1313",
+          "description": "Manufactured by Yamato using PVC, this figure stands 210mm tall and originally retailed for 47 USD. A counterfeit version of this item exists."
+        },
+        {
+          "name": "Simca the Swallow 1/8",
+          "set": "N/A",
+          "released": "11/2011",
+          "image": "https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/Air%20Gear/simca2.jpg",
+          "link": "https://www.google.com/search?q=Simca+the+Swallow+1%2F8+for+sale",
+          "description": "Low availabilty. Manufactured by Kaitendoh using Candy Resin and Polystone. WARNING: A counterfeit version of this item exists."
+        },
+        {
+          "name": "Simca (Megahouse)",
+          "set": "N/A",
+          "released": "9/2006",
+          "image": "https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/Air%20Gear/simca3.jpg",
+          "link": "https://solarisjapan.com/products/air-gear-simca-excellent-model-megahouse",
+          "description": "Manufactured by MegaHouse using PVC, this figure stands 190mm tall."
+        },
+        {
+          "name": "Ringo",
+          "set": "N/A",
+          "released": "9/2006",
+          "image": "https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/Air%20Gear/Ringo.jpg",
+          "link": "https://www.ebay.com/sch/i.html?_nkw=Air+Gear+-+Noyamano+Ringo+-+Excellent+Model+-+1%2F8+%28MegaHouse%29&_sacat=0&_from=R40&_trksid=p2332490.m570.l1313",
+          "description": "Manufactured by MegaHouse using PVC, this figure stands 190mm tall."
+        },
+        {
+          "name": "Croissant Mask Ringo",
+          "set": "N/A",
+          "released": "1/2007",
+          "image": "https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/Air%20Gear/Croissant%20Mask%20Ringo.jpg",
+          "link": "https://solarisjapan.com/products/air-gear-noyamano-ringo-1-8-croissant-kamen-ver-bandai-1?srsltid=AfmBOor6H_Vl4ke0LDBq9cICEuv4G1ef7QuMoRD99vHGAm3Y3qMJ1eBC",
+          "description": "Low availabilty. Manufactured by Bandi using PVC, this figure is 1/8. WITHOUT Blue stand."
+        }
+      ],
+      "Bleach": [
+        {
+          "name": "Ulquiorra",
+          "set": "一番くじ BLEACH Stirring Souls vol.3",
+          "released": "August 2025",
+          "image": "https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Bleach/UlquiorraStirringSouls.jpg",
+          "link": "https://1kuji.com/products/bleach6",
+          "description": "A highly detailed Ulquiorra figure from the latest Bleach lottery series, expected in August 2025."
+        }
+      ],
+      "AKASHI": [
+        {
+          "name": "Nikkinami",
+          "set": "TikTok",
+          "released": "November 10th",
+          "image": "https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/GQn-WZlaAAArxs7.jpg",
+          "link": "#",
+          "description": "A unique figure inspired by TikTok trends, representing the Scorpio zodiac sign."
+        }
+      ],
+      "AttackOnTitan": [],
+      "Berserk": [],
+      "BlueLock": [],
+      "ChainsawMan": [],
+      "CodeGeass": [],
+      "DeathNote": [],
+      "DemonSlayer": [],
+      "DragonBallZ": [],
+      "FireForce": [],
+      "FullmetalAlchemist": [],
+      "GurrenLagann": [],
+      "Haikyu": [],
+      "HellsParadise": [],
+      "HunterXHunter": [],
+      "JujutsuKaisen": [],
+      "KaijuNo8": [],
+      "KatekyoHitmanReborn": [],
+      "KurokoNoBasket": [],
+      "Mashle": [],
+      "MobPsycho100": [],
+      "Naruto": [],
+      "OnePiece": [],
+      "OnePunchMan": [],
+      "SakamotoDays": [],
+      "ShangriLaFrontier": [],
+      "SoloLeveling": [],
+      "SoulEater": [],
+      "TheGodOfHighSchool": [],
+      "TokyoGhoul": [],
+      "TokyoRevengers": [],
+      "TowerOfGod": [],
+      "UndeadUnluck": [],
+      "VinlandSaga": [],
+      "WindBreaker": [],
+      "YuYuHakusho": [],
+      "Zelda": [],
+      "FinalFantasy": [],
+      "Purchased": []
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const navLinks = document.querySelectorAll('.tree-view a');
+      const sections = document.querySelectorAll('section');
+      const banner = document.getElementById('mainBanner');
+      const bannerContainer = document.getElementById('mainBannerContainer');
+      const defaultBanner = 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/default.jpg';
+
+      // Populate figures from JSON
+      function populateFigures() {
+        Object.keys(figuresData).forEach(category => {
+          const section = document.getElementById(category);
+          if (!section) return;
+          const grid = section.querySelector('.figure-grid');
+          grid.innerHTML = ''; // Clear existing content
+          const figures = figuresData[category];
+          if (figures.length === 0) {
+            grid.innerHTML = '<p class="no-figures">No figures available for this category.</p>';
+          } else {
+            figures.forEach(figure => {
+              const card = document.createElement('div');
+              card.className = 'figure-card';
+              card.innerHTML = `
+                <div class="figure-image">
+                  <img src="${figure.image}" alt="${figure.name} Figure" loading="lazy">
+                </div>
+                <div class="figure-info">
+                  <h2>${figure.name}</h2>
+                  <p><strong>Set:</strong> ${figure.set}</p>
+                  <p><strong>Released:</strong> ${figure.released}</p>
+                  <p><strong>Description:</strong> ${figure.description}</p>
+                  <a href="${figure.link}" target="_blank">Buy / View Listing</a>
+                </div>
+              `;
+              grid.appendChild(card);
+            });
+          }
+        });
+        updateCount();
+        updateShowMore();
+        addButtons();
+      }
+
+      // Load the previously active link from localStorage
+      function loadState() {
+        const activeId = localStorage.getItem('activeNav');
+        if (activeId) {
+          const activeLink = document.querySelector(`a[href="#${activeId}"]`);
+          if (activeLink) {
+            activateLink(activeLink);
+          }
+        } else {
+          // Default to AirGear if no state
+          const defaultLink = document.querySelector('a[href="#AirGear"]');
+          if (defaultLink) activateLink(defaultLink);
+        }
+      }
+
+      // Save the active link ID to localStorage
+      function saveState(id) {
+        localStorage.setItem('activeNav', id);
+      }
+
+      // Activate a single link and update the UI
+      function activateLink(link) {
+        navLinks.forEach(l => l.classList.remove('active'));
+        sections.forEach(s => s.classList.remove('active'));
+        link.classList.add('active');
+        const sectionId = link.getAttribute('href').slice(1);
+        const section = document.getElementById(sectionId);
+        if (section) {
+          section.classList.add('active');
+          // Check if banner exists, else use default
+          const bannerUrl = `https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/${sectionId.toLowerCase()}.jpg`;
+          banner.src = defaultBanner; // Set default initially
+          const img = new Image();
+          img.src = bannerUrl;
+          img.onload = () => {
+            banner.src = bannerUrl; // Use category banner if it loads
+            bannerContainer.classList.add('active');
+          };
+          img.onerror = () => {
+            banner.src = defaultBanner; // Fallback to default
+            bannerContainer.classList.add('active');
+          };
+        }
+        saveState(sectionId);
+        updateCount();
+      }
+
+      // Update the figure count in section titles
+      function updateCount() {
+        sections.forEach(section => {
+          const count = section.querySelectorAll('.figure-card').length;
+          section.setAttribute('data-count', count || 0);
+        });
+      }
+
+      // Add click event listeners to navigation links
+      navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          activateLink(link);
+        });
+      });
+
+      // Search function to filter figures in the active section
+      function searchFigures() {
+        const input = document.getElementById('searchBox').value.toLowerCase();
+        const activeSection = document.querySelector('section.active');
+        if (activeSection) {
+          activeSection.querySelectorAll('.figure-card').forEach(card => {
+            const isVisible = card.textContent.toLowerCase().includes(input);
+            card.style.display = isVisible ? '' : 'none';
+          });
+        }
+      }
+
+      document.getElementById('searchBox').addEventListener('input', searchFigures);
+
+      // Mobile navigation toggle and close on outside click
+      const navToggle = document.getElementById('navToggle');
+      const sidebar = document.getElementById('sidebar');
+      navToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+      });
+      document.addEventListener('click', (e) => {
+        if (!sidebar.contains(e.target) && !navToggle.contains(e.target) && window.innerWidth <= 767) {
+          sidebar.classList.remove('active');
+        }
+      });
+
+      // Show More button functionality
+      function updateShowMore() {
+        document.querySelectorAll('.show-more').forEach(button => button.remove());
+        document.querySelectorAll('.figure-grid').forEach(grid => {
+          const section = grid.closest('section');
+          const figureCount = grid.querySelectorAll('.figure-card').length;
+          if (figureCount > 6) {
+            const button = document.createElement('button');
+            button.textContent = 'Show More';
+            button.className = 'show-more';
+            button.addEventListener('click', () => {
+              const hiddenCards = section.querySelectorAll('.figure-card[style*="display: none"]');
+              for (let i = 0; i < 6 && i < hiddenCards.length; i++) {
+                hiddenCards[i].style.display = '';
+              }
+              if (section.querySelectorAll('.figure-card[style*="display: none"]').length === 0) {
+                button.remove();
+              }
+            });
+            section.appendChild(button);
+            grid.querySelectorAll('.figure-card').forEach((card, index) => {
+              if (index >= 6) card.style.display = 'none';
+            });
+          }
+        });
+      }
+
+      // Move to Purchased and Remove from Purchased functionality
+      function moveCard(card, targetSectionId, action) {
+        const password = prompt('Enter PIN to move/remove:');
+        if (password === '1992') {
+          const clone = card.cloneNode(true);
+          const targetGrid = document.getElementById(targetSectionId).querySelector('.figure-grid');
+          if (action === 'move') {
+            clone.querySelector('.move-button')?.remove();
+            clone.querySelector('.remove-button')?.remove();
+            targetGrid.innerHTML = ''; // Clear "No figures" message
+            targetGrid.appendChild(clone);
+            card.style.display = 'none';
+          } else if (action === 'remove' && targetSectionId === 'RecentPurchases') {
+            card.remove();
+            if (targetGrid.querySelectorAll('.figure-card').length === 0) {
+              targetGrid.innerHTML = '<p class="no-figures">No figures available for this category.</p>';
+            }
+          }
+          updateCount();
+          updateShowMore();
+          addButtons();
+        } else {
+          alert('Incorrect PIN!');
+        }
+      }
+
+      // Add Move/Remove buttons dynamically
+      function addButtons() {
+        document.querySelectorAll('.figure-card').forEach(card => {
+          const figureInfo = card.querySelector('.figure-info');
+          // Remove existing buttons
+          figureInfo.querySelectorAll('.move-button, .remove-button').forEach(btn => btn.remove());
+          // Add Move button if not in RecentPurchases
+          if (!card.closest('#RecentPurchases')) {
+            const moveButton = document.createElement('button');
+            moveButton.textContent = 'Move to Purchased';
+            moveButton.className = 'move-button';
+            moveButton.addEventListener('click', () => moveCard(card, 'RecentPurchases', 'move'));
+            figureInfo.appendChild(moveButton);
+          }
+          // Add Remove button if in RecentPurchases
+          if (card.closest('#RecentPurchases')) {
+            const removeButton = document.createElement('button');
+            removeButton.textContent = 'Remove from Purchased';
+            removeButton.className = 'remove-button';
+            removeButton.addEventListener('click', () => moveCard(card, 'RecentPurchases', 'remove'));
+            figureInfo.appendChild(removeButton);
+          }
+        });
+      }
+
+      // Initialize the page
+      populateFigures();
+      loadState();
+    });
+  </script>
 </body>
 </html>
