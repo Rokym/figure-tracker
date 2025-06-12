@@ -153,11 +153,11 @@
       }
     }
 
-    /* Banner styling */
+    /* Banner styling (adjusted for better fit) */
     .banner {
       margin: 2rem 0; /* Vertical margin */
       max-width: 100%; /* Full width */
-      max-height: 200px; /* Fixed height */
+      max-height: 150px; /* Reduced height for better fit */
       overflow: hidden; /* Hide overflow */
       display: none; /* Hidden by default */
     }
@@ -166,10 +166,15 @@
     }
     .banner img {
       width: 100%; /* Full width */
-      height: 200px; /* Fixed height */
-      object-fit: cover; /* Maintain aspect ratio */
+      height: 150px; /* Reduced height */
+      object-fit: contain; /* Show entire image, maintain aspect ratio */
       border-radius: 8px; /* Rounded corners */
       loading: lazy; /* Lazy load images */
+    }
+    @media (max-width: 767px) {
+      .banner img {
+        height: 100px; /* Smaller on mobile */
+      }
     }
 
     /* Section styling */
