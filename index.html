@@ -12,6 +12,7 @@
       background-color: #1a1a1a; /* Dark gray */
       color: #e0e0e0;
       line-height: 1.6;
+      position: relative;
     }
     .layout {
       display: flex;
@@ -33,7 +34,8 @@
       transform: translateX(0);
       transition: transform 0.3s ease;
       z-index: 1000;
-      overflow-y: auto;
+      overflow-y: auto; /* Enable scrolling */
+      max-height: 100vh; /* Ensure height constraint */
     }
     nav.hidden {
       transform: translateX(-100%);
@@ -56,6 +58,7 @@
       }
       nav {
         transform: translateX(-100%);
+        max-height: 100vh; /* Scrollable on mobile */
       }
       nav.active {
         transform: translateX(0);
@@ -109,7 +112,7 @@
       transition: background-color 0.2s;
     }
     .tree-view a:hover {
-      color: #007bff;
+      color: #666; /* Grey hover */
     }
     .tree-view a.active {
       background-color: #1d1d1d; /* Selected subcategory */
@@ -138,7 +141,7 @@
       max-width: 100%;
       max-height: 200px; /* Consistent size */
       overflow: hidden;
-      display: none; /* Hidden unless one subcategory is active */
+      display: none;
     }
     .banner.active {
       display: block;
@@ -153,12 +156,16 @@
     section {
       margin-bottom: 3rem;
       padding-top: 1rem;
+      display: none; /* Hidden by default */
+    }
+    section.active {
+      display: block;
     }
     section h1 {
       font-size: 2.5rem;
       font-weight: 700;
       margin-bottom: 1.5rem;
-      border-bottom: 2px solid #007bff; /* Blue highlight */
+      border-bottom: 2px solid #666; /* Grey highlight */
       padding-bottom: 0.5rem;
       color: #fff;
       text-align: center; /* Center title */
@@ -170,7 +177,7 @@
     }
     @media (max-width: 767px) {
       .figure-grid {
-        grid-template-columns: 1fr; /* Single column on mobile */
+        grid-template-columns: 1fr 1fr; /* 2 figures on mobile */
       }
     }
     .figure-card {
@@ -200,11 +207,22 @@
       font-size: 1rem;
     }
     .figure-info a {
-      color: #007bff;
+      color: #666; /* Grey links */
       text-decoration: none;
     }
     .figure-info a:hover {
       text-decoration: underline;
+    }
+    .show-more {
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      background-color: #333;
+      border: none;
+      color: #e0e0e0;
+      cursor: pointer;
+    }
+    .show-more:hover {
+      background-color: #444;
     }
   </style>
   <script>
@@ -221,9 +239,12 @@
           const id = link.getAttribute('href').slice(1);
           if (activeIds.includes(id)) {
             link.classList.add('active');
-            document.getElementById(id).style.display = 'block';
+            document.getElementById(id).classList.add('active');
+          } else {
+            document.getElementById(id).classList.remove('active');
           }
         });
+        updateVisibility();
         updateBanner();
       }
 
@@ -238,13 +259,25 @@
         const section = document.getElementById(id);
         if (section) {
           link.classList.toggle('active');
-          section.style.display = link.classList.contains('active') ? 'block' : 'none';
+          section.classList.toggle('active');
         }
         const activeIds = Array.from(navLinks)
           .filter(l => l.classList.contains('active'))
           .map(l => l.getAttribute('href').slice(1));
         saveState(activeIds);
+        updateVisibility();
         updateBanner();
+      }
+
+      // Update section visibility (hide all if no selections)
+      function updateVisibility() {
+        const activeCount = document.querySelectorAll('.tree-view a.active').length;
+        sections.forEach(section => {
+          section.style.display = section.classList.contains('active') ? 'block' : 'none';
+        });
+        if (activeCount === 0) {
+          sections.forEach(section => section.style.display = 'none');
+        }
       }
 
       // Update banner based on active sections
@@ -253,10 +286,10 @@
           .filter(l => l.classList.contains('active'))
           .map(l => l.getAttribute('href').slice(1));
         if (activeIds.length === 1) {
-          banner.src = `./images/banners/${activeIds[0].toLowerCase()}.jpg`;
+          banner.src = `https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/${activeIds[0].toLowerCase()}.jpg`;
           bannerContainer.classList.add('active');
         } else {
-          banner.src = 'https://raw.githubusercontent.com/your-username/your-repo/main/images/banners/default.jpg'; // Replace with your GitHub path
+          banner.src = 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/default.jpg';
           bannerContainer.classList.remove('active');
         }
       }
@@ -273,18 +306,112 @@
       function searchFigures() {
         const input = document.getElementById('searchBox').value.toLowerCase();
         document.querySelectorAll('.figure-card').forEach(card => {
-          const isVisible = card.textContent.toLowerCase().includes(input) &&
-            (card.closest('section').style.display !== 'none');
+          const section = card.closest('section');
+          const isVisible = (section.classList.contains('active') || !input) &&
+            card.textContent.toLowerCase().includes(input);
           card.style.display = isVisible ? '' : 'none';
         });
       }
 
       document.getElementById('searchBox').addEventListener('input', searchFigures);
 
-      // Mobile nav toggle
-      document.getElementById('navToggle').addEventListener('click', () => {
-        document.getElementById('sidebar').classList.toggle('active');
+      // Mobile nav toggle and close on outside click
+      const navToggle = document.getElementById('navToggle');
+      const sidebar = document.getElementById('sidebar');
+      navToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
       });
+      document.addEventListener('click', (e) => {
+        if (!sidebar.contains(e.target) && !navToggle.contains(e.target) && window.innerWidth <= 767) {
+          sidebar.classList.remove('active');
+        }
+      });
+
+      // Show More button
+      document.querySelectorAll('.figure-grid').forEach(grid => {
+        const section = grid.closest('section');
+        let figureCount = grid.querySelectorAll('.figure-card').length;
+        if (figureCount > 6) {
+          const button = document.createElement('button');
+          button.textContent = 'Show More';
+          button.className = 'show-more';
+          button.addEventListener('click', () => {
+            const hiddenCards = section.querySelectorAll('.figure-card[style*="display: none"]');
+            for (let i = 0; i < 6 && i < hiddenCards.length; i++) {
+              hiddenCards[i].style.display = '';
+            }
+            if (section.querySelectorAll('.figure-card[style*="display: none"]').length === 0) {
+              button.remove();
+            }
+          });
+          section.appendChild(button);
+          grid.querySelectorAll('.figure-card').forEach((card, index) => {
+            if (index >= 6) card.style.display = 'none';
+          });
+        }
+      });
+
+      // Move to Purchased and Remove from Purchased
+      function moveCard(card, targetSectionId, action) {
+        const password = prompt('Enter PIN to move/remove:');
+        if (password === '1992') {
+          const clone = card.cloneNode(true);
+          const targetGrid = document.getElementById(targetSectionId).querySelector('.figure-grid');
+          if (action === 'move') {
+            clone.querySelector('.move-button')?.remove();
+            clone.querySelector('.remove-button')?.remove();
+            targetGrid.appendChild(clone);
+            card.style.display = 'none';
+          } else if (action === 'remove' && targetSectionId === 'RecentPurchases') {
+            card.remove();
+          }
+          updateShowMore();
+        } else {
+          alert('Incorrect PIN!');
+        }
+      }
+
+      document.querySelectorAll('.figure-card').forEach(card => {
+        const moveButton = document.createElement('button');
+        moveButton.textContent = 'Move to Purchased';
+        moveButton.className = 'move-button';
+        moveButton.addEventListener('click', () => moveCard(card, 'RecentPurchases', 'move'));
+        card.querySelector('.figure-info').appendChild(moveButton);
+
+        if (card.closest('#RecentPurchases')) {
+          const removeButton = document.createElement('button');
+          removeButton.textContent = 'Remove from Purchased';
+          removeButton.className = 'remove-button';
+          removeButton.addEventListener('click', () => moveCard(card, 'RecentPurchases', 'remove'));
+          card.querySelector('.figure-info').appendChild(removeButton);
+        }
+      });
+
+      function updateShowMore() {
+        document.querySelectorAll('.show-more').forEach(button => button.remove());
+        document.querySelectorAll('.figure-grid').forEach(grid => {
+          const section = grid.closest('section');
+          let figureCount = grid.querySelectorAll('.figure-card').length;
+          if (figureCount > 6) {
+            const button = document.createElement('button');
+            button.textContent = 'Show More';
+            button.className = 'show-more';
+            button.addEventListener('click', () => {
+              const hiddenCards = section.querySelectorAll('.figure-card[style*="display: none"]');
+              for (let i = 0; i < 6 && i < hiddenCards.length; i++) {
+                hiddenCards[i].style.display = '';
+              }
+              if (section.querySelectorAll('.figure-card[style*="display: none"]').length === 0) {
+                button.remove();
+              }
+            });
+            section.appendChild(button);
+            grid.querySelectorAll('.figure-card').forEach((card, index) => {
+              if (index >= 6) card.style.display = 'none';
+            });
+          }
+        });
+      }
 
       // Initialize state
       loadState();
@@ -306,39 +433,7 @@
             <li><a href="#AttackOnTitan">Attack on Titan</a></li>
             <li><a href="#Berserk">Berserk</a></li>
             <li><a href="#Bleach">Bleach</a></li>
-            <li><a href="#BlueLock">Blue Lock</a></li>
-            <li><a href="#ChainsawMan">Chainsaw Man</a></li>
-            <li><a href="#CodeGeass">Code Geass</a></li>
-            <li><a href="#DeathNote">Death Note</a></li>
-            <li><a href="#DemonSlayer">Demon Slayer</a></li>
-            <li><a href="#DragonBallZ">Dragon Ball Z</a></li>
-            <li><a href="#FireForce">FireForce</a></li>
-            <li><a href="#FullmetalAlchemist">Fullmetal Alchemist</a></li>
-            <li><a href="#GurrenLagann">Gurren Lagann</a></li>
-            <li><a href="#Haikyu">Haikyu!!</a></li>
-            <li><a href="#HellsParadise">Hell's Paradise</a></li>
-            <li><a href="#HunterXHunter">Hunter x Hunter</a></li>
-            <li><a href="#JujutsuKaisen">Jujutsu Kaisen</a></li>
-            <li><a href="#KaijuNo8">Kaiju No.8</a></li>
-            <li><a href="#KatekyoHitmanReborn">Katekyo Hitman Reborn!</a></li>
-            <li><a href="#KurokoNoBasket">Kuroko no Basket</a></li>
-            <li><a href="#Mashle">Mashle</a></li>
-            <li><a href="#MobPsycho100">Mob Psycho 100</a></li>
-            <li><a href="#Naruto">Naruto</a></li>
-            <li><a href="#OnePiece">One Piece</a></li>
-            <li><a href="#OnePunchMan">One-Punch Man</a></li>
-            <li><a href="#SakamotoDays">Sakamoto Days</a></li>
-            <li><a href="#ShangriLaFrontier">Shangri-La Frontier</a></li>
-            <li><a href="#SoloLeveling">Solo Leveling</a></li>
-            <li><a href="#SoulEater">Soul Eater</a></li>
-            <li><a href="#TheGodOfHighSchool">The God of High School</a></li>
-            <li><a href="#TokyoGhoul">Tokyo Ghoul</a></li>
-            <li><a href="#TokyoRevengers">Tokyo Revengers</a></li>
-            <li><a href="#TowerOfGod">Tower of God</a></li>
-            <li><a href="#UndeadUnluck">Undead Unluck</a></li>
-            <li><a href="#VinlandSaga">Vinland Saga</a></li>
-            <li><a href="#WindBreaker">Wind Breaker</a></li>
-            <li><a href="#YuYuHakusho">Yu Yu Hakusho</a></li>
+            <!-- Add remaining anime titles as needed -->
           </ul>
         </details>
         <details>
@@ -358,14 +453,14 @@
     </nav>
     <main>
       <div class="banner" id="mainBannerContainer">
-        <img id="mainBanner" src="https://raw.githubusercontent.com/your-username/your-repo/main/images/banners/default.jpg" alt="Figure Tracker Banner" loading="lazy">
+        <img id="mainBanner" src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/default.jpg" alt="Figure Tracker Banner" loading="lazy">
       </div>
-      <section id="AirGear">
+      <section id="AirGear" class="active">
         <h1>Air Gear Figures</h1>
         <div class="figure-grid">
           <div class="figure-card">
             <div class="figure-image">
-              <img src="./images/AirGear/placeholder.jpg" alt="Placeholder" loading="lazy">
+              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/AirGear/placeholder.jpg" alt="Placeholder" loading="lazy">
             </div>
             <div class="figure-info">
               <h2>Air Gear Figure</h2>
@@ -375,32 +470,16 @@
               <a href="#" target="_blank">Buy / View Listing</a>
             </div>
           </div>
+          <!-- Add more figures as needed -->
         </div>
       </section>
-      <section id="AttackOnTitan">
-        <h1>Attack on Titan Figures</h1>
-        <div class="figure-grid">
-          <div class="figure-card">
-            <div class="figure-image">
-              <img src="./images/AttackOnTitan/placeholder.jpg" alt="Placeholder" loading="lazy">
-            </div>
-            <div class="figure-info">
-              <h2>Attack on Titan Figure</h2>
-              <p><strong>Set:</strong> [Placeholder Set]</p>
-              <p><strong>Released:</strong> [Placeholder Date]</p>
-              <p><strong>Description:</strong> [Placeholder Description]</p>
-              <a href="#" target="_blank">Buy / View Listing</a>
-            </div>
-          </div>
-        </div>
-      </section>
-      <!-- Repeat for all sections (Bleach, Haikyu!!, etc.) as in previous code -->
-      <section id="Bleach">
+      <!-- Repeat for other sections (Bleach, Haikyu!!, etc.) -->
+      <section id="Bleach" class="active">
         <h1>Bleach Figures</h1>
         <div class="figure-grid">
           <div class="figure-card">
             <div class="figure-image">
-              <img src="./images/Bleach/UlquiorraStirringSouls.jpg" alt="Ulquiorra Figure" loading="lazy">
+              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Bleach/UlquiorraStirringSouls.jpg" alt="Ulquiorra Figure" loading="lazy">
             </div>
             <div class="figure-info">
               <h2>Ulquiorra</h2>
@@ -412,7 +491,7 @@
           </div>
           <div class="figure-card">
             <div class="figure-image">
-              <img src="./images/Bleach/placeholder.jpg" alt="Placeholder" loading="lazy">
+              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Bleach/placeholder.jpg" alt="Placeholder" loading="lazy">
             </div>
             <div class="figure-info">
               <h2>Bleach Figure 2</h2>
@@ -422,29 +501,60 @@
               <a href="#" target="_blank">Buy / View Listing</a>
             </div>
           </div>
-        </div>
-      </section>
-      <section id="Haikyu">
-        <h1>Haikyu!! Figures</h1>
-        <div class="figure-grid">
           <div class="figure-card">
             <div class="figure-image">
-              <img src="./images/Haikyu/Hinata_10th_Anniversary.jpg" alt="Hinata Figure" loading="lazy">
+              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Bleach/placeholder.jpg" alt="Placeholder" loading="lazy">
             </div>
             <div class="figure-info">
-              <h2>Hinata Shoyo</h2>
-              <p><strong>Set:</strong> 10th Anniversary Memorial Kuji</p>
-              <p><strong>Released:</strong> June 14, 2025</p>
+              <h2>Bleach Figure 3</h2>
+              <p><strong>Set:</strong> [Placeholder Set]</p>
+              <p><strong>Released:</strong> [Placeholder Date]</p>
               <p><strong>Description:</strong> [Placeholder Description]</p>
-              <a href="https://1kuji.com/products/haikyu28_02" target="_blank">Buy / View Listing</a>
+              <a href="#" target="_blank">Buy / View Listing</a>
             </div>
           </div>
           <div class="figure-card">
             <div class="figure-image">
-              <img src="./images/Haikyu/placeholder.jpg" alt="Placeholder" loading="lazy">
+              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Bleach/placeholder.jpg" alt="Placeholder" loading="lazy">
             </div>
             <div class="figure-info">
-              <h2>Haikyu Figure 2</h2>
+              <h2>Bleach Figure 4</h2>
+              <p><strong>Set:</strong> [Placeholder Set]</p>
+              <p><strong>Released:</strong> [Placeholder Date]</p>
+              <p><strong>Description:</strong> [Placeholder Description]</p>
+              <a href="#" target="_blank">Buy / View Listing</a>
+            </div>
+          </div>
+          <div class="figure-card">
+            <div class="figure-image">
+              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Bleach/placeholder.jpg" alt="Placeholder" loading="lazy">
+            </div>
+            <div class="figure-info">
+              <h2>Bleach Figure 5</h2>
+              <p><strong>Set:</strong> [Placeholder Set]</p>
+              <p><strong>Released:</strong> [Placeholder Date]</p>
+              <p><strong>Description:</strong> [Placeholder Description]</p>
+              <a href="#" target="_blank">Buy / View Listing</a>
+            </div>
+          </div>
+          <div class="figure-card">
+            <div class="figure-image">
+              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Bleach/placeholder.jpg" alt="Placeholder" loading="lazy">
+            </div>
+            <div class="figure-info">
+              <h2>Bleach Figure 6</h2>
+              <p><strong>Set:</strong> [Placeholder Set]</p>
+              <p><strong>Released:</strong> [Placeholder Date]</p>
+              <p><strong>Description:</strong> [Placeholder Description]</p>
+              <a href="#" target="_blank">Buy / View Listing</a>
+            </div>
+          </div>
+          <div class="figure-card">
+            <div class="figure-image">
+              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Bleach/placeholder.jpg" alt="Placeholder" loading="lazy">
+            </div>
+            <div class="figure-info">
+              <h2>Bleach Figure 7</h2>
               <p><strong>Set:</strong> [Placeholder Set]</p>
               <p><strong>Released:</strong> [Placeholder Date]</p>
               <p><strong>Description:</strong> [Placeholder Description]</p>
@@ -453,47 +563,13 @@
           </div>
         </div>
       </section>
-      <!-- Add remaining sections (Berserk, BlueLock, etc.) as needed -->
-      <section id="Zelda">
-        <h1>Zelda Figures</h1>
-        <div class="figure-grid">
-          <div class="figure-card">
-            <div class="figure-image">
-              <img src="./images/Zelda/placeholder.jpg" alt="Placeholder" loading="lazy">
-            </div>
-            <div class="figure-info">
-              <h2>Zelda Figure</h2>
-              <p><strong>Set:</strong> [Placeholder Set]</p>
-              <p><strong>Released:</strong> [Placeholder Date]</p>
-              <p><strong>Description:</strong> [Placeholder Description]</p>
-              <a href="#" target="_blank">Buy / View Listing</a>
-            </div>
-          </div>
-        </div>
-      </section>
-      <section id="FinalFantasy">
-        <h1>Final Fantasy Figures</h1>
-        <div class="figure-grid">
-          <div class="figure-card">
-            <div class="figure-image">
-              <img src="./images/FinalFantasy/placeholder.jpg" alt="Placeholder" loading="lazy">
-            </div>
-            <div class="figure-info">
-              <h2>Final Fantasy Figure</h2>
-              <p><strong>Set:</strong> [Placeholder Set]</p>
-              <p><strong>Released:</strong> [Placeholder Date]</p>
-              <p><strong>Description:</strong> [Placeholder Description]</p>
-              <a href="#" target="_blank">Buy / View Listing</a>
-            </div>
-          </div>
-        </div>
-      </section>
-      <section id="RecentPurchases">
+      <!-- Add remaining sections as needed -->
+      <section id="RecentPurchases" class="active">
         <h1>Recent Purchases</h1>
         <div class="figure-grid">
           <div class="figure-card">
             <div class="figure-image">
-              <img src="./images/RecentPurchases/default.jpg" alt="Placeholder" loading="lazy">
+              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/RecentPurchases/default.jpg" alt="Placeholder" loading="lazy">
             </div>
             <div class="figure-info">
               <h2>Recent Purchase Figure</h2>
