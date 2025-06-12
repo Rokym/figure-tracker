@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- === HEAD SECTION === -->
   <!-- Meta tags for character encoding and responsive viewport -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +9,9 @@
   <title>Figure Tracker - Dark Theme</title>
   <!-- Google Fonts for Roboto typeface -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
   <style>
+    /* === STYLES SECTION === */
     /* Global styles for the body */
     body {
       margin: 0; /* Remove default margin */
@@ -155,11 +158,12 @@
 
     /* Banner styling (adjusted for better fit) */
     .banner {
-      margin: 2rem 0; /* Vertical margin */
+      margin: 1.5rem 0; /* Reduced vertical margin for cleaner look */
       max-width: 100%; /* Full width */
       max-height: 150px; /* Reduced height for better fit */
       overflow: hidden; /* Hide overflow */
       display: none; /* Hidden by default */
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Subtle shadow for depth */
     }
     .banner.active {
       display: block; /* Show when active */
@@ -179,7 +183,7 @@
 
     /* Section styling */
     section {
-      margin-bottom: 3rem; /* Space below section */
+      margin-bottom: 2rem; /* Reduced space below section */
       padding-top: 1rem; /* Top padding */
       display: none; /* Hidden by default */
     }
@@ -189,7 +193,7 @@
     section h1 {
       font-size: 2.5rem; /* Large title */
       font-weight: 700; /* Bold */
-      margin-bottom: 1.5rem; /* Space below */
+      margin-bottom: 1rem; /* Reduced space below */
       border-bottom: 2px solid #666; /* Grey underline */
       padding-bottom: 0.5rem; /* Underline padding */
       color: #fff; /* White text */
@@ -209,7 +213,7 @@
     .figure-grid {
       display: grid; /* Use CSS Grid */
       grid-template-columns: repeat(4, 1fr); /* 4 columns on desktop */
-      gap: 1.5rem; /* Gap between cards */
+      gap: 1.2rem; /* Reduced gap for tighter layout */
     }
     @media (max-width: 767px) {
       .figure-grid {
@@ -219,8 +223,12 @@
 
     /* Figure card styling */
     .figure-card {
-      padding-bottom: 1rem; /* Bottom padding */
+      padding-bottom: 0.8rem; /* Reduced bottom padding */
       border-bottom: 1px solid #444; /* Bottom border */
+      transition: transform 0.2s; /* Smooth hover effect */
+    }
+    .figure-card:hover {
+      transform: translateY(-2px); /* Slight lift on hover for visual feedback */
     }
     .figure-image {
       max-width: 100%; /* Full width of card */
@@ -229,20 +237,20 @@
       width: 100%; /* Full width */
       max-width: 200px; /* Max image width */
       height: auto; /* Maintain aspect ratio */
-      border-radius: 8px; /* Rounded corners */
+      border-radius: 6px; /* Slightly smaller radius */
       loading: lazy; /* Lazy load */
     }
     .figure-info {
-      margin-top: 0.5rem; /* Space above info */
+      margin-top: 0.4rem; /* Reduced space above info */
     }
     .figure-info h2 {
-      font-size: 1.5rem; /* Title size */
-      margin: 0 0 0.5rem; /* Margin */
+      font-size: 1.4rem; /* Slightly smaller title */
+      margin: 0 0 0.4rem; /* Adjusted margin */
       color: #e0e0e0; /* Light text */
     }
     .figure-info p {
-      margin: 0.3rem 0; /* Vertical margin */
-      font-size: 1rem; /* Text size */
+      margin: 0.2rem 0; /* Reduced vertical margin */
+      font-size: 0.9rem; /* Slightly smaller text */
     }
     .figure-info a {
       color: #666; /* Grey links */
@@ -252,196 +260,21 @@
       text-decoration: underline; /* Underline on hover */
     }
     .show-more {
-      margin-top: 1rem; /* Space above button */
-      padding: 0.5rem 1rem; /* Inner padding */
+      margin-top: 0.8rem; /* Reduced space above button */
+      padding: 0.4rem 0.8rem; /* Reduced padding */
       background-color: #333; /* Dark background */
       border: none; /* No border */
       color: #e0e0e0; /* Light text */
       cursor: pointer; /* Pointer cursor */
+      border-radius: 4px; /* Rounded corners */
     }
     .show-more:hover {
       background-color: #444; /* Darker on hover */
     }
   </style>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // Get all navigation links, sections, and banner elements
-      const navLinks = document.querySelectorAll('.tree-view a');
-      const sections = document.querySelectorAll('section');
-      const banner = document.getElementById('mainBanner');
-      const bannerContainer = document.getElementById('mainBannerContainer');
-
-      // Load the previously active link from localStorage
-      function loadState() {
-        const activeId = localStorage.getItem('activeNav');
-        if (activeId) {
-          const activeLink = document.querySelector(`a[href="#${activeId}"]`);
-          if (activeLink) {
-            activateLink(activeLink);
-          }
-        }
-        updateCount();
-      }
-
-      // Save the active link ID to localStorage
-      function saveState(id) {
-        localStorage.setItem('activeNav', id);
-      }
-
-      // Activate a single link and update the UI
-      function activateLink(link) {
-        // Remove active class from all links and sections
-        navLinks.forEach(l => l.classList.remove('active'));
-        sections.forEach(s => s.classList.remove('active'));
-        // Add active class to the clicked link and its section
-        link.classList.add('active');
-        const sectionId = link.getAttribute('href').slice(1);
-        const section = document.getElementById(sectionId);
-        if (section) {
-          section.classList.add('active');
-        }
-        // Update banner with the selected category's image
-        banner.src = `https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/${sectionId.toLowerCase()}.jpg`;
-        bannerContainer.classList.add('active');
-        saveState(sectionId);
-        updateCount();
-      }
-
-      // Update the figure count in section titles
-      function updateCount() {
-        sections.forEach(section => {
-          const count = section.querySelectorAll('.figure-card').length;
-          section.setAttribute('data-count', count); // Set count attribute
-        });
-      }
-
-      // Add click event listeners to navigation links
-      navLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-          e.preventDefault(); // Prevent default anchor behavior
-          activateLink(link); // Activate the clicked link
-        });
-      });
-
-      // Search function to filter figures in the active section
-      function searchFigures() {
-        const input = document.getElementById('searchBox').value.toLowerCase();
-        const activeSection = document.querySelector('section.active');
-        if (activeSection) {
-          activeSection.querySelectorAll('.figure-card').forEach(card => {
-            const isVisible = card.textContent.toLowerCase().includes(input);
-            card.style.display = isVisible ? '' : 'none'; // Show or hide card
-          });
-        }
-      }
-
-      document.getElementById('searchBox').addEventListener('input', searchFigures);
-
-      // Mobile navigation toggle and close on outside click
-      const navToggle = document.getElementById('navToggle');
-      const sidebar = document.getElementById('sidebar');
-      navToggle.addEventListener('click', () => {
-        sidebar.classList.toggle('active'); // Toggle sidebar visibility
-      });
-      document.addEventListener('click', (e) => {
-        if (!sidebar.contains(e.target) && !navToggle.contains(e.target) && window.innerWidth <= 767) {
-          sidebar.classList.remove('active'); // Close on outside click
-        }
-      });
-
-      // Show More button functionality
-      document.querySelectorAll('.figure-grid').forEach(grid => {
-        const section = grid.closest('section');
-        let figureCount = grid.querySelectorAll('.figure-card').length;
-        if (figureCount > 6) { // Only add if more than 6 figures
-          const button = document.createElement('button');
-          button.textContent = 'Show More';
-          button.className = 'show-more';
-          button.addEventListener('click', () => {
-            const hiddenCards = section.querySelectorAll('.figure-card[style*="display: none"]');
-            for (let i = 0; i < 6 && i < hiddenCards.length; i++) {
-              hiddenCards[i].style.display = ''; // Show next 6 cards
-            }
-            if (section.querySelectorAll('.figure-card[style*="display: none"]').length === 0) {
-              button.remove(); // Remove button if no more to show
-            }
-          });
-          section.appendChild(button);
-          grid.querySelectorAll('.figure-card').forEach((card, index) => {
-            if (index >= 6) card.style.display = 'none'; // Hide excess cards
-          });
-        }
-      });
-
-      // Move to Purchased and Remove from Purchased functionality
-      function moveCard(card, targetSectionId, action) {
-        const password = prompt('Enter PIN to move/remove:');
-        if (password === '1992') { // Check PIN
-          const clone = card.cloneNode(true); // Clone the card
-          const targetGrid = document.getElementById(targetSectionId).querySelector('.figure-grid');
-          if (action === 'move') {
-            clone.querySelector('.move-button')?.remove(); // Remove move button from clone
-            clone.querySelector('.remove-button')?.remove(); // Remove remove button from clone
-            targetGrid.appendChild(clone); // Add to target section
-            card.style.display = 'none'; // Hide original
-          } else if (action === 'remove' && targetSectionId === 'RecentPurchases') {
-            card.remove(); // Remove from Purchased
-          }
-          updateCount(); // Update count display
-          updateShowMore(); // Update Show More buttons
-        } else {
-          alert('Incorrect PIN!'); // Notify if wrong PIN
-        }
-      }
-
-      document.querySelectorAll('.figure-card').forEach(card => {
-        const moveButton = document.createElement('button');
-        moveButton.textContent = 'Move to Purchased';
-        moveButton.className = 'move-button';
-        moveButton.addEventListener('click', () => moveCard(card, 'RecentPurchases', 'move'));
-        card.querySelector('.figure-info').appendChild(moveButton);
-
-        if (card.closest('#RecentPurchases')) {
-          const removeButton = document.createElement('button');
-          removeButton.textContent = 'Remove from Purchased';
-          removeButton.className = 'remove-button';
-          removeButton.addEventListener('click', () => moveCard(card, 'RecentPurchases', 'remove'));
-          card.querySelector('.figure-info').appendChild(removeButton);
-        }
-      });
-
-      function updateShowMore() {
-        document.querySelectorAll('.show-more').forEach(button => button.remove()); // Remove existing buttons
-        document.querySelectorAll('.figure-grid').forEach(grid => {
-          const section = grid.closest('section');
-          let figureCount = grid.querySelectorAll('.figure-card').length;
-          if (figureCount > 6) {
-            const button = document.createElement('button');
-            button.textContent = 'Show More';
-            button.className = 'show-more';
-            button.addEventListener('click', () => {
-              const hiddenCards = section.querySelectorAll('.figure-card[style*="display: none"]');
-              for (let i = 0; i < 6 && i < hiddenCards.length; i++) {
-                hiddenCards[i].style.display = ''; // Show next 6
-              }
-              if (section.querySelectorAll('.figure-card[style*="display: none"]').length === 0) {
-                button.remove(); // Remove if no more
-              }
-            });
-            section.appendChild(button);
-            grid.querySelectorAll('.figure-card').forEach((card, index) => {
-              if (index >= 6) card.style.display = 'none'; // Hide excess
-            });
-          }
-        });
-      }
-
-      // Initialize the page state
-      loadState();
-    });
-  </script>
 </head>
 <body>
+  <!-- === NAVIGATION SECTION === -->
   <button id="navToggle">☰ Menu</button>
   <div class="layout">
     <nav id="sidebar">
@@ -505,21 +338,19 @@
           <ul>
             <li><a href="#RecentPurchases">Recent Purchases</a></li>
             <!-- Add more purchased subcategories here as needed -->
-          </ul>
-        </details>
-        <details>
-          <summary>📁 Movies</summary>
-          <ul>
-            <li><a href="#Inception">Inception</a></li>
             <!-- Add more movie subcategories here as needed -->
           </ul>
         </details>
       </div>
     </nav>
+
+    <!-- === MAIN CONTENT SECTION === -->
     <main>
       <div class="banner" id="mainBannerContainer">
         <img id="mainBanner" src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/default.jpg" alt="Figure Tracker Banner" loading="lazy">
       </div>
+
+      <!-- === FIGURE CATEGORIES SECTION === -->
       <section id="AirGear">
         <h1>Air Gear Figures</h1>
         <div class="figure-grid">
@@ -746,28 +577,190 @@
             </div>
           </div>
           <!-- Add more .figure-card blocks here for additional purchased figures -->
-        </div>
-      </section>
-      <section id="Inception">
-        <h1>Inception Figures</h1>
-        <div class="figure-grid">
-          <div class="figure-card">
-            <div class="figure-image">
-              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Inception/inception.jpg" alt="Inception Figure" loading="lazy">
-            </div>
-            <div class="figure-info">
-              <h2>Inception Figure</h2>
-              <p><strong>Set:</strong> [Placeholder Set]</p>
-              <p><strong>Released:</strong> [Placeholder Date]</p>
-              <p><strong>Description:</strong> [Placeholder Description]</p>
-              <a href="#" target="_blank">Buy / View Listing</a>
-            </div>
-          </div>
           <!-- Add more .figure-card blocks here for additional Inception figures -->
         </div>
       </section>
       <!-- Add new section here, e.g., <section id="NewCategory"><h1>NewCategory Figures</h1><div class="figure-grid">...</div></section> -->
     </main>
   </div>
+
+  <!-- === SCRIPTS SECTION === -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Get all navigation links, sections, and banner elements
+      const navLinks = document.querySelectorAll('.tree-view a');
+      const sections = document.querySelectorAll('section');
+      const banner = document.getElementById('mainBanner');
+      const bannerContainer = document.getElementById('mainBannerContainer');
+
+      // Load the previously active link from localStorage
+      function loadState() {
+        const activeId = localStorage.getItem('activeNav');
+        if (activeId) {
+          const activeLink = document.querySelector(`a[href="#${activeId}"]`);
+          if (activeLink) {
+            activateLink(activeLink);
+          }
+        }
+        updateCount();
+      }
+
+      // Save the active link ID to localStorage
+      function saveState(id) {
+        localStorage.setItem('activeNav', id);
+      }
+
+      // Activate a single link and update the UI
+      function activateLink(link) {
+        // Remove active class from all links and sections
+        navLinks.forEach(l => l.classList.remove('active'));
+        sections.forEach(s => s.classList.remove('active'));
+        // Add active class to the clicked link and its section
+        link.classList.add('active');
+        const sectionId = link.getAttribute('href').slice(1);
+        const section = document.getElementById(sectionId);
+        if (section) {
+          section.classList.add('active');
+        }
+        // Update banner with the selected category's image
+        banner.src = `https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/${sectionId.toLowerCase()}.jpg`;
+        bannerContainer.classList.add('active');
+        saveState(sectionId);
+        updateCount();
+      }
+
+      // Update the figure count in section titles
+      function updateCount() {
+        sections.forEach(section => {
+          const count = section.querySelectorAll('.figure-card').length;
+          section.setAttribute('data-count', count); // Set count attribute
+        });
+      }
+
+      // Add click event listeners to navigation links
+      navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault(); // Prevent default anchor behavior
+          activateLink(link); // Activate the clicked link
+        });
+      });
+
+      // Search function to filter figures in the active section
+      function searchFigures() {
+        const input = document.getElementById('searchBox').value.toLowerCase();
+        const activeSection = document.querySelector('section.active');
+        if (activeSection) {
+          activeSection.querySelectorAll('.figure-card').forEach(card => {
+            const isVisible = card.textContent.toLowerCase().includes(input);
+            card.style.display = isVisible ? '' : 'none'; // Show or hide card
+          });
+        }
+      }
+
+      document.getElementById('searchBox').addEventListener('input', searchFigures);
+
+      // Mobile navigation toggle and close on outside click
+      const navToggle = document.getElementById('navToggle');
+      const sidebar = document.getElementById('sidebar');
+      navToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('active'); // Toggle sidebar visibility
+      });
+      document.addEventListener('click', (e) => {
+        if (!sidebar.contains(e.target) && !navToggle.contains(e.target) && window.innerWidth <= 767) {
+          sidebar.classList.remove('active'); // Close on outside click
+        }
+      });
+
+      // Show More button functionality
+      document.querySelectorAll('.figure-grid').forEach(grid => {
+        const section = grid.closest('section');
+        let figureCount = grid.querySelectorAll('.figure-card').length;
+        if (figureCount > 6) { // Only add if more than 6 figures
+          const button = document.createElement('button');
+          button.textContent = 'Show More';
+          button.className = 'show-more';
+          button.addEventListener('click', () => {
+            const hiddenCards = section.querySelectorAll('.figure-card[style*="display: none"]');
+            for (let i = 0; i < 6 && i < hiddenCards.length; i++) {
+              hiddenCards[i].style.display = ''; // Show next 6 cards
+            }
+            if (section.querySelectorAll('.figure-card[style*="display: none"]').length === 0) {
+              button.remove(); // Remove button if no more to show
+            }
+          });
+          section.appendChild(button);
+          grid.querySelectorAll('.figure-card').forEach((card, index) => {
+            if (index >= 6) card.style.display = 'none'; // Hide excess cards
+          });
+        }
+      });
+
+      // Move to Purchased and Remove from Purchased functionality
+      function moveCard(card, targetSectionId, action) {
+        const password = prompt('Enter PIN to move/remove:');
+        if (password === '1992') { // Check PIN
+          const clone = card.cloneNode(true); // Clone the card
+          const targetGrid = document.getElementById(targetSectionId).querySelector('.figure-grid');
+          if (action === 'move') {
+            clone.querySelector('.move-button')?.remove(); // Remove move button from clone
+            clone.querySelector('.remove-button')?.remove(); // Remove remove button from clone
+            targetGrid.appendChild(clone); // Add to target section
+            card.style.display = 'none'; // Hide original
+          } else if (action === 'remove' && targetSectionId === 'RecentPurchases') {
+            card.remove(); // Remove from Purchased
+          }
+          updateCount(); // Update count display
+          updateShowMore(); // Update Show More buttons
+        } else {
+          alert('Incorrect PIN!'); // Notify if wrong PIN
+        }
+      }
+
+      document.querySelectorAll('.figure-card').forEach(card => {
+        const moveButton = document.createElement('button');
+        moveButton.textContent = 'Move to Purchased';
+        moveButton.className = 'move-button';
+        moveButton.addEventListener('click', () => moveCard(card, 'RecentPurchases', 'move'));
+        card.querySelector('.figure-info').appendChild(moveButton);
+
+        if (card.closest('#RecentPurchases')) {
+          const removeButton = document.createElement('button');
+          removeButton.textContent = 'Remove from Purchased';
+          removeButton.className = 'remove-button';
+          removeButton.addEventListener('click', () => moveCard(card, 'RecentPurchases', 'remove'));
+          card.querySelector('.figure-info').appendChild(removeButton);
+        }
+      });
+
+      function updateShowMore() {
+        document.querySelectorAll('.show-more').forEach(button => button.remove()); // Remove existing buttons
+        document.querySelectorAll('.figure-grid').forEach(grid => {
+          const section = grid.closest('section');
+          let figureCount = grid.querySelectorAll('.figure-card').length;
+          if (figureCount > 6) {
+            const button = document.createElement('button');
+            button.textContent = 'Show More';
+            button.className = 'show-more';
+            button.addEventListener('click', () => {
+              const hiddenCards = section.querySelectorAll('.figure-card[style*="display: none"]');
+              for (let i = 0; i < 6 && i < hiddenCards.length; i++) {
+                hiddenCards[i].style.display = ''; // Show next 6
+              }
+              if (section.querySelectorAll('.figure-card[style*="display: none"]').length === 0) {
+                button.remove(); // Remove if no more
+              }
+            });
+            section.appendChild(button);
+            grid.querySelectorAll('.figure-card').forEach((card, index) => {
+              if (index >= 6) card.style.display = 'none'; // Hide excess
+            });
+          }
+        });
+      }
+
+      // Initialize the page state
+      loadState();
+    });
+  </script>
 </body>
 </html>
