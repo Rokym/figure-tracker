@@ -1,833 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- === HEAD SECTION === -->
-  <!-- Meta tags for character encoding and responsive viewport -->
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Title of the webpage -->
-  <title>Figure Tracker - Dark Theme</title>
-  <!-- Google Fonts for Roboto typeface -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-
-  <style>
-    /* === STYLES SECTION === */
-    /* Global styles for the body */
-    body {
-      margin: 0; /* Remove default margin */
-      font-family: 'Roboto', system-ui, sans-serif; /* Font stack */
-      background-color: #1a1a1a; /* Dark gray background */
-      color: #e0e0e0; /* Light gray text */
-      line-height: 1.6; /* Line spacing */
-      position: relative; /* For z-index layering */
-    }
-
-    /* Layout container for sidebar and main content */
-    .layout {
-      display: flex; /* Use flexbox for layout */
-      flex-direction: row; /* Horizontal on desktop */
-    }
-    @media (max-width: 767px) {
-      .layout {
-        flex-direction: column; /* Stack vertically on mobile */
-      }
-    }
-
-    /* Sidebar navigation styles */
-    nav {
-      width: 250px; /* Fixed width */
-      min-height: 100vh; /* Full viewport height */
-      background-color: #000; /* Black background */
-      padding: 1rem; /* Inner spacing */
-      position: fixed; /* Fixed position */
-      top: 0; /* Top of viewport */
-      left: 0; /* Left edge */
-      transform: translateX(0); /* Start position */
-      transition: transform 0.3s ease; /* Smooth slide effect */
-      z-index: 1000; /* Above other content */
-      overflow-y: auto; /* Enable vertical scrolling */
-      max-height: 100vh; /* Limit height for scrolling */
-    }
-    nav.hidden {
-      transform: translateX(-100%); /* Hide off-screen on mobile */
-    }
-    #navToggle {
-      display: none; /* Hidden by default */
-      position: fixed; /* Fixed position for toggle */
-      top: 10px; /* Top offset */
-      left: 10px; /* Left offset */
-      background: #333; /* Dark gray button */
-      color: #fff; /* White text */
-      border: none; /* No border */
-      padding: 10px; /* Inner padding */
-      z-index: 1100; /* Above sidebar */
-      cursor: pointer; /* Pointer cursor */
-    }
-    @media (max-width: 767px) {
-      #navToggle {
-        display: block; /* Show on mobile */
-      }
-      nav {
-        transform: translateX(-100%); /* Hidden by default on mobile */
-        max-height: 100vh; /* Scrollable height */
-      }
-      nav.active {
-        transform: translateX(0); /* Show when active */
-      }
-    }
-
-    /* Search bar styling */
-    .search-container {
-      margin-bottom: 1.5rem; /* Space below search */
-    }
-    #searchBox {
-      width: 100%; /* Full width of container */
-      padding: 0.5rem; /* Inner padding */
-      border: 1px solid #333; /* Dark border */
-      border-radius: 5px; /* Rounded corners */
-      background-color: #1a1a1a; /* Match body background */
-      color: #e0e0e0; /* Light text */
-      font-size: 1rem; /* Font size */
-    }
-
-    /* Expandable category styling */
-    details {
-      margin-bottom: 1rem; /* Space between categories */
-    }
-    summary {
-      background-color: #131211; /* Unclicked category background */
-      color: #949393; /* Unclicked text color */
-      padding: 0.5rem; /* Inner padding */
-      border-radius: 4px; /* Rounded corners */
-      cursor: pointer; /* Pointer cursor */
-      list-style: none; /* Remove default arrow */
-    }
-    summary:hover {
-      background-color: #1d1d1d; /* Darker on hover */
-    }
-    details[open] summary {
-      background-color: #2a2a2a; /* Clicked category background */
-      color: #f1f1f1; /* Clicked text color */
-    }
-
-    /* Subcategory list styling */
-    .tree-view ul {
-      list-style: none; /* No bullets */
-      padding: 0; /* No padding */
-      margin: 0 0 0 1rem; /* Left margin for indent */
-    }
-    .tree-view li {
-      margin: 0.3rem 0; /* Vertical spacing between items */
-    }
-    .tree-view a {
-      color: #e0e0e0; /* Default text color */
-      text-decoration: none; /* No underline */
-      font-size: 1rem; /* Font size */
-      display: block; /* Full width clickable area */
-      padding: 0.5rem; /* Inner padding */
-      border-radius: 4px; /* Rounded corners */
-      transition: background-color 0.2s; /* Smooth hover transition */
-    }
-    .tree-view a:hover {
-      color: #666; /* Grey on hover */
-    }
-    .tree-view a.active {
-      background-color: #1d1d1d; /* Active subcategory background */
-      color: #e0e0e0; /* Active text color */
-    }
-
-    /* Main content area */
-    main {
-      flex: 1; /* Take remaining space */
-      padding: 2rem; /* Inner padding */
-      margin-left: 260px; /* Offset for sidebar */
-      max-width: 1400px; /* Max width for 4-column layout */
-      border-left: 1px solid #333; /* Left border */
-      border-right: 1px solid #333; /* Right border */
-      min-height: 100vh; /* Full height */
-      margin-right: auto; /* Center align */
-    }
-    @media (max-width: 767px) {
-      main {
-        margin-left: 0; /* No offset on mobile */
-        padding-top: 60px; /* Space for toggle */
-        border-left: none; /* No borders on mobile */
-        border-right: none;
-      }
-    }
-
-    /* Banner styling (adjusted for better fit) */
-    .banner {
-      margin: 1.5rem 0; /* Reduced vertical margin for cleaner look */
-      max-width: 100%; /* Full width */
-      max-height: 150px; /* Reduced height for better fit */
-      overflow: hidden; /* Hide overflow */
-      display: none; /* Hidden by default */
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Subtle shadow for depth */
-    }
-    .banner.active {
-      display: block; /* Show when active */
-    }
-    .banner img {
-      width: 100%; /* Full width */
-      height: 150px; /* Reduced height */
-      object-fit: contain; /* Show entire image, maintain aspect ratio */
-      border-radius: 8px; /* Rounded corners */
-      loading: lazy; /* Lazy load images */
-    }
-    @media (max-width: 767px) {
-      .banner img {
-        height: 100px; /* Smaller on mobile */
-      }
-    }
-
-    /* Section styling */
-    section {
-      margin-bottom: 2rem; /* Reduced space below section */
-      padding-top: 1rem; /* Top padding */
-      display: none; /* Hidden by default */
-    }
-    section.active {
-      display: block; /* Show when active */
-    }
-    section h1 {
-      font-size: 2.5rem; /* Large title */
-      font-weight: 700; /* Bold */
-      margin-bottom: 1rem; /* Reduced space below */
-      border-bottom: 2px solid #666; /* Grey underline */
-      padding-bottom: 0.5rem; /* Underline padding */
-      color: #fff; /* White text */
-      text-align: center; /* Centered */
-      display: flex; /* Flex for count */
-      justify-content: center; /* Center align */
-      align-items: center; /* Vertical center */
-    }
-    section h1::after {
-      content: ' (' attr(data-count) ')'; /* Add count */
-      font-size: 1.2rem; /* Smaller font */
-      color: #949393; /* Grey text */
-      margin-left: 0.5rem; /* Space before count */
-    }
-
-    /* Figure grid layout */
-    .figure-grid {
-      display: grid; /* Use CSS Grid */
-      grid-template-columns: repeat(4, 1fr); /* 4 columns on desktop */
-      gap: 1.2rem; /* Reduced gap for tighter layout */
-    }
-    @media (max-width: 767px) {
-      .figure-grid {
-        grid-template-columns: 1fr 1fr; /* 2 columns on mobile */
-      }
-    }
-
-    /* Figure card styling */
-    .figure-card {
-      padding-bottom: 0.8rem; /* Reduced bottom padding */
-      border-bottom: 1px solid #444; /* Bottom border */
-      transition: transform 0.2s; /* Smooth hover effect */
-    }
-    .figure-card:hover {
-      transform: translateY(-2px); /* Slight lift on hover for visual feedback */
-    }
-    .figure-image {
-      max-width: 100%; /* Full width of card */
-    }
-    .figure-image img {
-      width: 100%; /* Full width */
-      max-width: 200px; /* Max image width */
-      height: auto; /* Maintain aspect ratio */
-      border-radius: 6px; /* Slightly smaller radius */
-      loading: lazy; /* Lazy load */
-    }
-    .figure-info {
-      margin-top: 0.4rem; /* Reduced space above info */
-    }
-    .figure-info h2 {
-      font-size: 1.4rem; /* Slightly smaller title */
-      margin: 0 0 0.4rem; /* Adjusted margin */
-      color: #e0e0e0; /* Light text */
-    }
-    .figure-info p {
-      margin: 0.2rem 0; /* Reduced vertical margin */
-      font-size: 0.9rem; /* Slightly smaller text */
-    }
-    .figure-info a {
-      color: #666; /* Grey links */
-      text-decoration: none; /* No underline */
-    }
-    .figure-info a:hover {
-      text-decoration: underline; /* Underline on hover */
-    }
-    .show-more {
-      margin-top: 0.8rem; /* Reduced space above button */
-      padding: 0.4rem 0.8rem; /* Reduced padding */
-      background-color: #333; /* Dark background */
-      border: none; /* No border */
-      color: #e0e0e0; /* Light text */
-      cursor: pointer; /* Pointer cursor */
-      border-radius: 4px; /* Rounded corners */
-    }
-    .show-more:hover {
-      background-color: #444; /* Darker on hover */
-    }
-  </style>
+    <!-- Sets up the page to use standard text encoding and scale on phones -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Title shown in the browser tab -->
+    <title>Figure Tracker</title>
+    <!-- Basic CSS styling to make the page look good -->
+    <style>
+        /* Makes the page use a clean font and layout */
+        body { 
+            display: flex; /* Sidebar and main content side by side */
+            font-family: Arial, sans-serif; /* Nice readable font */
+            margin: 0; /* No extra space around the page */
+        }
+        /* Styles the sidebar (menu) */
+        .sidebar { 
+            width: 250px; /* Wider to fit long series names */
+            background: #f4f4f4; /* Light gray background */
+            padding: 20px; /* Space inside */
+        }
+        /* Removes bullet points from lists */
+        .sidebar ul { 
+            list-style: none; 
+            padding: 0; 
+        }
+        /* Adds space between sidebar items and makes them clickable */
+        .sidebar li { 
+            margin: 10px 0; 
+            cursor: pointer; /* Hand icon when hovering */
+        }
+        /* Indents sub-items (like Air Gear under Anime) */
+        .sidebar ul ul { 
+            padding-left: 20px; 
+        }
+        /* Styles the main content area */
+        .main { 
+            flex-grow: 1; /* Takes up remaining space */
+            padding: 20px; /* Space inside */
+        }
+        /* Styles each figure box */
+        .figure { 
+            display: flex; /* Image and details side by side */
+            margin-bottom: 20px; /* Space between figures */
+            border: 1px solid #ddd; /* Light border */
+            padding: 10px; /* Space inside */
+        }
+        /* Styles figure images */
+        .figure img { 
+            width: 100px; /* Fixed width */
+            height: auto; /* Keeps proportions */
+            margin-right: 20px; /* Space to the right */
+        }
+        /* Styles figure details */
+        .figure-details h3 { 
+            margin: 0 0 10px; /* Space below name */
+        }
+        .figure-details p { 
+            margin: 5px 0; /* Space between lines */
+        }
+    </style>
 </head>
 <body>
-  <!-- === NAVIGATION SECTION === -->
-  <button id="navToggle">☰ Menu</button>
-  <div class="layout">
-    <nav id="sidebar">
-      <div class="search-container">
-        <input type="text" id="searchBox" placeholder="Search figures...">
-      </div>
-      <div class="tree-view">
-        <details>
-          <summary>📁 Anime</summary>
-          <ul>
-            <li><a href="#AirGear">Air Gear</a></li>
-            <li><a href="#AttackOnTitan">Attack on Titan</a></li>
-            <li><a href="#Berserk">Berserk</a></li>
-            <li><a href="#Bleach">Bleach</a></li>
-            <li><a href="#BlueLock">Blue Lock</a></li>
-            <li><a href="#ChainsawMan">Chainsaw Man</a></li>
-            <li><a href="#CodeGeass">Code Geass</a></li>
-            <li><a href="#DeathNote">Death Note</a></li>
-            <li><a href="#DemonSlayer">Demon Slayer</a></li>
-            <li><a href="#DragonBallZ">Dragon Ball Z</a></li>
-            <li><a href="#FireForce">Fire Force</a></li>
-            <li><a href="#FullmetalAlchemist">Fullmetal Alchemist</a></li>
-            <li><a href="#GurrenLagann">Gurren Lagann</a></li>
-            <li><a href="#Haikyu">Haikyu!!</a></li>
-            <li><a href="#HellsParadise">Hell's Paradise</a></li>
-            <li><a href="#HunterXHunter">Hunter x Hunter</a></li>
-            <li><a href="#JujutsuKaisen">Jujutsu Kaisen</a></li>
-            <li><a href="#KaijuNo8">Kaiju No.8</a></li>
-            <li><a href="#KatekyoHitmanReborn">Katekyo Hitman Reborn!</a></li>
-            <li><a href="#KurokoNoBasket">Kuroko no Basket</a></li>
-            <li><a href="#Mashle">Mashle</a></li>
-            <li><a href="#MobPsycho100">Mob Psycho 100</a></li>
-            <li><a href="#Naruto">Naruto</a></li>
-            <li><a href="#OnePiece">One Piece</a></li>
-            <li><a href="#OnePunchMan">One-Punch Man</a></li>
-            <li><a href="#SakamotoDays">Sakamoto Days</a></li>
-            <li><a href="#ShangriLaFrontier">Shangri-La Frontier</a></li>
-            <li><a href="#SoloLeveling">Solo Leveling</a></li>
-            <li><a href="#SoulEater">Soul Eater</a></li>
-            <li><a href="#TheGodOfHighSchool">The God of High School</a></li>
-            <li><a href="#TokyoGhoul">Tokyo Ghoul</a></li>
-            <li><a href="#TokyoRevengers">Tokyo Revengers</a></li>
-            <li><a href="#TowerOfGod">Tower of God</a></li>
-            <li><a href="#UndeadUnluck">Undead Unluck</a></li>
-            <li><a href="#VinlandSaga">Vinland Saga</a></li>
-            <li><a href="#WindBreaker">Wind Breaker</a></li>
-            <li><a href="#YuYuHakusho">Yu Yu Hakusho</a></li>
-            <!-- Add more anime subcategories here as needed -->
-          </ul>
-        </details>
-        <details>
-          <summary>📁 Games</summary>
-          <ul>
-            <li><a href="#Zelda">Zelda</a></li>
-            <li><a href="#FinalFantasy">Final Fantasy</a></li>
-            <!-- Add more game subcategories here as needed -->
-          </ul>
-        </details>
-        <details>
-          <summary>📁 Purchased</summary>
-          <ul>
-            <li><a href="#RecentPurchases">Recent Purchases</a></li>
-            <!-- Add more purchased subcategories here as needed -->
-          </ul>
-        </details>
-        <details>
-          <summary>📁 AKASHI</summary>
-          <ul>
-            <li><a href="#AKASHI">Wishlist</a></li> <!-- Changed from #tiktok to #AKASHI -->
-          </ul>
-        </details>
-      </div>
-    </nav>
-    <!-- === MAIN CONTENT SECTION === -->
-    <main>
-      <div class="banner" id="mainBannerContainer">
-        <img id="mainBanner" src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/default.jpg" alt="Figure Tracker Banner" loading="lazy">
-      </div>
-
-      <!-- === FIGURE CATEGORIES SECTION === -->
-      <section id="AirGear">
-        <div class="figure-grid">
-          <div class="figure-card">
-            <div class="figure-image">
-              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/Air%20Gear/simca.jpg" alt="Air Gear Figure" loading="lazy">
-            </div>
-            <div class="figure-info">
-              <h2>Air Gear Figure</h2>
-              <p><strong>Set:</strong> Creators' Labo - #013 (Yamato)</p>
-              <p><strong>Released:</strong> 10/2007</p>
-              <p><strong>Description:</strong> Manufactured by Yamato using PVC, this figure stands 210mm tall and originally retailed for 47 USD. A counterfeit version of this item exists. </p>
-              <a href="https://www.ebay.com/sch/i.html?_nkw=Air+Gear+-+Simca+-+Creators%27+Labo+-+%23013+%28Yamato%29&_sacat=0&_from=R40&_trksid=p4432023.m570.l1313" target="_blank">Buy / View Listing</a>
-            </div>
-          </div>
-        <div class="figure-grid">
-          <div class="figure-card">
-            <div class="figure-image">
-              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Air Gear/airgear.jpg" alt="Air Gear Figure" loading="lazy">
-            </div>
-            <div class="figure-info">
-              <h2>Air Gear Figure</h2>
-              <p><strong>Set:</strong> [Placeholder Set]</p>
-              <p><strong>Released:</strong> [Placeholder Date]</p>
-              <p><strong>Description:</strong> [Placeholder Description]</p>
-              <a href="#" target="_blank">Buy / View Listing</a>
-            </div>
-          </div>
-        <div class="figure-grid">
-          <div class="figure-card">
-            <div class="figure-image">
-              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Air Gear/airgear.jpg" alt="Air Gear Figure" loading="lazy">
-            </div>
-            <div class="figure-info">
-              <h2>Air Gear Figure</h2>
-              <p><strong>Set:</strong> [Placeholder Set]</p>
-              <p><strong>Released:</strong> [Placeholder Date]</p>
-              <p><strong>Description:</strong> [Placeholder Description]</p>
-              <a href="#" target="_blank">Buy / View Listing</a>
-            </div>
-          </div>
-        <div class="figure-grid">
-          <div class="figure-card">
-            <div class="figure-image">
-              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Air Gear/airgear.jpg" alt="Air Gear Figure" loading="lazy">
-            </div>
-            <div class="figure-info">
-              <h2>Air Gear Figure</h2>
-              <p><strong>Set:</strong> [Placeholder Set]</p>
-              <p><strong>Released:</strong> [Placeholder Date]</p>
-              <p><strong>Description:</strong> [Placeholder Description]</p>
-              <a href="#" target="_blank">Buy / View Listing</a>
-            </div>
-          </div>
-        <div class="figure-grid">
-          <div class="figure-card">
-            <div class="figure-image">
-              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Air Gear/airgear.jpg" alt="Air Gear Figure" loading="lazy">
-            </div>
-            <div class="figure-info">
-              <h2>Air Gear Figure</h2>
-              <p><strong>Set:</strong> [Placeholder Set]</p>
-              <p><strong>Released:</strong> [Placeholder Date]</p>
-              <p><strong>Description:</strong> [Placeholder Description]</p>
-              <a href="#" target="_blank">Buy / View Listing</a>
-            </div>
-          </div>
-          <!-- Add more .figure-card blocks here for additional Air Gear figures -->
-        </div>
-      </section>
-      <section id="AttackOnTitan">
-        <div class="figure-grid">
-          <div class="figure-card">
-            <div class="figure-image">
-              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/AttackOnTitan/placeholder.jpg" alt="Placeholder" loading="lazy">
-            </div>
-            <div class="figure-info">
-              <h2>Attack on Titan Figure</h2>
-              <p><strong>Set:</strong> [Placeholder Set]</p>
-              <p><strong>Released:</strong> [Placeholder Date]</p>
-              <p><strong>Description:</strong> [Placeholder Description]</p>
-              <a href="#" target="_blank">Buy / View Listing</a>
-            </div>
-          </div>
-          <!-- Add more .figure-card blocks here for additional Attack on Titan figures -->
-        </div>
-      </section>
-      <section id="Berserk">
-        <div class="figure-grid">
-          <div class="figure-card">
-            <div class="figure-image">
-              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Berserk/placeholder.jpg" alt="Placeholder" loading="lazy">
-            </div>
-            <div class="figure-info">
-              <h2>Berserk Figure</h2>
-              <p><strong>Set:</strong> [Placeholder Set]</p>
-              <p><strong>Released:</strong> [Placeholder Date]</p>
-              <p><strong>Description:</strong> [Placeholder Description]</p>
-              <a href="#" target="_blank">Buy / View Listing</a>
-            </div>
-          </div>
-          <!-- Add more .figure-card blocks here for additional Berserk figures -->
-        </div>
-      </section>
-      <section id="Bleach">
-        <div class="figure-grid">
-          <div class="figure-card">
-            <div class="figure-image">
-              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Bleach/UlquiorraStirringSouls.jpg" alt="Ulquiorra Figure" loading="lazy">
-            </div>
-            <div class="figure-info">
-              <h2>Ulquiorra</h2>
-              <p><strong>Set:</strong> 一番くじ BLEACH Stirring Souls vol.3</p>
-              <p><strong>Released:</strong> August 2025</p>
-              <p><strong>Description:</strong> [Placeholder Description]</p>
-              <a href="https://1kuji.com/products/bleach6" target="_blank">Buy / View Listing</a>
-            </div>
-          </div>
-          <div class="figure-card">
-            <div class="figure-image">
-              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Bleach/bleach.jpg" alt="Bleach Figure" loading="lazy">
-            </div>
-            <div class="figure-info">
-              <h2>Bleach Figure 2</h2>
-              <p><strong>Set:</strong> [Placeholder Set]</p>
-              <p><strong>Released:</strong> [Placeholder Date]</p>
-              <p><strong>Description:</strong> [Placeholder Description]</p>
-              <a href="#" target="_blank">Buy / View Listing</a>
-            </div>
-          </div>
-          <div class="figure-card">
-            <div class="figure-image">
-              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Bleach/bleach.jpg" alt="Bleach Figure" loading="lazy">
-            </div>
-            <div class="figure-info">
-              <h2>Bleach Figure 3</h2>
-              <p><strong>Set:</strong> [Placeholder Set]</p>
-              <p><strong>Released:</strong> [Placeholder Date]</p>
-              <p><strong>Description:</strong> [Placeholder Description]</p>
-              <a href="#" target="_blank">Buy / View Listing</a>
-            </div>
-          </div>
-          <div class="figure-card">
-            <div class="figure-image">
-              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Bleach/bleach.jpg" alt="Bleach Figure" loading="lazy">
-            </div>
-            <div class="figure-info">
-              <h2>Bleach Figure 4</h2>
-              <p><strong>Set:</strong> [Placeholder Set]</p>
-              <p><strong>Released:</strong> [Placeholder Date]</p>
-              <p><strong>Description:</strong> [Placeholder Description]</p>
-              <a href="#" target="_blank">Buy / View Listing</a>
-            </div>
-          </div>
-          <div class="figure-card">
-            <div class="figure-image">
-              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Bleach/bleach.jpg" alt="Bleach Figure" loading="lazy">
-            </div>
-            <div class="figure-info">
-              <h2>Bleach Figure 5</h2>
-              <p><strong>Set:</strong> [Placeholder Set]</p>
-              <p><strong>Released:</strong> [Placeholder Date]</p>
-              <p><strong>Description:</strong> [Placeholder Description]</p>
-              <a href="#" target="_blank">Buy / View Listing</a>
-            </div>
-          </div>
-          <div class="figure-card">
-            <div class="figure-image">
-              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Bleach/bleach.jpg" alt="Bleach Figure" loading="lazy">
-            </div>
-            <div class="figure-info">
-              <h2>Bleach Figure 6</h2>
-              <p><strong>Set:</strong> [Placeholder Set]</p>
-              <p><strong>Released:</strong> [Placeholder Date]</p>
-              <p><strong>Description:</strong> [Placeholder Description]</p>
-              <a href="#" target="_blank">Buy / View Listing</a>
-            </div>
-          </div>
-          <div class="figure-card">
-            <div class="figure-image">
-              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Bleach/bleach.jpg" alt="Bleach Figure" loading="lazy">
-            </div>
-            <div class="figure-info">
-              <h2>Bleach Figure 7</h2>
-              <p><strong>Set:</strong> [Placeholder Set]</p>
-              <p><strong>Released:</strong> [Placeholder Date]</p>
-              <p><strong>Description:</strong> [Placeholder Description]</p>
-              <a href="#" target="_blank">Buy / View Listing</a>
-            </div>
-          </div>
-          <!-- Add more .figure-card blocks here for additional Bleach figures -->
-        </div>
-      </section>
-      <section id="Haikyu">
-        <div class="figure-grid">
-          <div class="figure-card">
-            <div class="figure-image">
-              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Haikyu/Hinata_10th_Anniversary.jpg" alt="Hinata Figure" loading="lazy">
-            </div>
-            <div class="figure-info">
-              <h2>Hinata Shoyo</h2>
-              <p><strong>Set:</strong> 10th Anniversary Memorial Kuji</p>
-              <p><strong>Released:</strong> June 14, 2025</p>
-              <p><strong>Description:</strong> [Placeholder Description]</p>
-              <a href="https://1kuji.com/products/haikyu28_02" target="_blank">Buy / View Listing</a>
-            </div>
-          </div>
-          <div class="figure-card">
-            <div class="figure-image">
-              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Haikyu/haikyu.jpg" alt="Haikyu Figure" loading="lazy">
-            </div>
-            <div class="figure-info">
-              <h2>Haikyu Figure 2</h2>
-              <p><strong>Set:</strong> [Placeholder Set]</p>
-              <p><strong>Released:</strong> [Placeholder Date]</p>
-              <p><strong>Description:</strong> [Placeholder Description]</p>
-              <a href="#" target="_blank">Buy / View Listing</a>
-            </div>
-          </div>
-          <!-- Add more .figure-card blocks here for additional Haikyu!! figures -->
-        </div>
-      </section>
-      <section id="Zelda">
-        <div class="figure-grid">
-          <div class="figure-card">
-            <div class="figure-image">
-              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Zelda/placeholder.jpg" alt="Placeholder" loading="lazy">
-            </div>
-            <div class="figure-info">
-              <h2>Zelda Figure</h2>
-              <p><strong>Set:</strong> [Placeholder Set]</p>
-              <p><strong>Released:</strong> [Placeholder Date]</p>
-              <p><strong>Description:</strong> [Placeholder Description]</p>
-              <a href="#" target="_blank">Buy / View Listing</a>
-            </div>
-          </div>
-          <!-- Add more .figure-card blocks here for additional Zelda figures -->
-        </div>
-      </section>
-      <section id="FinalFantasy">
-        <div class="figure-grid">
-          <div class="figure-card">
-            <div class="figure-image">
-              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/FinalFantasy/placeholder.jpg" alt="Placeholder" loading="lazy">
-            </div>
-            <div class="figure-info">
-              <h2>Final Fantasy Figure</h2>
-              <p><strong>Set:</strong> [Placeholder Set]</p>
-              <p><strong>Released:</strong> [Placeholder Date]</p>
-              <p><strong>Description:</strong> [Placeholder Description]</p>
-              <a href="#" target="_blank">Buy / View Listing</a>
-            </div>
-          </div>
-          <!-- Add more .figure-card blocks here for additional Final Fantasy figures -->
-        </div>
-      </section>
-      <section id="RecentPurchases">
-        <h1>Recent Purchases</h1>
-        <div class="figure-grid">
-          <div class="figure-card">
-            <div class="figure-image">
-              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/RecentPurchases/default.jpg" alt="Placeholder" loading="lazy">
-            </div>
-            <div class="figure-info">
-              <h2>Recent Purchase Figure</h2>
-              <p><strong>Set:</strong> [Placeholder Set]</p>
-              <p><strong>Released:</strong> [Placeholder Date]</p>
-              <p><strong>Description:</strong> [Placeholder Description]</p>
-              <a href="#" target="_blank">Buy / View Listing</a>
-            </div>
-          </div>
-          <!-- Add more .figure-card blocks here for additional purchased figures -->
-    
-          <!-- Add more .figure-card blocks here for additional Inception figures -->
-        </div>
-      </section>
-      <section id="AKASHI">
-        <h1>Wishlist</h1>
-        <div class="figure-grid">
-          <div class="figure-card">
-            <div class="figure-image">
-              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/GQn-WZlaAAArxs7.jpg" alt="Air Gear Figure" loading="lazy">
-            </div>
-            <div class="figure-info">
-              <h2>Nikkinami</h2>
-              <p><strong>Set:</strong> TikTok</p>
-              <p><strong>Released:</strong> November 10th</p>
-              <p><strong>Description:</strong> Scorpio</p>
-              <a href="#" target="_blank">Buy / View Listing</a>
-            </div>
-          </div>
-        </div>
-      </section>
-      <!-- Add new section here, e.g., <section id="NewCategory"><h1>NewCategory Figures</h1><div class="figure-grid">...</div></section> -->
-    </main>
-  </div>
-
-  <!-- === SCRIPTS SECTION === -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // Get all navigation links, sections, and banner elements
-      const navLinks = document.querySelectorAll('.tree-view a');
-      const sections = document.querySelectorAll('section');
-      const banner = document.getElementById('mainBanner');
-      const bannerContainer = document.getElementById('mainBannerContainer');
-
-      // Load the previously active link from localStorage
-      function loadState() {
-        const activeId = localStorage.getItem('activeNav');
-        if (activeId) {
-          const activeLink = document.querySelector(`a[href="#${activeId}"]`);
-          if (activeLink) {
-            activateLink(activeLink);
-          }
-        }
-        updateCount();
-      }
-
-      // Save the active link ID to localStorage
-      function saveState(id) {
-        localStorage.setItem('activeNav', id);
-      }
-
-      // Activate a single link and update the UI
-      function activateLink(link) {
-        // Remove active class from all links and sections
-        navLinks.forEach(l => l.classList.remove('active'));
-        sections.forEach(s => s.classList.remove('active'));
-        // Add active class to the clicked link and its section
-        link.classList.add('active');
-        const sectionId = link.getAttribute('href').slice(1);
-        const section = document.getElementById(sectionId);
-        if (section) {
-          section.classList.add('active');
-        }
-        // Update banner with the selected category's image
-        banner.src = `https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/${sectionId.toLowerCase()}.jpg`;
-        bannerContainer.classList.add('active');
-        saveState(sectionId);
-        updateCount();
-      }
-
-      // Update the figure count in section titles
-      function updateCount() {
-        sections.forEach(section => {
-          const count = section.querySelectorAll('.figure-card').length;
-          section.setAttribute('data-count', count); // Set count attribute
-        });
-      }
-
-      // Add click event listeners to navigation links
-      navLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-          e.preventDefault(); // Prevent default anchor behavior
-          activateLink(link); // Activate the clicked link
-        });
-      });
-
-      // Search function to filter figures in the active section
-      function searchFigures() {
-        const input = document.getElementById('searchBox').value.toLowerCase();
-        const activeSection = document.querySelector('section.active');
-        if (activeSection) {
-          activeSection.querySelectorAll('.figure-card').forEach(card => {
-            const isVisible = card.textContent.toLowerCase().includes(input);
-            card.style.display = isVisible ? '' : 'none'; // Show or hide card
-          });
-        }
-      }
-
-      document.getElementById('searchBox').addEventListener('input', searchFigures);
-
-      // Mobile navigation toggle and close on outside click
-      const navToggle = document.getElementById('navToggle');
-      const sidebar = document.getElementById('sidebar');
-      navToggle.addEventListener('click', () => {
-        sidebar.classList.toggle('active'); // Toggle sidebar visibility
-      });
-      document.addEventListener('click', (e) => {
-        if (!sidebar.contains(e.target) && !navToggle.contains(e.target) && window.innerWidth <= 767) {
-          sidebar.classList.remove('active'); // Close on outside click
-        }
-      });
-
-      // Show More button functionality
-      document.querySelectorAll('.figure-grid').forEach(grid => {
-        const section = grid.closest('section');
-        let figureCount = grid.querySelectorAll('.figure-card').length;
-        if (figureCount > 6) { // Only add if more than 6 figures
-          const button = document.createElement('button');
-          button.textContent = 'Show More';
-          button.className = 'show-more';
-          button.addEventListener('click', () => {
-            const hiddenCards = section.querySelectorAll('.figure-card[style*="display: none"]');
-            for (let i = 0; i < 6 && i < hiddenCards.length; i++) {
-              hiddenCards[i].style.display = ''; // Show next 6 cards
-            }
-            if (section.querySelectorAll('.figure-card[style*="display: none"]').length === 0) {
-              button.remove(); // Remove button if no more to show
-            }
-          });
-          section.appendChild(button);
-          grid.querySelectorAll('.figure-card').forEach((card, index) => {
-            if (index >= 6) card.style.display = 'none'; // Hide excess cards
-          });
-        }
-      });
-
-      // Move to Purchased and Remove from Purchased functionality
-      function moveCard(card, targetSectionId, action) {
-        const password = prompt('Enter PIN to move/remove:');
-        if (password === '1992') { // Check PIN
-          const clone = card.cloneNode(true); // Clone the card
-          const targetGrid = document.getElementById(targetSectionId).querySelector('.figure-grid');
-          if (action === 'move') {
-            clone.querySelector('.move-button')?.remove(); // Remove move button from clone
-            clone.querySelector('.remove-button')?.remove(); // Remove remove button from clone
-            targetGrid.appendChild(clone); // Add to target section
-            card.style.display = 'none'; // Hide original
-          } else if (action === 'remove' && targetSectionId === 'RecentPurchases') {
-            card.remove(); // Remove from Purchased
-          }
-          updateCount(); // Update count display
-          updateShowMore(); // Update Show More buttons
-        } else {
-          alert('Incorrect PIN!'); // Notify if wrong PIN
-        }
-      }
-
-      document.querySelectorAll('.figure-card').forEach(card => {
-        const moveButton = document.createElement('button');
-        moveButton.textContent = 'Move to Purchased';
-        moveButton.className = 'move-button';
-        moveButton.addEventListener('click', () => moveCard(card, 'RecentPurchases', 'move'));
-        card.querySelector('.figure-info').appendChild(moveButton);
-
-        if (card.closest('#RecentPurchases')) {
-          const removeButton = document.createElement('button');
-          removeButton.textContent = 'Remove from Purchased';
-          removeButton.className = 'remove-button';
-          removeButton.addEventListener('click', () => moveCard(card, 'RecentPurchases', 'remove'));
-          card.querySelector('.figure-info').appendChild(removeButton);
-        }
-      });
-
-      function updateShowMore() {
-        document.querySelectorAll('.show-more').forEach(button => button.remove()); // Remove existing buttons
-        document.querySelectorAll('.figure-grid').forEach(grid => {
-          const section = grid.closest('section');
-          let figureCount = grid.querySelectorAll('.figure-card').length;
-          if (figureCount > 6) {
-            const button = document.createElement('button');
-            button.textContent = 'Show More';
-            button.className = 'show-more';
-            button.addEventListener('click', () => {
-              const hiddenCards = section.querySelectorAll('.figure-card[style*="display: none"]');
-              for (let i = 0; i < 6 && i < hiddenCards.length; i++) {
-                hiddenCards[i].style.display = ''; // Show next 6
-              }
-              if (section.querySelectorAll('.figure-card[style*="display: none"]').length === 0) {
-                button.remove(); // Remove if no more
-              }
-            });
-            section.appendChild(button);
-            grid.querySelectorAll('.figure-card').forEach((card, index) => {
-              if (index >= 6) card.style.display = 'none'; // Hide excess
-            });
-          }
-        });
-      }
-
-      // Initialize the page state
-      loadState();
-    });
-  </script>
+    <!-- Sidebar with menu -->
+    <div class="sidebar">
+        <!-- Menu title -->
+        <h2>☰ Menu</h2>
+        <ul>
+            <!-- Anime category with all your series -->
+            <li>📁 Anime
+                <ul>
+                    <li data-series="AirGear">Air Gear</li>
+                    <li data-series="AttackOnTitan">Attack on Titan</li>
+                    <li data-series="Berserk">Berserk</li>
+                    <li data-series="Bleach">Bleach</li>
+                    <li data-series="BlueLock">Blue Lock</li>
+                    <li data-series="ChainsawMan">Chainsaw Man</li>
+                    <li data-series="CodeGeass">Code Geass</li>
+                    <li data-series="DeathNote">Death Note</li>
+                    <li data-series="DemonSlayer">Demon Slayer</li>
+                    <li data-series="DragonBallZ">Dragon Ball Z</li>
+                    <li data-series="FireForce">Fire Force</li>
+                    <li data-series="FullmetalAlchemist">Fullmetal Alchemist</li>
+                    <li data-series="GurrenLagann">Gurren Lagann</li>
+                    <li data-series="Haikyu">Haikyu!!</li>
+                    <li data-series="HellsParadise">Hell's Paradise</li>
+                    <li data-series="HunterXHunter">Hunter x Hunter</li>
+                    <li data-series="JujutsuKaisen">Jujutsu Kaisen</li>
+                    <li data-series="KaijuNo8">Kaiju No.8</li>
+                    <li data-series="KatekyoHitmanReborn">Katekyo Hitman Reborn!</li>
+                    <li data-series="KurokoNoBasket">Kuroko no Basket</li>
+                    <li data-series="Mashle">Mashle</li>
+                    <li data-series="MobPsycho100">Mob Psycho 100</li>
+                    <li data-series="Naruto">Naruto</li>
+                    <li data-series="OnePiece">One Piece</li>
+                    <li data-series="OnePunchMan">One-Punch Man</li>
+                    <li data-series="SakamotoDays">Sakamoto Days</li>
+                    <li data-series="ShangriLaFrontier">Shangri-La Frontier</li>
+                    <li data-series="SoloLeveling">Solo Leveling</li>
+                    <li data-series="SoulEater">Soul Eater</li>
+                    <li data-series="TheGodOfHighSchool">The God of High School</li>
+                    <li data-series="TokyoGhoul">Tokyo Ghoul</li>
+                    <li data-series="TokyoRevengers">Tokyo Revengers</li>
+                    <li data-series="TowerOfGod">Tower of God</li>
+                    <li data-series="UndeadUnluck">Undead Unluck</li>
+                    <li data-series="VinlandSaga">Vinland Saga</li>
+                    <li data-series="WindBreaker">Wind Breaker</li>
+                    <li data-series="YuYuHakusho">Yu Yu Hakusho</li>
+                </ul>
+            </li>
+            <!-- Games category -->
+            <li>📁 Games
+                <ul>
+                    <li data-series="Zelda">Zelda</li>
+                    <li data-series="FinalFantasy">Final Fantasy</li>
+                </ul>
+            </li>
+            <!-- Purchased category -->
+            <li data-series="Purchased">📁 Purchased</li>
+            <!-- AKASHI category -->
+            <li data-series="AKASHI">📁 AKASHI</li>
+        </ul>
+    </div>
+    <!-- Main content area -->
+    <div class="main">
+        <!-- Title that changes based on selection -->
+        <h2 id="category-title">Select a Series</h2>
+        <!-- Placeholder where figures will appear -->
+        <div id="figure-list"></div>
+    </div>
+    <!-- Links to JavaScript file -->
+    <script src="script.js"></script>
 </body>
 </html>
