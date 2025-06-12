@@ -122,7 +122,7 @@
       flex: 1;
       padding: 2rem;
       margin-left: 260px; /* Adjusted for sidebar + padding */
-      max-width: 1200px; /* Increased for 3-column layout */
+      max-width: 1400px; /* Increased for 4-column layout */
       border-left: 1px solid #333; /* Vertical lines */
       border-right: 1px solid #333;
       min-height: 100vh;
@@ -169,10 +169,19 @@
       padding-bottom: 0.5rem;
       color: #fff;
       text-align: center; /* Center title */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    section h1::after {
+      content: ' (' attr(data-count) ')';
+      font-size: 1.2rem;
+      color: #949393;
+      margin-left: 0.5rem;
     }
     .figure-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr); /* 3 figures horizontally */
+      grid-template-columns: repeat(4, 1fr); /* 4 figures horizontally */
       gap: 1.5rem;
     }
     @media (max-width: 767px) {
@@ -232,85 +241,65 @@
       const banner = document.getElementById('mainBanner');
       const bannerContainer = document.getElementById('mainBannerContainer');
 
-      // Load active links from localStorage
+      // Load active link from localStorage
       function loadState() {
-        const activeIds = JSON.parse(localStorage.getItem('activeNavs')) || [];
-        navLinks.forEach(link => {
-          const id = link.getAttribute('href').slice(1);
-          if (activeIds.includes(id)) {
-            link.classList.add('active');
-            document.getElementById(id).classList.add('active');
-          } else {
-            document.getElementById(id).classList.remove('active');
+        const activeId = localStorage.getItem('activeNav');
+        if (activeId) {
+          const activeLink = document.querySelector(`a[href="#${activeId}"]`);
+          if (activeLink) {
+            activateLink(activeLink);
           }
-        });
-        updateVisibility();
-        updateBanner();
+        }
+        updateCount();
       }
 
-      // Save active links to localStorage
-      function saveState(activeIds) {
-        localStorage.setItem('activeNavs', JSON.stringify(activeIds));
+      // Save active link to localStorage
+      function saveState(id) {
+        localStorage.setItem('activeNav', id);
       }
 
-      // Toggle link and section visibility
-      function toggleLink(link) {
-        const id = link.getAttribute('href').slice(1);
-        const section = document.getElementById(id);
+      // Activate a link and update UI
+      function activateLink(link) {
+        navLinks.forEach(l => l.classList.remove('active'));
+        sections.forEach(s => s.classList.remove('active'));
+        link.classList.add('active');
+        const sectionId = link.getAttribute('href').slice(1);
+        const section = document.getElementById(sectionId);
         if (section) {
-          link.classList.toggle('active');
-          section.classList.toggle('active');
+          section.classList.add('active');
         }
-        const activeIds = Array.from(navLinks)
-          .filter(l => l.classList.contains('active'))
-          .map(l => l.getAttribute('href').slice(1));
-        saveState(activeIds);
-        updateVisibility();
-        updateBanner();
+        banner.src = `https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/${sectionId.toLowerCase()}.jpg`;
+        bannerContainer.classList.add('active');
+        saveState(sectionId);
+        updateCount();
       }
 
-      // Update section visibility (hide all if no selections)
-      function updateVisibility() {
-        const activeCount = document.querySelectorAll('.tree-view a.active').length;
+      // Update figure count in section titles
+      function updateCount() {
         sections.forEach(section => {
-          section.style.display = section.classList.contains('active') ? 'block' : 'none';
+          const count = section.querySelectorAll('.figure-card').length;
+          section.setAttribute('data-count', count);
         });
-        if (activeCount === 0) {
-          sections.forEach(section => section.style.display = 'none');
-        }
-      }
-
-      // Update banner based on active sections
-      function updateBanner() {
-        const activeIds = Array.from(navLinks)
-          .filter(l => l.classList.contains('active'))
-          .map(l => l.getAttribute('href').slice(1));
-        if (activeIds.length === 1) {
-          banner.src = `https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/${activeIds[0].toLowerCase()}.jpg`;
-          bannerContainer.classList.add('active');
-        } else {
-          banner.src = 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/default.jpg';
-          bannerContainer.classList.remove('active');
-        }
       }
 
       // Handle nav link clicks
       navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
           e.preventDefault();
-          toggleLink(link);
+          activateLink(link);
         });
       });
 
       // Search function
       function searchFigures() {
         const input = document.getElementById('searchBox').value.toLowerCase();
-        document.querySelectorAll('.figure-card').forEach(card => {
-          const section = card.closest('section');
-          const isVisible = (section.classList.contains('active') || !input) &&
-            card.textContent.toLowerCase().includes(input);
-          card.style.display = isVisible ? '' : 'none';
-        });
+        const activeSection = document.querySelector('section.active');
+        if (activeSection) {
+          activeSection.querySelectorAll('.figure-card').forEach(card => {
+            const isVisible = card.textContent.toLowerCase().includes(input);
+            card.style.display = isVisible ? '' : 'none';
+          });
+        }
       }
 
       document.getElementById('searchBox').addEventListener('input', searchFigures);
@@ -365,6 +354,7 @@
           } else if (action === 'remove' && targetSectionId === 'RecentPurchases') {
             card.remove();
           }
+          updateCount();
           updateShowMore();
         } else {
           alert('Incorrect PIN!');
@@ -455,12 +445,12 @@
       <div class="banner" id="mainBannerContainer">
         <img id="mainBanner" src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/default.jpg" alt="Figure Tracker Banner" loading="lazy">
       </div>
-      <section id="AirGear" class="active">
+      <section id="AirGear">
         <h1>Air Gear Figures</h1>
         <div class="figure-grid">
           <div class="figure-card">
             <div class="figure-image">
-              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/AirGear/placeholder.jpg" alt="Placeholder" loading="lazy">
+              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Air Gear/airgear.jpg" alt="Air Gear Figure" loading="lazy">
             </div>
             <div class="figure-info">
               <h2>Air Gear Figure</h2>
@@ -473,8 +463,7 @@
           <!-- Add more figures as needed -->
         </div>
       </section>
-      <!-- Repeat for other sections (Bleach, Haikyu!!, etc.) -->
-      <section id="Bleach" class="active">
+      <section id="Bleach">
         <h1>Bleach Figures</h1>
         <div class="figure-grid">
           <div class="figure-card">
@@ -491,7 +480,7 @@
           </div>
           <div class="figure-card">
             <div class="figure-image">
-              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Bleach/placeholder.jpg" alt="Placeholder" loading="lazy">
+              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Bleach/bleach.jpg" alt="Bleach Figure" loading="lazy">
             </div>
             <div class="figure-info">
               <h2>Bleach Figure 2</h2>
@@ -503,7 +492,7 @@
           </div>
           <div class="figure-card">
             <div class="figure-image">
-              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Bleach/placeholder.jpg" alt="Placeholder" loading="lazy">
+              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Bleach/bleach.jpg" alt="Bleach Figure" loading="lazy">
             </div>
             <div class="figure-info">
               <h2>Bleach Figure 3</h2>
@@ -515,7 +504,7 @@
           </div>
           <div class="figure-card">
             <div class="figure-image">
-              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Bleach/placeholder.jpg" alt="Placeholder" loading="lazy">
+              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Bleach/bleach.jpg" alt="Bleach Figure" loading="lazy">
             </div>
             <div class="figure-info">
               <h2>Bleach Figure 4</h2>
@@ -527,7 +516,7 @@
           </div>
           <div class="figure-card">
             <div class="figure-image">
-              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Bleach/placeholder.jpg" alt="Placeholder" loading="lazy">
+              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Bleach/bleach.jpg" alt="Bleach Figure" loading="lazy">
             </div>
             <div class="figure-info">
               <h2>Bleach Figure 5</h2>
@@ -539,7 +528,7 @@
           </div>
           <div class="figure-card">
             <div class="figure-image">
-              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Bleach/placeholder.jpg" alt="Placeholder" loading="lazy">
+              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Bleach/bleach.jpg" alt="Bleach Figure" loading="lazy">
             </div>
             <div class="figure-info">
               <h2>Bleach Figure 6</h2>
@@ -551,7 +540,7 @@
           </div>
           <div class="figure-card">
             <div class="figure-image">
-              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Bleach/placeholder.jpg" alt="Placeholder" loading="lazy">
+              <img src="https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Bleach/bleach.jpg" alt="Bleach Figure" loading="lazy">
             </div>
             <div class="figure-info">
               <h2>Bleach Figure 7</h2>
@@ -563,8 +552,7 @@
           </div>
         </div>
       </section>
-      <!-- Add remaining sections as needed -->
-      <section id="RecentPurchases" class="active">
+      <section id="RecentPurchases">
         <h1>Recent Purchases</h1>
         <div class="figure-grid">
           <div class="figure-card">
