@@ -1,128 +1,81 @@
 {
   "AirGear": [
-      {
-          "name": "Simca",
-          "set": "Creators' Labo - #013 (Yamato)",
-          "company": "Yamato",
-          "released": "10/2007",
-          "image": "https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Air%20Gear/simca.jpg",
-          "link": "https://www.ebay.com/sch/i.html?_nkw=Air+Gear+-+Simca+-+Creators%27+Labo+-+%23013+%28Yamato%29&_sacat=0&_from=R40&_trksid=p4432023.m570.l1313",
-          "description": "Material: PVC, this figure stands 210mm tall and originally retailed for 47 USD. WARNING: A counterfeit version of this item exists."
-      },
-      {
-          "name": "Simca the Swallow 1/8",
-          "set": "N/A",
-          "Company": "Kaitendoh",
-          "released": "11/2011",
-          "image": "https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/Air%20Gear/simca2.jpg",
-          "link": "https://www.google.com/search?q=Simca+the+Swallow+1%2F8+for+sale",
-          "description": "Low availabilty. Material: Candy Resin and Polystone. WARNING: A counterfeit version of this item exists."
-      },
-      {
-          "name": "Simca (Megahouse)",
-          "set": "N/A",
-          "company": "MegaHouse",
-          "released": "9/2006",
-          "image": "https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/Air%20Gear/simca3.jpg",
-          "link": "https://solarisjapan.com/products/air-gear-simca-excellent-model-megahouse",
-          "description": "Material: PVC, this figure stands 190mm tall."
-      },
-      {
-          "name": "Ringo",
-          "set": "N/A",
-          "company": "MegaHouse",
-          "released": "9/2006",
-          "image": "https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/Air%20Gear/Ringo.jpg",
-          "link": "https://www.ebay.com/sch/i.html?_nkw=Air+Gear+-+Noyamano+Ringo+-+Excellent+Model+-+1%2F8+%28MegaHouse%29&_sacat=0&_from=R40&_trksid=p2332490.m570.l1313",
-          "description": "Material: PVC, this figure stands 190mm tall."
-      },
-      {
-          "name": "Croissant Mask Ringo",
-          "set": "N/A",
-          "company": "Bandi",
-          "released": "1/2007",
-          "image": "https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/Air%20Gear/Croissant%20Mask%20Ringo.jpg",
-          "link": "https://solarisjapan.com/products/air-gear-noyamano-ringo-1-8-croissant-kamen-ver-bandai-1?srsltid=AfmBOor6H_Vl4ke0LDBq9cICEuv4G1ef7QuMoRD99vHGAm3Y3qMJ1eBC",
-          "description": "Low availabilty. Material: PVC, this figure is 1/8. I'm tryna buy it WITHOUT the Blue stand."
-      }
-    
-  ],
-  "Attack on Titan": [
-      {
-          "name": "",
-          "set": "",
-          "company": "",
-          "released": "",
-          "image": "",
-          "link": "",
-          "description": ""
-      },
-      {
-          "name": "",
-          "set": "",
-          "company": "",
-          "released": "",
-          "image": "",
-          "link": "",
-          "description": ""
-      },
-      {
-          "name": "",
-          "set": "",
-          "company": "",
-          "released": "",
-          "image": "",
-          "link": "",
-          "description": ""
-        },
-      {
-          "name": "",
-          "set": "",
-          "company": "",
-          "released": "",
-          "image": "",
-          "link": "",
-          "description": ""
-      },
-      {
-          "name": "",
-          "set": "",
-          "company": "",
-          "released": "",
-          "image": "",
-          "link": "",
-          "description": ""
-      },
-      {
-          "name": "",
-          "set": "",
-          "company": "",
-          "released": "",
-          "image": "",
-          "link": "",
-          "description": ""
-      }
+    {
+      "name": "Simca",
+      "set": "Creators' Labo - #013 (Yamato)",
+      "company": "Yamato",
+      "released": "10/2007",
+      "image": "https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Air%20Gear/simca.jpg",
+      "link": "https://www.ebay.com/sch/i.html?_nkw=Air+Gear+-+Simca+-+Creators%27+Labo+-+%23013+%28Yamato%29&_sacat=0&_from=R40&_trksid=p4432023.m570.l1313",
+      "description": "Material: PVC, this figure stands 210mm tall and originally retailed for 47 USD. WARNING: A counterfeit version of this item exists.",
+      "type": "figure",
+      "purchased": false,
+      "pinned": false
+    },
+    {
+      "name": "Simca the Swallow 1/8",
+      "set": "N/A",
+      "company": "Kaitendoh",
+      "released": "11/2011",
+      "image": "https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/Air%20Gear/simca2.jpg",
+      "link": "https://www.google.com/search?q=Simca+the+Swallow+1%2F8+for+sale",
+      "description": "Low availabilty. Material: Candy Resin and Polystone. WARNING: A counterfeit version of this item exists.",
+      "type": "figure",
+      "purchased": false,
+      "pinned": false
+    },
+    {
+      "name": "Simca (Megahouse)",
+      "set": "N/A",
+      "company": "MegaHouse",
+      "released": "9/2006",
+      "image": "https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/Air%20Gear/simca3.jpg",
+      "link": "https://solarisjapan.com/products/air-gear-simca-excellent-model-megahouse",
+      "description": "Material: PVC, this figure stands 190mm tall.",
+      "type": "figure",
+      "purchased": false,
+      "pinned": false
+    },
+    {
+      "name": "Ringo",
+      "set": "N/A",
+      "company": "MegaHouse",
+      "released": "9/2006",
+      "image": "https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/Air%20Gear/Ringo.jpg",
+      "link": "https://www.ebay.com/sch/i.html?_nkw=Air+Gear+-+Noyamano+Ringo+-+Excellent+Model+-+1%2F8+%28MegaHouse%29&_sacat=0&_from=R40&_trksid=p2332490.m570.l1313",
+      "description": "Material: PVC, this figure stands 190mm tall.",
+      "type": "figure",
+      "purchased": false,
+      "pinned": false
+    },
+    {
+      "name": "Croissant Mask Ringo",
+      "set": "N/A",
+      "company": "Bandai",
+      "released": "1/2007",
+      "image": "https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/Air%20Gear/Croissant%20Mask%20Ringo.jpg",
+      "link": "https://solarisjapan.com/products/air-gear-noyamano-ringo-1-8-croissant-kamen-ver-bandai-1?srsltid=AfmBOor6H_Vl4ke0LDBq9cICEuv4G1ef7QuMoRD99vHGAm3Y3qMJ1eBC",
+      "description": "Low availabilty. Material: PVC, this figure is 1/8. I'm tryna buy it WITHOUT the Blue stand.",
+      "type": "figure",
+      "purchased": false,
+      "pinned": false
+    }
   ],
   "Bleach": [
-      {
-          "name": "Ulquiorra",
-          "set": "一番くじ BLEACH Stirring Souls vol.3",
-          "released": "August 2025",
-          "image": "https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Bleach/UlquiorraStirringSouls.jpg",
-          "link": "https://1kuji.com/products/bleach6",
-          "description": "A highly detailed Ulquiorra figure from the latest Bleach lottery series, expected in August 2025."
-      }
+    {
+      "name": "Ulquiorra",
+      "set": "一番くじ BLEACH Stirring Souls vol.3",
+      "company": "",
+      "released": "August 2025",
+      "image": "https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/Bleach/UlquiorraStirringSouls.jpg",
+      "link": "https://1kuji.com/products/bleach6",
+      "description": "A highly detailed Ulquiorra figure from the latest Bleach lottery series, expected in August 2025.",
+      "type": "figure",
+      "purchased": false,
+      "pinned": false
+    }
   ],
-  "AKASHI": [
-      {
-          "name": "Nikkinami",
-          "set": "TikTok",
-          "released": "November 10th",
-          "image": "https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/GQn-WZlaAAArxs7.jpg",
-          "link": "#",
-          "description": "A unique figure inspired by TikTok trends, representing the Scorpio zodiac sign."
-      }
-  ],
+  "AttackOnTitan": [],
   "Berserk": [],
   "BlueLock": [],
   "ChainsawMan": [],
