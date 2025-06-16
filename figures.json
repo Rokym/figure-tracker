@@ -61,6 +61,8 @@
       "pinned": false
     }
   ],
+  "AttackOnTitan": [],
+  "Berserk": [],
   "Bleach": [
     {
       "name": "Ulquiorra",
@@ -75,8 +77,6 @@
       "pinned": false
     }
   ],
-  "AttackOnTitan": [],
-  "Berserk": [],
   "BlueLock": [],
   "ChainsawMan": [],
   "CodeGeass": [],
@@ -92,6 +92,7 @@
   "JujutsuKaisen": [],
   "KaijuNo8": [],
   "KatekyoHitmanReborn": [],
+  "FinalFantasy": [],
   "KurokoNoBasket": [],
   "Mashle": [],
   "MobPsycho100": [],
@@ -111,6 +112,5 @@
   "WindBreaker": [],
   "YuYuHakusho": [],
   "Zelda": [],
-  "FinalFantasy": [],
   "Purchased": []
 }

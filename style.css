@@ -1,11 +1,11 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background: #fff;
-    color: #333;
+    background: #1a1a1a;
+    color: #e0e0e0;
 }
 header {
-    background: #f4f4f4;
+    background: #2a2a2a;
     padding: 20px;
     text-align: center;
 }
@@ -18,9 +18,20 @@ header h1 {
 }
 .sidebar {
     width: 250px;
-    background: #e8ecef;
+    background: #2a2a2a;
     padding: 20px;
     min-height: 100vh;
+}
+.search-container {
+    margin-bottom: 20px;
+}
+#search-box {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #444;
+    border-radius: 5px;
+    background: #333;
+    color: #e0e0e0;
 }
 .sidebar ul {
     list-style: none;
@@ -29,19 +40,48 @@ header h1 {
 .sidebar li {
     margin: 10px 0;
 }
-.sidebar a {
-    color: #333;
+.sidebar a.button-53 {
+    color: #e0e0e0;
     text-decoration: none;
     display: block;
     padding: 10px;
     border-radius: 5px;
+    background-color: #6b7280;
+    border: 0 solid #444;
+    box-sizing: border-box;
+    font-family: ui-sans-serif,system-ui,-apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+    font-size: 1rem;
+    font-weight: 700;
+    justify-content: center;
+    line-height: 1.75rem;
+    text-align: center;
+    width: 100%;
+    cursor: pointer;
+    transform: rotate(-2deg);
+    user-select: none;
 }
-.sidebar a:hover, .sidebar a.active {
-    background: #d1d9e0;
+.sidebar a.button-53:focus {
+    outline: 0;
+}
+.sidebar a.button-53:after {
+    content: '';
+    position: absolute;
+    border: 1px solid #e0e0e0;
+    bottom: 4px;
+    left: 4px;
+    width: calc(100% - 1px);
+    height: calc(100% - 1px);
+}
+.sidebar a.button-53:hover:after {
+    bottom: 2px;
+    left: 2px;
+}
+.sidebar a.active {
+    background: #4b5563;
 }
 .divider {
     border: 0;
-    border-top: 1px solid #ccc;
+    border-top: 1px solid #444;
     margin: 10px 0;
 }
 main {
@@ -66,6 +106,19 @@ main {
     border-radius: 5px;
     cursor: pointer;
 }
+.controls {
+    margin-bottom: 20px;
+}
+.controls label {
+    margin-right: 20px;
+}
+.controls select, .controls input {
+    padding: 5px;
+    border: 1px solid #444;
+    border-radius: 5px;
+    background: #333;
+    color: #e0e0e0;
+}
 .item-grid {
     display: flex;
     flex-wrap: wrap;
@@ -74,12 +127,12 @@ main {
 .item-card {
     width: 250px;
     padding: 15px;
-    border: 1px solid #ddd;
+    border: 1px solid #444;
     border-radius: 5px;
-    background: #fff;
+    background: #2a2a2a;
 }
 .item-card img {
-    max-width: 100%;
+    max-width: 200px;
     height: auto;
     border-radius: 5px;
 }
@@ -92,7 +145,7 @@ main {
     font-size: 0.9rem;
 }
 .item-card a {
-    color: #007bff;
+    color: #60a5fa;
     text-decoration: none;
 }
 .item-card a:hover {
@@ -104,18 +157,12 @@ main {
     border: none;
     border-radius: 5px;
     cursor: pointer;
-}
-.toggle-purchased {
     background: #28a745;
     color: #fff;
 }
-.toggle-pinned {
-    background: #ffc107;
-    color: #333;
-}
 .no-items {
     text-align: center;
-    color: #666;
+    color: #888;
 }
 @media (max-width: 768px) {
     .layout {
