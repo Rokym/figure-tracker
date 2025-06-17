@@ -1,4 +1,4 @@
-// Logo URLs (replace with your GitHub raw URLs)
+// Logo URLs
 const seriesLogos = {
     AirGear: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/airgear.jpg',
     Bleach: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/bleach.jpg',
@@ -68,7 +68,7 @@ function renderContent(series, figures, searchQuery = '') {
         if (searchQuery) {
             // Search results
             const results = searchItems(figures, searchQuery);
-            seriesLogoDiv.innerHTML = `<img src="https://via.placeholder.com/300x100?text=Search+Results" alt="Search Results">`;
+            seriesLogoDiv.innerHTML = `<img src="https://via.placeholder.com/400x100?text=Search+Results" alt="Search Results">`;
             if (results.length === 0) {
                 contentDiv.innerHTML = '<p class="no-items">No items found.</p>';
                 return;
@@ -79,16 +79,18 @@ function renderContent(series, figures, searchQuery = '') {
             const logoGrid = document.createElement('div');
             logoGrid.className = 'logo-grid';
             Object.keys(figures).filter(s => s !== 'Purchased').forEach(s => {
-                const logoDiv = document.createElement('div');
-                logoDiv.className = 'logo-item';
-                logoDiv.innerHTML = `<img src="${seriesLogos[s]}" alt="${s}" data-series="${s}">`;
-                logoGrid.appendChild(logoDiv);
+                const logoCard = document.createElement('div');
+                logoCard.className = 'logo-card';
+                logoCard.innerHTML = `
+                    <img src="${seriesLogos[s]}" alt="${s}" data-series="${s}">
+                `;
+                logoGrid.appendChild(logoCard);
             });
             contentDiv.appendChild(logoGrid);
         }
     } else if (series === 'Purchased') {
         // Purchased page
-        seriesLogoDiv.innerHTML = `<img src="https://via.placeholder.com/300x100?text=Purchased" alt="Purchased">`;
+        seriesLogoDiv.innerHTML = `<img src="https://via.placeholder.com/400x100?text=Purchased" alt="Purchased">`;
         const items = [];
         Object.keys(figures).forEach(s => {
             if (figures[s]) {
@@ -106,7 +108,7 @@ function renderContent(series, figures, searchQuery = '') {
         renderItems(items, figures, contentDiv, series);
     } else {
         // Series page
-        seriesLogoDiv.innerHTML = `<img src="${seriesLogos[series] || 'https://via.placeholder.com/300x100?text=' + series}" alt="${series}">`;
+        seriesLogoDiv.innerHTML = `<img src="${seriesLogos[series] || 'https://via.placeholder.com/400x100?text=' + series}" alt="${series}">`;
         if (!figures[series] || figures[series].length === 0) {
             contentDiv.innerHTML = '<p class="no-items">No items found for this series.</p>';
             return;
@@ -147,17 +149,20 @@ function renderItems(items, figures, contentDiv, series) {
             <select id="sort-select">
                 <option value="name-asc">Name (A-Z)</option>
                 <option value="name-desc">Name (Z-A)</option>
-                <option value="series-asc">Series (A-Z)</option>
-                <option value="series-desc">Series (Z-A)</option>
                 <option value="release-asc">Release Date (Oldest)</option>
                 <option value="release-desc">Release Date (Newest)</option>
-                <option value="type-asc">Type (A-Z)</option>
-                <option value="type-desc">Type (Z-A)</option>
             </select>
         </label>
         <label><input type="checkbox" id="filter-figure" checked> Figure</label>
         <label><input type="checkbox" id="filter-manga" checked> Manga</label>
         <label><input type="checkbox" id="filter-merch" checked> Merch</label>
+        <label>
+            Columns:
+            <select id="column-select">
+                <option value="5">5 Columns</option>
+                <option value="6">6 Columns</option>
+            </select>
+        </label>
     `;
     contentDiv.appendChild(controlsDiv);
     
@@ -197,23 +202,70 @@ function renderItems(items, figures, contentDiv, series) {
             const itemDiv = document.createElement('div');
             itemDiv.className = 'item-card';
             itemDiv.innerHTML = `
-                <img src="${item.image}" alt="${item.name}">
+                <img src="${item.image}" alt="${item.name}" class="figure-image">
+                <hr class="card-divider">
                 <h3>${item.name}</h3>
                 <p><strong>Type:</strong> ${item.type}</p>
                 <p><strong>Set:</strong> ${item.set}</p>
                 <p><strong>Company:</strong> ${item.company || 'N/A'}</p>
                 <p><strong>Released:</strong> ${item.released}</p>
-                <p><strong>Description:</strong> ${item.description}</p>
+                <p class="description">${item.description}</p>
+                <button class="show-more">Show More</button>
                 <a href="${item.link}" target="_blank">Buy / View Listing</a>
                 <button class="toggle-purchased" data-series="${item.series}" data-name="${item.name}">
                     ${item.purchased ? 'Mark as Not Purchased' : 'Mark as Purchased'}
                 </button>
             `;
             itemGrid.appendChild(itemDiv);
+            
+            // Show More button
+            const desc = itemDiv.querySelector('.description');
+            const showMore = itemDiv.querySelector('.show-more');
+            if (desc.scrollHeight <= desc.clientHeight) {
+                showMore.style.display = 'none';
+            } else {
+                showMore.addEventListener('click', () => {
+                    if (desc.classList.contains('expanded')) {
+                        desc.classList.remove('expanded');
+                        showMore.textContent = 'Show More';
+                    } else {
+                        desc.classList.add('expanded');
+                        showMore.textContent = 'Show Less';
+                    }
+                });
+            }
+            
+            // Zoom image
+            const img = itemDiv.querySelector('.figure-image');
+            img.addEventListener('click', () => {
+                const overlay = document.createElement('div');
+                overlay.className = 'zoom-overlay';
+                overlay.innerHTML = `
+                    <img src="${item.image}" alt="${item.name}">
+                    <button class="close-btn">×</button>
+                `;
+                document.body.appendChild(overlay);
+                
+                // Close on overlay click
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) {
+                        overlay.remove();
+                    }
+                });
+                
+                // Close on button click
+                overlay.querySelector('.close-btn').addEventListener('click', () => {
+                    overlay.remove();
+                });
+            });
         });
+        
+        // Update columns
+        const columns = document.getElementById('column-select').value;
+        itemGrid.classList.toggle('five-columns', columns === '5');
     }
     
-    // Parse release date (e.g., "10/2007" to Date)
+    // Parse release date
     function parseDate(dateStr) {
         const [month, year] = dateStr.split('/');
         return new Date(parseInt(year), parseInt(month) - 1);
@@ -222,11 +274,12 @@ function renderItems(items, figures, contentDiv, series) {
     // Initial render
     updateItems();
     
-    // Event listeners for sort/filter
+    // Event listeners for sort/filter/columns
     document.getElementById('sort-select').addEventListener('change', updateItems);
     document.getElementById('filter-figure').addEventListener('change', updateItems);
     document.getElementById('filter-manga').addEventListener('change', updateItems);
     document.getElementById('filter-merch').addEventListener('change', updateItems);
+    document.getElementById('column-select').addEventListener('change', updateItems);
 }
 
 // Update item (in-memory)
