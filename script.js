@@ -1,53 +1,56 @@
-// Logo URLs
+// Logo URLs and customizations
 const seriesLogos = {
-    AirGear: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/airgear.jpg',
-    Bleach: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/bleach.jpg',
-    AttackOnTitan: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/attackontitan_200.jpg',
-    Berserk: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/berserk.jpg',
-    BlueLock: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/bluelock.jpg',
-    ChainsawMan: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/chainsawman_200.jpg',
-    CodeGeass: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/codegeass_200.jpg',
-    DeathNote: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/deathnote_200.jpg',
-    DemonSlayer: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/demonslayer_200.jpg',
-    DragonBallZ: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/dragonballsuper_2000.jpg',
-    FireForce: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/fireforce_200.jpg',
-    FullmetalAlchemist: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/fullmetalalchemist_200.jpg',
-    GurrenLagann: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/gurrenlagann_200.jpg',
-    Haikyu: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/haikyu.jpg',
-    HellsParadise: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/hellsparadise_200.jpg',
-    HunterXHunter: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/hxh_200.jpg',
-    JujutsuKaisen: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/jujutsukaisen.jpg',
-    KaijuNo8: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/kaijuno8_200.jpg',
-    KatekyoHitmanReborn: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/katekyohitmanreborn_200.jpg',
-    FinalFantasy: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/finalfantasy7.png',
-    KurokoNoBasket: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/kurokonobasket_200-ezgif.com-gif-maker.jpg',
-    Mashle: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/mashle_2001.jpg',
-    MobPsycho100: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/mobpsycho100_200.jpg',
-    Naruto: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/Naruto_logo.svg.png',
-    OnePiece: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/onepiece_zoro.jpg',
-    OnePunchMan: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/onepunchman.jpg',
-    SakamotoDays: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/sakamotodays_200.jpg',
-    ShangriLaFrontier: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/shangrilafrontier_200.jpg',
-    SoloLeveling: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/sololeveling_arise.jpg',
-    SoulEater: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/souleater_200.jpg',
-    TheGodOfHighSchool: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/thegodofhighschool_200.jpg',
-    TokyoGhoul: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/tokyoghoul_200.jpg',
-    TokyoRevengers: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/tokyo-revengers.png',
-    TowerOfGod: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/towerofgod_200.jpg',
-    UndeadUnluck: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/undeadunluck.png',
-    VinlandSaga: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/vinlandsaga_200.jpg',
-    WindBreaker: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/windbreaker_200.jpg',
-    YuYuHakusho: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/yuyuhakusho_200.jpg',
-    Zelda: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/thelegendofzelda_200.jpg'
+    AirGear: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/airgear.jpg', size: 'medium', color: 'default' },
+    Bleach: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/bleach.jpg', size: 'large', color: 'bleach' },
+    AttackOnTitan: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/attackontitan_200.jpg', size: 'medium', color: 'default' },
+    Berserk: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/berserk.jpg', size: 'medium', color: 'default' },
+    BlueLock: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/bluelock.jpg', size: 'medium', color: 'default' },
+    ChainsawMan: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/chainsawman_200.jpg', size: 'medium', color: 'default' },
+    CodeGeass: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/codegeass1.png', size: 'medium', color: 'default' },
+    DeathNote: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/deathnote1.jpg', size: 'medium', color: 'default' },
+    DemonSlayer: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/demonslayer_200.jpg', size: 'medium', color: 'default' },
+    DragonBallZ: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/dragonballsuper_2000.jpg', size: 'medium', color: 'default' },
+    FireForce: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/fireforce_200.jpg', size: 'medium', color: 'default' },
+    FullmetalAlchemist: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/fullmetalalchemist_200.jpg', size: 'medium', color: 'default' },
+    GurrenLagann: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/gurrenlagann_200.jpg', size: 'medium', color: 'default' },
+    Haikyu: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/haikyu.jpg', size: 'medium', color: 'default' },
+    HellsParadise: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/hellsparadise_200.jpg', size: 'medium', color: 'default' },
+    HunterXHunter: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/hxh_200.jpg', size: 'medium', color: 'default' },
+    JujutsuKaisen: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/jujutsukaisen.jpg', size: 'medium', color: 'default' },
+    KaijuNo8: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/kaijuno8_200.jpg', size: 'medium', color: 'default' },
+    KatekyoHitmanReborn: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/katekyohitmanreborn_200.jpg', size: 'medium', color: 'default' },
+    FinalFantasy: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/finalfantasy7.png', size: 'medium', color: 'default' },
+    KurokoNoBasket: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/kurokonobasket_200-ezgif.com-gif-maker.jpg', size: 'medium', color: 'default' },
+    Mashle: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/mashle_2001.jpg', size: 'medium', color: 'default' },
+    MobPsycho100: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/mobpsycho100_200.jpg', size: 'medium', color: 'default' },
+    Naruto: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/Naruto_logo.svg.png', size: 'large', color: 'naruto' },
+    OnePiece: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/onepiece_zoro.jpg', size: 'medium', color: 'default' },
+    OnePunchMan: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/onepunchman.jpg', size: 'medium', color: 'default' },
+    SakamotoDays: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/sakamotodays_200.jpg', size: 'medium', color: 'default' },
+    ShangriLaFrontier: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/shangrilafrontier_200.jpg', size: 'medium', color: 'default' },
+    SoloLeveling: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/sololeveling_arise.jpg', size: 'medium', color: 'default' },
+    SoulEater: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/souleater_200.jpg', size: 'medium', color: 'default' },
+    TheGodOfHighSchool: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/thegodofhighschool_200.jpg', size: 'medium', color: 'default' },
+    TokyoGhoul: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/tokyoghoul_200.jpg', size: 'medium', color: 'default' },
+    TokyoRevengers: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/tokyo-revengers.png', size: 'medium', color: 'default' },
+    TowerOfGod: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/towerofgod_200.jpg', size: 'medium', color: 'default' },
+    UndeadUnluck: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/undeadunluck.png', size: 'medium', color: 'default' },
+    VinlandSaga: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/vinlandsaga_200.jpg', size: 'medium', color: 'default' },
+    WindBreaker: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/windbreaker_200.jpg', size: 'medium', color: 'default' },
+    YuYuHakusho: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/yuyuhakusho1.png', size: 'medium', color: 'default' },
+    Zelda: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/thelegendofzelda_200.jpg', size: 'medium', color: 'default' }
 };
 
 // Load figures.json
 async function loadFigures() {
     try {
+        // Fetch JSON data from figures.json
         const response = await fetch('figures.json');
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         return await response.json();
     } catch (error) {
-        console.error('Error loading JSON:', error);
+        // Log error if fetch fails
+        console.error('Error loading figures.json:', error);
         return {};
     }
 }
@@ -73,18 +76,29 @@ function renderContent(series, figures, searchQuery = '') {
                 contentDiv.innerHTML = '<p class="no-items">No items found.</p>';
                 return;
             }
-            renderItems(results, figures, contentDiv, series);
+            renderItems(results, figures, contentDiv, series, true);
         } else {
-            // Logo grid
+            // All page: show logo grid
             const logoGrid = document.createElement('div');
             logoGrid.className = 'logo-grid';
             Object.keys(figures).filter(s => s !== 'Purchased').forEach(s => {
+                // Render logo cards without borders
                 const logoCard = document.createElement('div');
                 logoCard.className = 'logo-card';
+                logoCard.setAttribute('data-color', seriesLogos[s]?.color || 'default');
                 logoCard.innerHTML = `
-                    <img src="${seriesLogos[s]}" alt="${s}" data-series="${s}">
+                    <img src="${seriesLogos[s]?.url || 'https://via.placeholder.com/250'}" alt="${s}" data-series="${s}" data-size="${seriesLogos[s]?.size || 'medium'}">
                 `;
                 logoGrid.appendChild(logoCard);
+                
+                /* Alternative: Render images directly
+                const img = document.createElement('img');
+                img.src = seriesLogos[s]?.url || 'https://via.placeholder.com/250';
+                img.alt = s;
+                img.setAttribute('data-series', s);
+                img.setAttribute('data-size', seriesLogos[s]?.size || 'medium');
+                logoGrid.appendChild(img);
+                */
             });
             contentDiv.appendChild(logoGrid);
         }
@@ -105,19 +119,19 @@ function renderContent(series, figures, searchQuery = '') {
             contentDiv.innerHTML = '<p class="no-items">No purchased items.</p>';
             return;
         }
-        renderItems(items, figures, contentDiv, series);
+        renderItems(items, figures, contentDiv, series, false);
     } else {
-        // Series page
-        seriesLogoDiv.innerHTML = `<img src="${seriesLogos[series] || 'https://via.placeholder.com/400x100?text=' + series}" alt="${series}">`;
+        // Handle individual series page
+        seriesLogoDiv.innerHTML = `<img src="${seriesLogos[series]?.url || 'https://via.placeholder.com/400x100?text=' + series}" alt="${series}">`;
         if (!figures[series] || figures[series].length === 0) {
             contentDiv.innerHTML = '<p class="no-items">No items found for this series.</p>';
             return;
         }
-        renderItems(figures[series].map(item => ({ ...item, series })), figures, contentDiv, series);
+        renderItems(figures[series].map(item => ({ ...item, series })), figures, contentDiv, series, false);
     }
 }
 
-// Search items
+// Search items based on query
 function searchItems(figures, query) {
     query = query.toLowerCase();
     const results = [];
@@ -139,9 +153,9 @@ function searchItems(figures, query) {
     return results;
 }
 
-// Render items with sort/filter
-function renderItems(items, figures, contentDiv, series) {
-    // Sort/filter controls
+// Render items with controls
+function renderItems(items, figures, contentDiv, series, isSearch = false) {
+    // Create controls container
     const controlsDiv = document.createElement('div');
     controlsDiv.className = 'controls';
     controlsDiv.innerHTML = `
@@ -153,9 +167,14 @@ function renderItems(items, figures, contentDiv, series) {
                 <option value="release-desc">Release Date (Newest)</option>
             </select>
         </label>
-        <label><input type="checkbox" id="filter-figure" checked> Figure</label>
-        <label><input type="checkbox" id="filter-manga" checked> Manga</label>
-        <label><input type="checkbox" id="filter-merch" checked> Merch</label>
+        <div class="filter-container">
+            <button class="filter-icon"><i class="fas fa-filter"></i> Filter</button>
+            <div class="filter-dropdown">
+                <label><input type="checkbox" id="filter-figure" name="filter-type" value="figure" checked> Figure</label>
+                <label><input type="checkbox" id="filter-manga" name="filter-type" value="manga" checked> Manga</label>
+                <label><input type="checkbox" id="filter-merch" name="filter-type" value="merch" checked> Merch</label>
+            </div>
+        </div>
         <label>
             Columns:
             <select id="column-select">
@@ -166,7 +185,7 @@ function renderItems(items, figures, contentDiv, series) {
     `;
     contentDiv.appendChild(controlsDiv);
     
-    // Item grid
+    // Create item grid
     const itemGrid = document.createElement('div');
     itemGrid.className = 'item-grid';
     contentDiv.appendChild(itemGrid);
@@ -185,10 +204,6 @@ function renderItems(items, figures, contentDiv, series) {
         filteredItems.sort((a, b) => {
             if (sortValue === 'name-asc') return a.name.localeCompare(b.name);
             if (sortValue === 'name-desc') return b.name.localeCompare(a.name);
-            if (sortValue === 'series-asc') return a.series.localeCompare(b.series);
-            if (sortValue === 'series-desc') return b.series.localeCompare(a.series);
-            if (sortValue === 'type-asc') return a.type.localeCompare(b.type);
-            if (sortValue === 'type-desc') return b.type.localeCompare(a.type);
             if (sortValue === 'release-asc' || sortValue === 'release-desc') {
                 const dateA = parseDate(a.released);
                 const dateB = parseDate(b.released);
@@ -203,7 +218,7 @@ function renderItems(items, figures, contentDiv, series) {
             itemDiv.className = 'item-card';
             itemDiv.innerHTML = `
                 <img src="${item.image}" alt="${item.name}" class="figure-image">
-                <hr class="card-divider">
+                ${!isSearch && series !== 'All' ? '<hr class="card-divider">' : ''}
                 <h3>${item.name}</h3>
                 <p><strong>Type:</strong> ${item.type}</p>
                 <p><strong>Set:</strong> ${item.set}</p>
@@ -218,7 +233,7 @@ function renderItems(items, figures, contentDiv, series) {
             `;
             itemGrid.appendChild(itemDiv);
             
-            // Show More button
+            // Show More
             const desc = itemDiv.querySelector('.description');
             const showMore = itemDiv.querySelector('.show-more');
             if (desc.scrollHeight <= desc.clientHeight) {
@@ -246,14 +261,12 @@ function renderItems(items, figures, contentDiv, series) {
                 `;
                 document.body.appendChild(overlay);
                 
-                // Close on overlay click
                 overlay.addEventListener('click', (e) => {
                     if (e.target === overlay) {
                         overlay.remove();
                     }
                 });
                 
-                // Close on button click
                 overlay.querySelector('.close-btn').addEventListener('click', () => {
                     overlay.remove();
                 });
@@ -265,20 +278,36 @@ function renderItems(items, figures, contentDiv, series) {
         itemGrid.classList.toggle('five-columns', columns === '5');
     }
     
-    // Parse release date
+    // Parse release date for sorting
     function parseDate(dateStr) {
         const [month, year] = dateStr.split('/');
         return new Date(parseInt(year), parseInt(month) - 1);
     }
     
-    // Initial render
-    updateItems();
+    // Toggle filter dropdown
+    const filterIcon = controlsDiv.querySelector('.filter-icon');
+    const filterDropdown = controlsDiv.querySelector('.filter-dropdown');
+    filterIcon.addEventListener('click', () => {
+        filterDropdown.classList.toggle('show');
+    });
     
-    // Event listeners for sort/filter/columns
-    document.getElementById('sort-select').addEventListener('change', updateItems);
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!filterIcon.contains(e.target) && !filterDropdown.contains(e.target)) {
+            filterDropdown.classList.remove('show');
+        }
+    });
+    
+    // Update items on filter change
     document.getElementById('filter-figure').addEventListener('change', updateItems);
     document.getElementById('filter-manga').addEventListener('change', updateItems);
     document.getElementById('filter-merch').addEventListener('change', updateItems);
+    
+    // Initial render
+    updateItems();
+    
+    // Event listeners for sort and columns
+    document.getElementById('sort-select').addEventListener('change', updateItems);
     document.getElementById('column-select').addEventListener('change', updateItems);
 }
 
@@ -288,7 +317,6 @@ function updateItem(figures, series, name, key, value) {
         const item = figures[series].find(i => i.name === name);
         if (item) {
             item[key] = value;
-            console.log('Updated:', figures);
             return true;
         }
     }
@@ -299,17 +327,18 @@ function updateItem(figures, series, name, key, value) {
 async function init() {
     const figures = await loadFigures();
     
-    // Sidebar clicks
-    document.querySelectorAll('.sidebar a[data-series]').forEach(link => {
+    // Add click handlers for sidebar and title links
+    document.querySelectorAll('.sidebar a[data-series], .top-left-text[data-series]').forEach(link => {
         link.addEventListener('click', e => {
             e.preventDefault();
             document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
-            link.classList.add('active');
-            renderContent(link.getAttribute('data-series'), figures);
+            const series = link.getAttribute('data-series');
+            document.querySelector(`.sidebar a[data-series="${series}"]`)?.classList.add('active');
+            renderContent(series, figures);
         });
     });
     
-    // Logo clicks
+    // Handle logo clicks to navigate to series
     document.addEventListener('click', e => {
         if (e.target.tagName === 'IMG' && e.target.hasAttribute('data-series')) {
             document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
@@ -318,7 +347,7 @@ async function init() {
         }
     });
     
-    // Toggle purchased
+    // Handle purchased toggle
     document.addEventListener('click', e => {
         if (e.target.classList.contains('toggle-purchased')) {
             const series = e.target.getAttribute('data-series');
@@ -335,7 +364,7 @@ async function init() {
         }
     });
     
-    // Search
+    // Handle search input
     const searchBox = document.getElementById('search-box');
     searchBox.addEventListener('input', () => {
         const query = searchBox.value.trim();

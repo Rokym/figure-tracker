@@ -1,18 +1,30 @@
+<!-- 
+  This is the main HTML file for the Weeb Corner application.
+  It sets up the basic structure with a sidebar for navigation and a main content area.
+  Includes external CSS for styling and Font Awesome for icons.
+  JavaScript is loaded at the end to ensure DOM is ready.
+-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Meta tags for character encoding and responsive viewport -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Figure Tracker</title>
+    <title>Weeb Corner</title>
+    <!-- Link to external stylesheet -->
     <link rel="stylesheet" href="style.css">
+    <!-- Link to Font Awesome for filter icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
+    <!-- Top-left title, clickable to "All" page, styled with button-53 class -->
+    <a href="#" class="top-left-text button-53" data-series="All">weeb corner</a>
     <div class="container">
+        <!-- Sidebar for navigation and search -->
         <div class="sidebar">
             <input type="text" id="search-box" placeholder="Search items...">
             <a href="#" class="button-53" data-series="All">All</a>
             <a href="#" class="button-53" data-series="Purchased">Purchased</a>
-            <hr>
             <a href="#" class="button-53" data-series="AirGear">Air Gear</a>
             <a href="#" class="button-53" data-series="Bleach">Bleach</a>
             <a href="#" class="button-53" data-series="AttackOnTitan">Attack on Titan</a>
@@ -53,11 +65,13 @@
             <a href="#" class="button-53" data-series="YuYuHakusho">Yu Yu Hakusho</a>
             <a href="#" class="button-53" data-series="Zelda">Zelda</a>
         </div>
+        <!-- Main content area for logos and items -->
         <div class="main-content">
             <div id="series-logo"></div>
             <div id="content"></div>
         </div>
     </div>
+    <!-- External JavaScript for dynamic content -->
     <script src="script.js"></script>
 </body>
 </html>
