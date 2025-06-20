@@ -61,7 +61,92 @@
       "pinned": false
     }
   ],
-  "AttackOnTitan": [],
+  "AttackOnTitan": [
+    {
+      "name": "Eren, Mikasa and Armin",
+      "set": "Rumbling",
+      "company": "Bandai Spirits",
+      "released": "8/31/2024",
+      "image": "place",
+      "link": "https://www.ebay.com/sch/i.html?_nkw=bandai+spirits+ichibansho+Eren%2C+Mikasa+and+Armin&_sacat=0&_from=R40&_trksid=m570.l1313&_odkw=bandai+spirits+ichibansho+Levi+Ackermann+%28Rumbling%29&_osacat=0",
+      "description": "Sold out. Standing at approximately 4 inches tall, Eren Jaeger & Mikasa Ackerman & Armin Arlert are seen in an iconic pose.",
+      "type": "figure",
+      "purchased": false,
+      "pinned": false
+    },
+    {
+      "name": "Levi Ackermann (Rumbling)",
+      "set": "Rumbling",
+      "company": "Bandai Spirits",
+      "released": "8/31/2024",
+      "image": "place",
+      "link": "https://www.ebay.com/sch/i.html?_nkw=bandai+spirits+ichibansho+Levi+Ackermann+%28Rumbling%29&_sacat=0&_from=R40&_trksid=m570.l1313&_odkw=bandai+spirits+Levi+Ackermann+%28Rumbling%29&_osacat=0",
+      "description": "Sold out. Standing at approximately 6 inches tall, Levi is seen in an iconic pose.",
+      "type": "figure",
+      "purchased": false,
+      "pinned": false
+    },
+    {
+      "name": "Annie Leonhart",
+      "set": "The World Outside the Walls",
+      "company": "Bandai",
+      "released": "4/30/2025",
+      "image": "place",
+      "link": "https://www.ebay.com/sch/i.html?_nkw=Attack+on+Titan+KUJI+The+World+Outside+the+Walls+annie+leonhart&_sacat=0&_from=R40&_trksid=p2334524.m570.l1313&_odkw=Attack+on+Titan+KUJI+The+World+Outside+the+Walls+attack+TITAN&_osacat=0",
+      "description": "Sold out. Bandai's Ichibansho line pays homage to Attack on Titan's Annie Leonhart, measure at 7 inches tall",
+      "type": "figure",
+      "purchased": false,
+      "pinned": false
+    },
+    {
+      "name": "Attack Titan",
+      "set": "The World Outside the Walls",
+      "company": "Bandai",
+      "released": "4/30/2025",
+      "image": "place",
+      "link": "https://www.ebay.com/sch/i.html?_nkw=Attack+on+Titan+KUJI+The+World+Outside+the+Walls+attack+TITAN&_sacat=0&_from=R40&_trksid=p2334524.m570.l1313&_odkw=Attack+on+Titan+KUJI+The+World+Outside+the+Walls+FEMALE+TITAN&_osacat=0",
+      "description": "Sold out. Bandai's Ichibansho line pays homage to Attack on Titan's Eren Yeager, measures at 11.8 inches tall.",
+      "type": "figure",
+      "purchased": false,
+      "pinned": false
+    },
+    {
+      "name": "Female Titan",
+      "set": "The World Outside the Walls",
+      "company": "Bandai",
+      "released": "4/30/2025",
+      "image": "place",
+      "link": "https://www.ebay.com/sch/i.html?_nkw=Attack+on+Titan+KUJI+The+World+Outside+the+Walls+FEMALE+TITAN&_sacat=0&_from=R40&_trksid=p2332490.m570.l1313",
+      "description": "Sold Out. Bandai's Ichibansho line pays homage to Attack on Titan's Female titan, measures at 11.8 inches tall.",
+      "type": "figure",
+      "purchased": false,
+      "pinned": false
+    },
+    {
+      "name": "Beast Titan",
+      "set": "I'll take down the Beast Titan",
+      "company": "Bandai Spirits",
+      "released": "10/11/2025",
+      "image": "place",
+      "link": "https://www.google.com/search?q=attack+on+titan+levi+beast+titan+ill+take+down+the+beast+titan&sca_esv=f7661461505a9ca6&rlz=1C1GCER_en&sxsrf=AE3TifPLxhP0MZI2vqb97iITwYwMNWL26g%3A1750454877529&ei=XdJVaI2EIOWj5NoPnpjtmQ4&ved=0ahUKEwjNpq7J-ICOAxXlEVkFHR5MO-MQ4dUDCBA&uact=5&oq=attack+on+titan+levi+beast+titan+ill+take+down+the+beast+titan&gs_lp=Egxnd3Mtd2l6LXNlcnAiPmF0dGFjayBvbiB0aXRhbiBsZXZpIGJlYXN0IHRpdGFuIGlsbCB0YWtlIGRvd24gdGhlIGJlYXN0IHRpdGFuSOdgUJoIWLxfcAN4AZABAJgBvAGgAe8hqgEEMS4zNLgBA8gBAPgBAZgCIqACyx_CAgoQABiwAxjWBBhHwgIGEAAYBxgewgIHEC4YgAQYDcICBxAAGIAEGA3CAgsQABiABBiRAhiKBcICBhAAGBYYHsICBRAhGKABwgIFECEYqwLCAgcQIRigARgKwgIHECEYChirApgDAIgGAZAGCJIHBDMuMzGgB76VArIHBDAuMzG4B7sfwgcLMC4xMS4yMC4xLjLIB6IB&sclient=gws-wiz-serp",
+      "description": "MegaImpact 30cm",
+      "type": "figure",
+      "purchased": false,
+      "pinned": false
+    },
+    {
+      "name": "Levi Ackermann (I'll take down the Beast Titan",
+      "set": "I'll take down the Beast Titan",
+      "company": "Bandai Spirits",
+      "released": "10/11/2025",
+      "image": "place",
+      "link": "https://www.google.com/search?q=attack+on+titan+levi+beast+titan+ill+take+down+the+beast+titan&sca_esv=f7661461505a9ca6&rlz=1C1GCER_en&sxsrf=AE3TifPLxhP0MZI2vqb97iITwYwMNWL26g%3A1750454877529&ei=XdJVaI2EIOWj5NoPnpjtmQ4&ved=0ahUKEwjNpq7J-ICOAxXlEVkFHR5MO-MQ4dUDCBA&uact=5&oq=attack+on+titan+levi+beast+titan+ill+take+down+the+beast+titan&gs_lp=Egxnd3Mtd2l6LXNlcnAiPmF0dGFjayBvbiB0aXRhbiBsZXZpIGJlYXN0IHRpdGFuIGlsbCB0YWtlIGRvd24gdGhlIGJlYXN0IHRpdGFuSOdgUJoIWLxfcAN4AZABAJgBvAGgAe8hqgEEMS4zNLgBA8gBAPgBAZgCIqACyx_CAgoQABiwAxjWBBhHwgIGEAAYBxgewgIHEC4YgAQYDcICBxAAGIAEGA3CAgsQABiABBiRAhiKBcICBhAAGBYYHsICBRAhGKABwgIFECEYqwLCAgcQIRigARgKwgIHECEYChirApgDAIgGAZAGCJIHBDMuMzGgB76VArIHBDAuMzG4B7sfwgcLMC4xMS4yMC4xLjLIB6IB&sclient=gws-wiz-serp",
+      "description": "Masterlise, 22cm",
+      "type": "figure",
+      "purchased": false,
+      "pinned": false
+    }
+  ],
   "Berserk": [],
   "Bleach": [
     {

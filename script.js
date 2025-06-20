@@ -6,21 +6,21 @@ const seriesLogos = {
     Berserk: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/berserk.jpg', size: 'medium', color: 'default' },
     BlueLock: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/bluelock.jpg', size: 'medium', color: 'default' },
     ChainsawMan: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/chainsawman_200.jpg', size: 'medium', color: 'default' },
-    CodeGeass: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/codegeass1.png', size: 'medium', color: 'default' },
+    CodeGeass: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/codegeass1.png', size: 'large', color: 'default' },
     DeathNote: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/deathnote1.jpg', size: 'medium', color: 'default' },
-    DemonSlayer: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/demonslayer_200.jpg', size: 'medium', color: 'default' },
+    DemonSlayer: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/demonslayer_200.jpg', size: 'small', color: 'default' },
     DragonBallZ: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/dragonballsuper_2000.jpg', size: 'medium', color: 'default' },
-    FireForce: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/fireforce_200.jpg', size: 'medium', color: 'default' },
+    FireForce: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/fireforce_200.jpg', size: 'small', color: 'default' },
     FullmetalAlchemist: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/fullmetalalchemist_200.jpg', size: 'medium', color: 'default' },
     GurrenLagann: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/gurrenlagann_200.jpg', size: 'medium', color: 'default' },
     Haikyu: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/haikyu.jpg', size: 'medium', color: 'default' },
     HellsParadise: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/hellsparadise_200.jpg', size: 'medium', color: 'default' },
     HunterXHunter: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/hxh_200.jpg', size: 'medium', color: 'default' },
-    JujutsuKaisen: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/jujutsukaisen.jpg', size: 'medium', color: 'default' },
+    JujutsuKaisen: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/jujutsukaisen.jpg', size: 'large', color: 'default' },
     KaijuNo8: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/kaijuno8_200.jpg', size: 'medium', color: 'default' },
     KatekyoHitmanReborn: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/katekyohitmanreborn_200.jpg', size: 'medium', color: 'default' },
     FinalFantasy: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/finalfantasy7.png', size: 'medium', color: 'default' },
-    KurokoNoBasket: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/kurokonobasket_200-ezgif.com-gif-maker.jpg', size: 'medium', color: 'default' },
+    KurokoNoBasket: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/kurokonobasket1.jpg', size: 'medium', color: 'default' },
     Mashle: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/mashle_2001.jpg', size: 'medium', color: 'default' },
     MobPsycho100: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/mobpsycho100_200.jpg', size: 'medium', color: 'default' },
     Naruto: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/Naruto_logo.svg.png', size: 'large', color: 'naruto' },
@@ -225,8 +225,8 @@ function renderItems(items, figures, contentDiv, series, isSearch = false) {
                 <p><strong>Company:</strong> ${item.company || 'N/A'}</p>
                 <p><strong>Released:</strong> ${item.released}</p>
                 <p class="description">${item.description}</p>
-                <button class="show-more">Show More</button>
-                <a href="${item.link}" target="_blank">Buy / View Listing</a>
+               <a href="${item.link}" target="_blank">Buy / View Listing</a> <!-- Moved up -->
+                <button class="show-more">Show More</button> <!-- Moved down -->
                 <button class="toggle-purchased" data-series="${item.series}" data-name="${item.name}">
                     ${item.purchased ? 'Mark as Not Purchased' : 'Mark as Purchased'}
                 </button>

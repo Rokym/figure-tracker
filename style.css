@@ -63,7 +63,7 @@ body {
     flex: 1;
     padding: 16px; /* 20 * 0.8 */
     /* Darker background for All page */
-    background: #111111;
+    background: #000000;
     /* Vertical scrolling only */
     overflow-y: auto;
     overflow-x: hidden;
@@ -87,7 +87,7 @@ body {
 
 /* Sidebar */
 #search-box {
-    width: 100%;
+    width: 95%;
     padding: 12px; /* 15 * 0.8 */
     margin-top: 16px; /* 20 * 0.8 */
     margin-bottom: 32px; /* 40 * 0.8 */
@@ -155,7 +155,7 @@ body {
     width: 100%;
     max-width: 400px; /* 500 * 0.8 */
     height: auto;
-    margin-bottom: 16px; /* 20 * 0.8 */
+    margin-bottom: 10px; /* 20 * 0.8 */
     border-radius: 4px; /* 5 * 0.8 */
 }
 
@@ -179,15 +179,15 @@ body {
 }
 
 .logo-card[data-color="default"] {
-    background: #111111;
+    background: #000000;
 }
 
 .logo-card[data-color="naruto"] {
-    background: #111111;
+    background: #000000;
 }
 
 .logo-card[data-color="bleach"] {
-    background: #111111;
+    background: #000000;
 }
 
 .logo-card:hover {
@@ -199,7 +199,7 @@ body {
     height: 200px; /* 250 * 0.8 */
     object-fit: contain;
     object-position: center;
-    background-color: #111111;
+    background-color: #000000;
     border-radius: 4px; /* 5 * 0.8 */
     cursor: pointer;
 }
@@ -215,8 +215,8 @@ body {
 }
 
 .logo-card img[data-size="large"] {
-    width: 240px; /* 300 * 0.8 */
-    height: 240px; /* 300 * 0.8 */
+    width: 300px; /* 300 * 0.8 */
+    height: 30px; /* 300 * 0.8 */
 }
 
 /* Alternative: No logo cards (commented out) */
@@ -233,16 +233,16 @@ body {
     transform: scale(1.05);
 }
 .logo-grid img[data-size="small"] {
-    width: 160px; /* 200 * 0.8 */
-    height: 160px; /* 200 * 0.8 */
+    width: 200px; /* 200 * 0.8 */
+    height: 300px; /* 200 * 0.8 */
 }
 .logo-grid img[data-size="medium"] {
-    width: 200px; /* 250 * 0.8 */
-    height: 200px; /* 250 * 0.8 */
+    width: 280px; /* 250 * 0.8 */
+    height: 280px; /* 250 * 0.8 */
 }
 .logo-grid img[data-size="large"] {
-    width: 240px; /* 300 * 0.8 */
-    height: 240px; /* 300 * 0.8 */
+    width: 300px; /* 300 * 0.8 */
+    height: 300px; /* 300 * 0.8 */
 }
 */
 
