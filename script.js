@@ -178,8 +178,8 @@ function renderItems(items, figures, contentDiv, series, isSearch = false) {
         <label>
             Columns:
             <select id="column-select">
-                <option value="5">5 Columns</option>
                 <option value="6">6 Columns</option>
+                <option value="5">5 Columns</option>
             </select>
         </label>
     `;
@@ -275,7 +275,7 @@ function renderItems(items, figures, contentDiv, series, isSearch = false) {
         
         // Update columns
         const columns = document.getElementById('column-select').value;
-        itemGrid.classList.toggle('five-columns', columns === '5');
+        itemGrid.classList.toggle('five-columns', columns === '6');
     }
     
     // Parse release date for sorting
