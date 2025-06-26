@@ -1,4 +1,4 @@
-// Logo URLs and customizations
+// Logo URLs and customizations for series banners
 const seriesLogos = {
     AirGear: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/airgear.jpg', size: 'medium', color: 'default' },
     Bleach: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/bleach.jpg', size: 'large', color: 'bleach' },
@@ -41,18 +41,32 @@ const seriesLogos = {
     Zelda: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/thelegendofzelda_200.jpg', size: 'medium', color: 'default' }
 };
 
-// Load figures.json
+// Load figures.json data
 async function loadFigures() {
     try {
-        // Fetch JSON data from figures.json
         const response = await fetch('figures.json');
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         return await response.json();
     } catch (error) {
-        // Log error if fetch fails
         console.error('Error loading figures.json:', error);
         return {};
     }
+}
+
+// Save current state to sessionStorage
+function saveState(series, query, scrollPosition) {
+    sessionStorage.setItem('currentSeries', series);
+    sessionStorage.setItem('searchQuery', query || '');
+    sessionStorage.setItem('scrollPosition', scrollPosition);
+}
+
+// Restore state from sessionStorage
+function restoreState() {
+    return {
+        series: sessionStorage.getItem('currentSeries') || 'All',
+        query: sessionStorage.getItem('searchQuery') || '',
+        scrollPosition: parseFloat(sessionStorage.getItem('scrollPosition')) || 0
+    };
 }
 
 // Render content based on series
@@ -64,25 +78,22 @@ function renderContent(series, figures, searchQuery = '') {
     seriesLogoDiv.innerHTML = '';
     contentDiv.innerHTML = '';
     
-    // Scroll to top
-    window.scrollTo(0, 0);
-    
     if (series === 'All') {
         if (searchQuery) {
-            // Search results
+            // Render search results
             const results = searchItems(figures, searchQuery);
             seriesLogoDiv.innerHTML = `<img src="https://via.placeholder.com/400x100?text=Search+Results" alt="Search Results">`;
             if (results.length === 0) {
                 contentDiv.innerHTML = '<p class="no-items">No items found.</p>';
+                saveState(series, searchQuery, 0);
                 return;
             }
             renderItems(results, figures, contentDiv, series, true);
         } else {
-            // All page: show logo grid
+            // Render logo grid for All page
             const logoGrid = document.createElement('div');
             logoGrid.className = 'logo-grid';
             Object.keys(figures).filter(s => s !== 'Purchased').forEach(s => {
-                // Render logo cards without borders
                 const logoCard = document.createElement('div');
                 logoCard.className = 'logo-card';
                 logoCard.setAttribute('data-color', seriesLogos[s]?.color || 'default');
@@ -90,20 +101,12 @@ function renderContent(series, figures, searchQuery = '') {
                     <img src="${seriesLogos[s]?.url || 'https://via.placeholder.com/250'}" alt="${s}" data-series="${s}" data-size="${seriesLogos[s]?.size || 'medium'}">
                 `;
                 logoGrid.appendChild(logoCard);
-                
-                /* Alternative: Render images directly
-                const img = document.createElement('img');
-                img.src = seriesLogos[s]?.url || 'https://via.placeholder.com/250';
-                img.alt = s;
-                img.setAttribute('data-series', s);
-                img.setAttribute('data-size', seriesLogos[s]?.size || 'medium');
-                logoGrid.appendChild(img);
-                */
             });
             contentDiv.appendChild(logoGrid);
+            saveState(series, searchQuery, 0);
         }
     } else if (series === 'Purchased') {
-        // Purchased page
+        // Render purchased items
         seriesLogoDiv.innerHTML = `<img src="https://via.placeholder.com/400x100?text=Purchased" alt="Purchased">`;
         const items = [];
         Object.keys(figures).forEach(s => {
@@ -117,14 +120,16 @@ function renderContent(series, figures, searchQuery = '') {
         });
         if (items.length === 0) {
             contentDiv.innerHTML = '<p class="no-items">No purchased items.</p>';
+            saveState(series, searchQuery, 0);
             return;
         }
         renderItems(items, figures, contentDiv, series, false);
     } else {
-        // Handle individual series page
+        // Render individual series page
         seriesLogoDiv.innerHTML = `<img src="${seriesLogos[series]?.url || 'https://via.placeholder.com/400x100?text=' + series}" alt="${series}">`;
         if (!figures[series] || figures[series].length === 0) {
             contentDiv.innerHTML = '<p class="no-items">No items found for this series.</p>';
+            saveState(series, searchQuery, 0);
             return;
         }
         renderItems(figures[series].map(item => ({ ...item, series })), figures, contentDiv, series, false);
@@ -155,7 +160,7 @@ function searchItems(figures, query) {
 
 // Render items with controls
 function renderItems(items, figures, contentDiv, series, isSearch = false) {
-    // Create controls container
+    // Create controls for sorting and filtering
     const controlsDiv = document.createElement('div');
     controlsDiv.className = 'controls';
     controlsDiv.innerHTML = `
@@ -190,7 +195,7 @@ function renderItems(items, figures, contentDiv, series, isSearch = false) {
     itemGrid.className = 'item-grid';
     contentDiv.appendChild(itemGrid);
     
-    // Apply sort/filter
+    // Update items based on filters and sorting
     function updateItems() {
         let filteredItems = items.filter(item => {
             return (
@@ -203,7 +208,7 @@ function renderItems(items, figures, contentDiv, series, isSearch = false) {
         const sortValue = document.getElementById('sort-select').value;
         filteredItems.sort((a, b) => {
             if (sortValue === 'name-asc') return a.name.localeCompare(b.name);
-            if (sortValue === 'name-desc') return b.name.localeCompare(a.name);
+            if (sortValue === 'name-desc') return b.name.localeCompare(b.name);
             if (sortValue === 'release-asc' || sortValue === 'release-desc') {
                 const dateA = parseDate(a.released);
                 const dateB = parseDate(b.released);
@@ -225,15 +230,15 @@ function renderItems(items, figures, contentDiv, series, isSearch = false) {
                 <p><strong>Company:</strong> ${item.company || 'N/A'}</p>
                 <p><strong>Released:</strong> ${item.released}</p>
                 <p class="description">${item.description}</p>
-               <a href="${item.link}" target="_blank">Buy / View Listing</a> <!-- Moved up -->
-                <button class="show-more">Show More</button> <!-- Moved down -->
+                <a href="${item.link}" target="_blank">Buy / View Listing</a>
+                <button class="show-more">Show More</button>
                 <button class="toggle-purchased" data-series="${item.series}" data-name="${item.name}">
                     ${item.purchased ? 'Mark as Not Purchased' : 'Mark as Purchased'}
                 </button>
             `;
             itemGrid.appendChild(itemDiv);
             
-            // Show More
+            // Handle description show/hide
             const desc = itemDiv.querySelector('.description');
             const showMore = itemDiv.querySelector('.show-more');
             if (desc.scrollHeight <= desc.clientHeight) {
@@ -250,7 +255,7 @@ function renderItems(items, figures, contentDiv, series, isSearch = false) {
                 });
             }
             
-            // Zoom image
+            // Handle image zoom
             const img = itemDiv.querySelector('.figure-image');
             img.addEventListener('click', () => {
                 const overlay = document.createElement('div');
@@ -276,12 +281,17 @@ function renderItems(items, figures, contentDiv, series, isSearch = false) {
         // Update columns
         const columns = document.getElementById('column-select').value;
         itemGrid.classList.toggle('five-columns', columns === '6');
+        
+        // Save scroll position
+        contentDiv.addEventListener('scroll', () => {
+            saveState(series, document.getElementById('search-box').value, contentDiv.scrollTop);
+        }, { once: true });
     }
     
     // Parse release date for sorting
     function parseDate(dateStr) {
         const [month, year] = dateStr.split('/');
-        return new Date(parseInt(year), parseInt(month) - 1);
+        return new Date(parseInt(year) || 0, parseInt(month) - 1 || 0);
     }
     
     // Toggle filter dropdown
@@ -298,20 +308,18 @@ function renderItems(items, figures, contentDiv, series, isSearch = false) {
         }
     });
     
-    // Update items on filter change
+    // Update items on filter/sort/column change
     document.getElementById('filter-figure').addEventListener('change', updateItems);
     document.getElementById('filter-manga').addEventListener('change', updateItems);
     document.getElementById('filter-merch').addEventListener('change', updateItems);
+    document.getElementById('sort-select').addEventListener('change', updateItems);
+    document.getElementById('column-select').addEventListener('change', updateItems);
     
     // Initial render
     updateItems();
-    
-    // Event listeners for sort and columns
-    document.getElementById('sort-select').addEventListener('change', updateItems);
-    document.getElementById('column-select').addEventListener('change', updateItems);
 }
 
-// Update item (in-memory)
+// Update item in-memory
 function updateItem(figures, series, name, key, value) {
     if (figures[series]) {
         const item = figures[series].find(i => i.name === name);
@@ -327,7 +335,21 @@ function updateItem(figures, series, name, key, value) {
 async function init() {
     const figures = await loadFigures();
     
-    // Add click handlers for sidebar and title links
+    // Toggle sidebar on hamburger click
+    const hamburger = document.getElementById('hamburger');
+    const sidebar = document.getElementById('sidebar');
+    hamburger.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+    });
+    
+    // Close sidebar when clicking a link
+    document.querySelectorAll('.sidebar a[data-series]').forEach(link => {
+        link.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+        });
+    });
+    
+    // Handle sidebar and title link clicks
     document.querySelectorAll('.sidebar a[data-series], .top-left-text[data-series]').forEach(link => {
         link.addEventListener('click', e => {
             e.preventDefault();
@@ -335,15 +357,19 @@ async function init() {
             const series = link.getAttribute('data-series');
             document.querySelector(`.sidebar a[data-series="${series}"]`)?.classList.add('active');
             renderContent(series, figures);
+            saveState(series, '', 0);
         });
     });
     
-    // Handle logo clicks to navigate to series
+    // Handle logo clicks
     document.addEventListener('click', e => {
         if (e.target.tagName === 'IMG' && e.target.hasAttribute('data-series')) {
             document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
-            document.querySelector(`.sidebar a[data-series="${e.target.getAttribute('data-series')}"]`)?.classList.add('active');
-            renderContent(e.target.getAttribute('data-series'), figures);
+            const series = e.target.getAttribute('data-series');
+            document.querySelector(`.sidebar a[data-series="${series}"]`)?.classList.add('active');
+            renderContent(series, figures);
+            saveState(series, '', 0);
+            sidebar.classList.remove('active');
         }
     });
     
@@ -358,7 +384,9 @@ async function init() {
                 : 'Mark this item as purchased?';
             if (window.confirm(confirmMsg)) {
                 if (updateItem(figures, series, name, 'purchased', !item.purchased)) {
-                    renderContent(document.querySelector('.sidebar a.active')?.getAttribute('data-series') || 'All', figures);
+                    const currentSeries = document.querySelector('.sidebar a.active')?.getAttribute('data-series') || 'All';
+                    renderContent(currentSeries, figures, document.getElementById('search-box').value);
+                    saveState(currentSeries, document.getElementById('search-box').value, document.getElementById('content').scrollTop);
                 }
             }
         }
@@ -371,11 +399,18 @@ async function init() {
         document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
         document.querySelector('.sidebar a[data-series="All"]').classList.add('active');
         renderContent('All', figures, query);
+        saveState('All', query, 0);
     });
     
-    // Load All by default
-    document.querySelector('.sidebar a[data-series="All"]').classList.add('active');
-    renderContent('All', figures);
+    // Restore state or load default
+    const { series, query, scrollPosition } = restoreState();
+    document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+    document.querySelector(`.sidebar a[data-series="${series}"]`)?.classList.add('active');
+    searchBox.value = query;
+    renderContent(series, figures, query);
+    setTimeout(() => {
+        document.getElementById('content').scrollTop = scrollPosition;
+    }, 0);
 }
 
 init();
