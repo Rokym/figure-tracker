@@ -1,85 +1,77 @@
-<!-- HTML structure for the webpage -->
+<!-- 
+  This is the main HTML file for the Weeb Corner application.
+  It sets up the basic structure with a sidebar for navigation and a main content area.
+  Includes external CSS for styling and Font Awesome for icons.
+  JavaScript is loaded at the end to ensure DOM is ready.
+-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Meta tags for character encoding and responsive viewport -->
     <meta charset="UTF-8">
-    <!-- Enable responsive design with viewport meta tag -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weeb Corner</title>
-    <!-- Link to external styles -->
+    <!-- Link to external stylesheet -->
     <link rel="stylesheet" href="style.css">
-    <!-- Include Font Awesome for hamburger menu icon -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Link to Font Awesome for filter icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
-    <!-- Main container for layout -->
+    <!-- Top-left title, clickable to "All" page, styled with button-53 class -->
+    <a href="#" class="top-left-text button-53" data-series="All">weeb corner</a>
     <div class="container">
-        <!-- Hamburger menu icon for mobile sidebar toggle -->
-        <button class="hamburger" id="hamburger">
-            <i class="fas fa-bars"></i>
-        </button>
-        
-        <!-- Title link in top-left corner -->
-        <a href="#" class="top-left-text" data-series="All">weeb corner</a>
-        
-        <!-- Sidebar for series navigation -->
-        <div class="sidebar" id="sidebar">
-            <!-- Search input for filtering items -->
+        <!-- Sidebar for navigation and search -->
+        <div class="sidebar">
             <input type="text" id="search-box" placeholder="Search items...">
-            <!-- Navigation links for series -->
-            <a href="#" data-series="All">All</a>
-            <a href="#" data-series="Purchased">Purchased</a>
-            <a href="#" data-series="AirGear">Air Gear</a>
-            <a href="#" data-series="AttackOnTitan">Attack on Titan</a>
-            <a href="#" data-series="Berserk">Berserk</a>
-            <a href="#" data-series="Bleach">Bleach</a>
-            <a href="#" data-series="BlueLock">Blue Lock</a>
-            <a href="#" data-series="ChainsawMan">Chainsaw Man</a>
-            <a href="#" data-series="CodeGeass">Code Geass</a>
-            <a href="#" data-series="DeathNote">Death Note</a>
-            <a href="#" data-series="DemonSlayer">Demon Slayer</a>
-            <a href="#" data-series="DragonBallZ">Dragon Ball Z</a>
-            <a href="#" data-series="FinalFantasy">Final Fantasy</a>
-            <a href="#" data-series="FireForce">Fire Force</a>
-            <a href="#" data-series="FullmetalAlchemist">Fullmetal Alchemist</a>
-            <a href="#" data-series="GurrenLagann">Gurren Lagann</a>
-            <a href="#" data-series="Haikyu">Haikyu!!</a>
-            <a href="#" data-series="HellsParadise">Hell's Paradise</a>
-            <a href="#" data-series="HunterXHunter">Hunter x Hunter</a>
-            <a href="#" data-series="JujutsuKaisen">Jujutsu Kaisen</a>
-            <a href="#" data-series="KaijuNo8">Kaiju No.8</a>
-            <a href="#" data-series="KatekyoHitmanReborn">Katekyo Hitman Reborn!</a>
-            <a href="#" data-series="KurokoNoBasket">Kuroko no Basket</a>
-            <a href="#" data-series="Mashle">Mashle</a>
-            <a href="#" data-series="MobPsycho100">Mob Psycho 100</a>
-            <a href="#" data-series="Naruto">Naruto</a>
-            <a href="#" data-series="OnePiece">One Piece</a>
-            <a href="#" data-series="OnePunchMan">One-Punch Man</a>
-            <a href="#" data-series="SakamotoDays">Sakamoto Days</a>
-            <a href="#" data-series="ShangriLaFrontier">Shangri-La Frontier</a>
-            <a href="#" data-series="SoloLeveling">Solo Leveling</a>
-            <a href="#" data-series="SoulEater">Soul Eater</a>
-            <a href="#" data-series="TheGodOfHighSchool">The God of High School</a>
-            <a href="#" data-series="TokyoGhoul">Tokyo Ghoul</a>
-            <a href="#" data-series="TokyoRevengers">Tokyo Revengers</a>
-            <a href="#" data-series="TowerOfGod">Tower of God</a>
-            <a href="#" data-series="UndeadUnluck">Undead Unluck</a>
-            <a href="#" data-series="VinlandSaga">Vinland Saga</a>
-            <a href="#" data-series="WindBreaker">Wind Breaker</a>
-            <a href="#" data-series="YuYuHakusho">Yu Yu Hakusho</a>
-            <a href="#" data-series="Zelda">Zelda</a>
+            <a href="#" class="button-53" data-series="All">All</a>
+            <a href="#" class="button-53" data-series="Purchased">Purchased</a>
+            <a href="#" class="button-53" data-series="AirGear">Air Gear</a>
+            <a href="#" class="button-53" data-series="AttackOnTitan">Attack on Titan</a>
+            <a href="#" class="button-53" data-series="Berserk">Berserk</a>
+            <a href="#" class="button-53" data-series="Bleach">Bleach</a>
+            <a href="#" class="button-53" data-series="BlueLock">Blue Lock</a>
+            <a href="#" class="button-53" data-series="ChainsawMan">Chainsaw Man</a>
+            <a href="#" class="button-53" data-series="CodeGeass">Code Geass</a>
+            <a href="#" class="button-53" data-series="DeathNote">Death Note</a>
+            <a href="#" class="button-53" data-series="DemonSlayer">Demon Slayer</a>
+            <a href="#" class="button-53" data-series="DragonBallZ">Dragon Ball Z</a>
+            <a href="#" class="button-53" data-series="FinalFantasy">Final Fantasy</a>
+            <a href="#" class="button-53" data-series="FireForce">Fire Force</a>
+            <a href="#" class="button-53" data-series="FullmetalAlchemist">Fullmetal Alchemist</a>
+            <a href="#" class="button-53" data-series="GurrenLagann">Gurren Lagann</a>
+            <a href="#" class="button-53" data-series="Haikyu">Haikyu!!</a>
+            <a href="#" class="button-53" data-series="HellsParadise">Hell's Paradise</a>
+            <a href="#" class="button-53" data-series="HunterXHunter">Hunter x Hunter</a>
+            <a href="#" class="button-53" data-series="JujutsuKaisen">Jujutsu Kaisen</a>
+            <a href="#" class="button-53" data-series="KaijuNo8">Kaiju No.8</a>
+            <a href="#" class="button-53" data-series="KatekyoHitmanReborn">Katekyo Hitman Reborn!</a>
+            <a href="#" class="button-53" data-series="KurokoNoBasket">Kuroko no Basket</a>
+            <a href="#" class="button-53" data-series="Mashle">Mashle</a>
+            <a href="#" class="button-53" data-series="MobPsycho100">Mob Psycho 100</a>
+            <a href="#" class="button-53" data-series="Naruto">Naruto</a>
+            <a href="#" class="button-53" data-series="OnePiece">One Piece</a>
+            <a href="#" class="button-53" data-series="OnePunchMan">One-Punch Man</a>
+            <a href="#" class="button-53" data-series="SakamotoDays">Sakamoto Days</a>
+            <a href="#" class="button-53" data-series="ShangriLaFrontier">Shangri-La Frontier</a>
+            <a href="#" class="button-53" data-series="SoloLeveling">Solo Leveling</a>
+            <a href="#" class="button-53" data-series="SoulEater">Soul Eater</a>
+            <a href="#" class="button-53" data-series="TheGodOfHighSchool">The God of High School</a>
+            <a href="#" class="button-53" data-series="TokyoGhoul">Tokyo Ghoul</a>
+            <a href="#" class="button-53" data-series="TokyoRevengers">Tokyo Revengers</a>
+            <a href="#" class="button-53" data-series="TowerOfGod">Tower of God</a>
+            <a href="#" class="button-53" data-series="UndeadUnluck">Undead Unluck</a>
+            <a href="#" class="button-53" data-series="VinlandSaga">Vinland Saga</a>
+            <a href="#" class="button-53" data-series="WindBreaker">Wind Breaker</a>
+            <a href="#" class="button-53" data-series="YuYuHakusho">Yu Yu Hakusho</a>
+            <a href="#" class="button-53" data-series="Zelda">Zelda</a>
         </div>
-        
-        <!-- Main content area -->
+        <!-- Main content area for logos and items -->
         <div class="main-content">
-            <!-- Series logo or banner -->
             <div id="series-logo"></div>
-            <!-- Content area for items or logo grid -->
             <div id="content"></div>
         </div>
     </div>
-    
-    <!-- JavaScript for dynamic functionality -->
+    <!-- External JavaScript for dynamic content -->
     <script src="script.js"></script>
 </body>
 </html>
