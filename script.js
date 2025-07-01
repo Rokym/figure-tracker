@@ -17,7 +17,6 @@ const seriesLogos = {
     HellsParadise: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/hellsparadise_200.jpg', size: 'medium', color: 'default' },
     HunterXHunter: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/hxh_200.jpg', size: 'medium', color: 'default' },
     JujutsuKaisen: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/jujutsukaisen.jpg', size: 'large', color: 'default' },
-    KaijuNo8: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/kaijuno8_200.jpg', size: 'medium', color: 'default' },
     KatekyoHitmanReborn: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/katekyohitmanreborn_200.jpg', size: 'medium', color: 'default' },
     FinalFantasy: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/main/images/banners/finalfantasy7.png', size: 'medium', color: 'default' },
     KurokoNoBasket: { url: 'https://raw.githubusercontent.com/Rokym/figure-tracker/refs/heads/main/images/banners/kurokonobasket1.jpg', size: 'medium', color: 'default' },
