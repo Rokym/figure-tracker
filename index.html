@@ -1,76 +1,42 @@
-<!-- 
-  This is the main HTML file for the Weeb Corner application.
-  It sets up the basic structure with a sidebar for navigation and a main content area.
-  Includes external CSS for styling and Font Awesome for icons.
-  JavaScript is loaded at the end to ensure DOM is ready.
--->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Meta tags for character encoding and responsive viewport -->
+    <!-- Define character set and responsive viewport -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weeb Corner</title>
-    <!-- Link to external stylesheet -->
+    <title>Weeb Corner - Collection</title>
+    <!-- Link core and custom styles -->
+    <link rel="stylesheet" href="corestyles.css">
     <link rel="stylesheet" href="style.css">
-    <!-- Link to Font Awesome for filter icon -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
-    <!-- Top-left title, clickable to "All" page, styled with button-53 class -->
-    <a href="#" class="top-left-text button-53" data-series="All">weeb corner</a>
-    <div class="container">
-        <!-- Sidebar for navigation and search -->
-        <div class="sidebar">
-            <input type="text" id="search-box" placeholder="Search items...">
-            <a href="#" class="button-53" data-series="All">All</a>
-            <a href="#" class="button-53" data-series="Purchased">Purchased</a>
-            <a href="#" class="button-53" data-series="AirGear">Air Gear</a>
-            <a href="#" class="button-53" data-series="AttackOnTitan">Attack on Titan</a>
-            <a href="#" class="button-53" data-series="Berserk">Berserk</a>
-            <a href="#" class="button-53" data-series="Bleach">Bleach</a>
-            <a href="#" class="button-53" data-series="BlueLock">Blue Lock</a>
-            <a href="#" class="button-53" data-series="ChainsawMan">Chainsaw Man</a>
-            <a href="#" class="button-53" data-series="CodeGeass">Code Geass</a>
-            <a href="#" class="button-53" data-series="DeathNote">Death Note</a>
-            <a href="#" class="button-53" data-series="DemonSlayer">Demon Slayer</a>
-            <a href="#" class="button-53" data-series="DragonBallZ">Dragon Ball Z</a>
-            <a href="#" class="button-53" data-series="FinalFantasy">Final Fantasy</a>
-            <a href="#" class="button-53" data-series="FireForce">Fire Force</a>
-            <a href="#" class="button-53" data-series="FullmetalAlchemist">Fullmetal Alchemist</a>
-            <a href="#" class="button-53" data-series="GurrenLagann">Gurren Lagann</a>
-            <a href="#" class="button-53" data-series="Haikyu">Haikyu!!</a>
-            <a href="#" class="button-53" data-series="HellsParadise">Hell's Paradise</a>
-            <a href="#" class="button-53" data-series="HunterXHunter">Hunter x Hunter</a>
-            <a href="#" class="button-53" data-series="JujutsuKaisen">Jujutsu Kaisen</a>
-            <a href="#" class="button-53" data-series="KatekyoHitmanReborn">Katekyo Hitman Reborn!</a>
-            <a href="#" class="button-53" data-series="KurokoNoBasket">Kuroko no Basket</a>
-            <a href="#" class="button-53" data-series="Mashle">Mashle</a>
-            <a href="#" class="button-53" data-series="MobPsycho100">Mob Psycho 100</a>
-            <a href="#" class="button-53" data-series="Naruto">Naruto</a>
-            <a href="#" class="button-53" data-series="OnePiece">One Piece</a>
-            <a href="#" class="button-53" data-series="OnePunchMan">One-Punch Man</a>
-            <a href="#" class="button-53" data-series="SakamotoDays">Sakamoto Days</a>
-            <a href="#" class="button-53" data-series="ShangriLaFrontier">Shangri-La Frontier</a>
-            <a href="#" class="button-53" data-series="SoloLeveling">Solo Leveling</a>
-            <a href="#" class="button-53" data-series="SoulEater">Soul Eater</a>
-            <a href="#" class="button-53" data-series="TheGodOfHighSchool">The God of High School</a>
-            <a href="#" class="button-53" data-series="TokyoGhoul">Tokyo Ghoul</a>
-            <a href="#" class="button-53" data-series="TokyoRevengers">Tokyo Revengers</a>
-            <a href="#" class="button-53" data-series="TowerOfGod">Tower of God</a>
-            <a href="#" class="button-53" data-series="UndeadUnluck">Undead Unluck</a>
-            <a href="#" class="button-53" data-series="VinlandSaga">Vinland Saga</a>
-            <a href="#" class="button-53" data-series="WindBreaker">Wind Breaker</a>
-            <a href="#" class="button-53" data-series="YuYuHakusho">Yu Yu Hakusho</a>
-            <a href="#" class="button-53" data-series="Zelda">Zelda</a>
+    <!-- Main section for the collection gallery -->
+    <section id="collection-1602">
+        <div class="cs-container">
+            <!-- Header and filter buttons -->
+            <div class="cs-content">
+                <h2 class="cs-title">New Collection</h2>
+                <div class="cs-button-group">
+                    <!-- Dropdown for series selection -->
+                    <div class="cs-dropdown">
+                        <button class="cs-button" data-filter="series">Series</button>
+                        <div class="cs-dropdown-content">
+                            <!-- Series buttons populated by script.js -->
+                        </div>
+                    </div>
+                    <!-- Filter for purchased figures -->
+                    <button class="cs-button" data-filter="purchased">Purchased</button>
+                    <!-- Filter for all figures -->
+                    <button class="cs-button" data-filter="all">All</button>
+                </div>
+            </div>
+            <!-- Container for figure cards -->
+            <div class="cs-listing-wrapper">
+                <!-- Listings populated by script.js -->
+            </div>
         </div>
-        <!-- Main content area for logos and items -->
-        <div class="main-content">
-            <div id="series-logo"></div>
-            <div id="content"></div>
-        </div>
-    </div>
-    <!-- External JavaScript for dynamic content -->
+    </section>
+    <!-- Load JavaScript for dynamic content and interactions -->
     <script src="script.js"></script>
 </body>
 </html>
