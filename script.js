@@ -27,7 +27,7 @@ class GalleryFilter {
 
             // Initialize filter buttons
             this.$filters = document.querySelectorAll(this.filtersSelector);
-            this.$images = document.querySelectorAll(this.imagesSelector);
+            this.$images = document.querySelectorAll(this.imagesSelector) || [];
             if (this.$filters.length > 0) {
                 this.$activeFilter = Array.from(this.$filters).find(f => f.dataset.filter === 'all') || this.$filters[0];
                 this.$activeFilter.classList.add(this.activeClass);
@@ -36,11 +36,15 @@ class GalleryFilter {
                 $filter.addEventListener("click", () => this.onClick($filter));
             }
 
-            // Setup image pop-up listeners
+            // Setup image pop-up and zoom listeners
             this.setupImagePopups();
+            this.setupZoomDebug();
 
             // Debug: Log initial card count
             console.log('Initial card count:', document.querySelectorAll('.cs-item').length);
+        }).catch(error => {
+            console.error('Initialization failed:', error);
+            this.$listingWrapper.innerHTML = '<p style="color: var(--bodyTextColorWhite); text-align: center;">Failed to initialize gallery. Please check figures.json.</p>';
         });
     }
 
@@ -52,7 +56,6 @@ class GalleryFilter {
             return await response.json();
         } catch (error) {
             console.error('Error loading figures.json:', error);
-            this.$listingWrapper.innerHTML = '<p style="color: var(--bodyTextColorWhite); text-align: center;">Failed to load figures. Please try again.</p>';
             return {};
         }
     }
@@ -80,21 +83,26 @@ class GalleryFilter {
             listing.className = `cs-listing cs-hidden`;
             listing.dataset.category = `series-${series}`;
 
-            // Add series title
-            const title = document.createElement('h3');
-            title.className = 'cs-series-title';
-            title.textContent = series;
-            listing.appendChild(title);
+            // Add logo card
+            const logoItem = document.createElement('div');
+            logoItem.className = 'cs-item cs-logo-item';
+            // Use series-level logo
+            const logoUrl = figures[series].logo || 'https://placehold.co/150x60?text=Logo+Missing';
+            logoItem.innerHTML = `
+                <img class="cs-series-logo" src="${logoUrl}" alt="${series} Logo">
+            `;
+            listing.appendChild(logoItem);
+            console.log(`Rendered logo for ${series}: ${logoUrl}`);
 
             // Add figures
-            figures[series].forEach(figure => {
+            figures[series].figures.forEach(figure => {
                 const item = document.createElement('div');
                 item.className = 'cs-item';
                 item.innerHTML = `
                     <div class="cs-item-content">
                         <div class="cs-picture-group">
                             <picture class="cs-picture">
-                                <img loading="lazy" decoding="async" src="${figure.image}" alt="${figure.name}" width="305" height="400" onerror="this.src='https://via.placeholder.com/305x400?text=Image+Failed'" class="clickable-image">
+                                <img loading="lazy" decoding="async" src="${figure.image}" alt="${figure.name}" width="305" height="400" onerror="this.src='https://placehold.co/305x400?text=Image+Failed'" class="clickable-image">
                             </picture>
                         </div>
                         <div class="cs-details">
@@ -126,16 +134,34 @@ class GalleryFilter {
         purchasedTitle.className = 'cs-series-title';
         purchasedTitle.textContent = 'Purchased Figures';
         purchasedListing.appendChild(purchasedTitle);
+
+        // Group purchased figures by series
+        const purchasedBySeries = {};
         Object.keys(figures).forEach(series => {
-            figures[series].forEach(figure => {
-                if (figure.purchased) {
+            purchasedBySeries[series] = figures[series].figures.filter(figure => figure.purchased);
+        });
+
+        Object.keys(purchasedBySeries).forEach(series => {
+            if (purchasedBySeries[series].length > 0) {
+                // Add logo card
+                const logoItem = document.createElement('div');
+                logoItem.className = 'cs-item cs-logo-item';
+                const logoUrl = figures[series].logo || 'https://placehold.co/150x60?text=Logo+Missing';
+                logoItem.innerHTML = `
+                    <img class="cs-series-logo" src="${logoUrl}" alt="${series} Logo">
+                `;
+                purchasedListing.appendChild(logoItem);
+                console.log(`Rendered purchased logo for ${series}: ${logoUrl}`);
+
+                // Add figures
+                purchasedBySeries[series].forEach(figure => {
                     const item = document.createElement('div');
                     item.className = 'cs-item';
                     item.innerHTML = `
                         <div class="cs-item-content">
                             <div class="cs-picture-group">
                                 <picture class="cs-picture">
-                                    <img loading="lazy" decoding="async" src="${figure.image}" alt="${figure.name}" width="305" height="400" onerror="this.src='https://via.placeholder.com/305x400?text=Image+Failed'" class="clickable-image">
+                                    <img loading="lazy" decoding="async" src="${figure.image}" alt="${figure.name}" width="305" height="400" onerror="this.src='https://placehold.co/305x400?text=Image+Failed'" class="clickable-image">
                                 </picture>
                             </div>
                             <div class="cs-details">
@@ -155,26 +181,38 @@ class GalleryFilter {
                         </div>
                     `;
                     purchasedListing.appendChild(item);
-                }
-            });
+                });
+            }
         });
         this.$listingWrapper.appendChild(purchasedListing);
 
-        // Render all listing with series sections, no titles
+        // Render all listing with series sections and logos
         const allListing = document.createElement('div');
         allListing.className = `cs-listing cs-hidden`;
         allListing.dataset.category = 'all';
         Object.keys(figures).forEach(series => {
             const seriesSection = document.createElement('section');
             seriesSection.className = 'cs-series-section';
-            figures[series].forEach(figure => {
+
+            // Add logo card
+            const logoItem = document.createElement('div');
+            logoItem.className = 'cs-item cs-logo-item';
+            const logoUrl = figures[series].logo || 'https://placehold.co/150x60?text=Logo+Missing';
+            logoItem.innerHTML = `
+                <img class="cs-series-logo" src="${logoUrl}" alt="${series} Logo">
+            `;
+            seriesSection.appendChild(logoItem);
+            console.log(`Rendered all logo for ${series}: ${logoUrl}`);
+
+            // Add figures
+            figures[series].figures.forEach(figure => {
                 const item = document.createElement('div');
                 item.className = 'cs-item';
                 item.innerHTML = `
                     <div class="cs-item-content">
                         <div class="cs-picture-group">
                             <picture class="cs-picture">
-                                <img loading="lazy" decoding="async" src="${figure.image}" alt="${figure.name}" width="305" height="400" onerror="this.src='https://via.placeholder.com/305x400?text=Image+Failed'" class="clickable-image">
+                                <img loading="lazy" decoding="async" src="${figure.image}" alt="${figure.name}" width="305" height="400" onerror="this.src='https://placehold.co/305x400?text=Image+Failed'" class="clickable-image">
                             </picture>
                         </div>
                         <div class="cs-details">
@@ -203,30 +241,81 @@ class GalleryFilter {
         });
         this.$listingWrapper.appendChild(allListing);
 
-        this.$images = document.querySelectorAll(this.imagesSelector);
+        // Update images after rendering
+        this.$images = document.querySelectorAll(this.imagesSelector) || [];
         this.setupImagePopups();
-
-        // Debug: Log cards after rendering
-        console.log('Cards rendered:', document.querySelectorAll('.cs-item').length);
+        this.setupZoomDebug();
     }
 
     // Setup click listeners for image pop-ups
     setupImagePopups() {
+        // Remove existing overlays
+        const existingOverlays = document.querySelectorAll('.image-overlay');
+        existingOverlays.forEach(overlay => overlay.remove());
+
         const images = document.querySelectorAll('.clickable-image');
         images.forEach(image => {
             image.addEventListener('click', () => {
+                // Lock background scrolling
+                document.body.classList.add('cs-overlay-open');
+
+                // Create overlay
                 const overlay = document.createElement('div');
                 overlay.className = 'image-overlay';
-                overlay.innerHTML = `<img src="${image.src}" alt="${image.alt}" class="enlarged-image">`;
+                overlay.innerHTML = `
+                    <img src="${image.src}" alt="${image.alt}" class="enlarged-image">
+                    <button class="cs-close-overlay">X</button>
+                `;
                 document.body.appendChild(overlay);
-                overlay.addEventListener('click', () => overlay.remove());
+                console.log('Overlay opened:', image.src);
+
+                // Close on click outside
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) {
+                        overlay.remove();
+                        document.body.classList.remove('cs-overlay-open');
+                        console.log('Overlay closed: click outside');
+                    }
+                });
+
+                // Close on close button
+                const closeButton = overlay.querySelector('.cs-close-overlay');
+                closeButton.addEventListener('click', () => {
+                    overlay.remove();
+                    document.body.classList.remove('cs-overlay-open');
+                    console.log('Overlay closed: close button');
+                });
+
+                // Close on ESC key
+                const onKeydown = (e) => {
+                    if (e.key === 'Escape') {
+                        overlay.remove();
+                        document.body.classList.remove('cs-overlay-open');
+                        document.removeEventListener('keydown', onKeydown);
+                        console.log('Overlay closed: ESC key');
+                    }
+                };
+                document.addEventListener('keydown', onKeydown);
+            });
+        });
+    }
+
+    // Debug hover zoom
+    setupZoomDebug() {
+        const pictures = document.querySelectorAll('.cs-picture');
+        pictures.forEach(pic => {
+            pic.addEventListener('mouseenter', () => {
+                console.log('Hover on picture:', pic.querySelector('img').src);
+            });
+            pic.addEventListener('mouseleave', () => {
+                console.log('Hover off picture:', pic.querySelector('img').src);
             });
         });
     }
 
     // Handle filter button clicks
     onClick($filter) {
-        console.log('Filter clicked:', $filter.dataset.filter); // Debug log
+        console.log('Filter clicked:', $filter.dataset.filter);
         this.filter($filter.dataset.filter);
         const { activeClass } = this;
         this.$activeFilter.classList.remove(activeClass);
@@ -236,17 +325,17 @@ class GalleryFilter {
 
     // Filter figures and trigger animations
     filter(filter) {
-        console.log('Filtering:', filter); // Debug log
+        console.log('Filtering:', filter);
         const showAll = filter === "all";
         const { hiddenClass } = this;
 
-        // Toggle cs-hidden for animations
-        for (const $image of this.$images) {
+        // Ensure $images is iterable
+        const images = this.$images.length ? this.$images : [];
+        for (const $image of images) {
             const show = showAll || $image.dataset.category === filter;
             $image.classList.toggle(hiddenClass, !show);
-            // Debug: Log animation state for each listing
-            console.log(`Listing ${$image.dataset.category}: ${show ? 'Visible' : 'Hidden'}`);
             if (show) {
+                $image.offsetHeight; // Force reflow
                 const items = $image.querySelectorAll('.cs-item');
                 items.forEach((item, index) => {
                     console.log(`Card ${index + 1} in ${$image.dataset.category}: transform ${item.style.transform || 'none'}`);
