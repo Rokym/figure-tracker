@@ -138,8 +138,6 @@
         grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
         gap: clamp(1rem, 1.5vw, 1.25rem);
         position: relative;
-        transform-style: preserve-3d;
-        perspective: 700px;
         transition: transform 0.7s, opacity 0.3s, visibility 0.5s;
         transform-origin: center;
     }
@@ -154,7 +152,7 @@
     #collection-1602 .cs-series-section {
         scroll-snap-align: start;
         margin-bottom: 2rem;
-        padding-bottom: 2rem;
+        padding-bottom: 3rem; /* Increased spacing */
         min-height: 30rem; /* Ensure snapping works */
     }
     /* Padding for first card under series title */
@@ -170,18 +168,20 @@
         transform: scale(0);
         pointer-events: none;
     }
-    #collection-1602 .cs-listing.cs-hidden .cs-item {
-        transform: rotateY(180deg);
-    }
     /* Individual figure card */
     #collection-1602 .cs-item {
         width: 100%;
         max-width: 23.4375rem; /* Wider, original size */
         min-width: 0;
-        padding: 0; /* Moved to cs-item-content */
+        padding: 0;
         transform: rotateY(0);
+        transform-style: preserve-3d; /* Moved to cs-item */
+        perspective: 700px; /* Moved to cs-item */
         transition: transform 0.7s, opacity 0.3s;
         position: relative;
+    }
+    #collection-1602 .cs-listing.cs-hidden .cs-item {
+        transform: rotateY(180deg);
     }
     /* Content wrapper for background and border */
     #collection-1602 .cs-item-content {
@@ -189,18 +189,13 @@
         border: 1px solid var(--accent);
         padding: 1rem;
     }
-    /* Staggered animation delays for cards */
-    #collection-1602 .cs-item:nth-child(1) { transition-delay: 0.1s; }
-    #collection-1602 .cs-item:nth-child(2) { transition-delay: 0.2s; }
-    #collection-1602 .cs-item:nth-child(3) { transition-delay: 0.3s; }
-    #collection-1602 .cs-item:nth-child(4) { transition-delay: 0.4s; }
-    #collection-1602 .cs-item:nth-child(5) { transition-delay: 0.5s; }
-    #collection-1602 .cs-link:hover .cs-picture img {
+    /* Restore zoom-in on hover */
+    #collection-1602 .cs-picture:hover img {
         transform: scale(1.1);
     }
     #collection-1602 .cs-picture-group {
         width: auto;
-        height: 22rem; /* Keep taller height */
+        height: 22rem;
         margin-bottom: 1.25rem;
         position: relative;
     }
@@ -219,7 +214,7 @@
         transition: transform 0.6s;
     }
     #collection-1602 .cs-details {
-        max-height: 10rem; /* Limit height, scroll if needed */
+        max-height: 10rem;
         overflow: auto;
     }
     #collection-1602 .cs-category {
@@ -244,7 +239,7 @@
         line-height: 1.5em;
         color: var(--bodyTextColorWhite);
         margin: 0.5rem 0;
-        word-wrap: break-word; /* Ensure text wraps */
+        word-wrap: break-word;
     }
     #collection-1602 .cs-actions {
         margin-top: 1.25rem;
@@ -293,7 +288,7 @@
         border: none;
         height: 2px;
         background: var(--accent);
-        margin: 2rem 0;
+        margin: 3rem 0; /* Increased spacing */
     }
     /* Image pop-up overlay */
     .image-overlay {
@@ -326,7 +321,7 @@
         grid-template-columns: repeat(5, minmax(12rem, 18rem));
     }
     #collection-1602 .cs-item {
-        max-width: 23.4375rem; /* Wider, fits 5 across */
+        max-width: 23.4375rem;
     }
     #collection-1602 .cs-picture-group {
         height: 22rem;

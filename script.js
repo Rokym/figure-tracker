@@ -38,6 +38,9 @@ class GalleryFilter {
 
             // Setup image pop-up listeners
             this.setupImagePopups();
+
+            // Debug: Log initial card count
+            console.log('Initial card count:', document.querySelectorAll('.cs-item').length);
         });
     }
 
@@ -202,6 +205,9 @@ class GalleryFilter {
 
         this.$images = document.querySelectorAll(this.imagesSelector);
         this.setupImagePopups();
+
+        // Debug: Log cards after rendering
+        console.log('Cards rendered:', document.querySelectorAll('.cs-item').length);
     }
 
     // Setup click listeners for image pop-ups
@@ -238,6 +244,14 @@ class GalleryFilter {
         for (const $image of this.$images) {
             const show = showAll || $image.dataset.category === filter;
             $image.classList.toggle(hiddenClass, !show);
+            // Debug: Log animation state for each listing
+            console.log(`Listing ${$image.dataset.category}: ${show ? 'Visible' : 'Hidden'}`);
+            if (show) {
+                const items = $image.querySelectorAll('.cs-item');
+                items.forEach((item, index) => {
+                    console.log(`Card ${index + 1} in ${$image.dataset.category}: transform ${item.style.transform || 'none'}`);
+                });
+            }
         }
     }
 }
