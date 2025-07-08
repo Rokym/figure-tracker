@@ -23,6 +23,7 @@
         padding: var(--sectionPadding);
         background: var(--medium);
     }
+    /* Container for content and button group */
     #collection-1602 .cs-container {
         width: 100%;
         max-width: 80rem;
@@ -34,6 +35,7 @@
         position: relative;
         z-index: 1;
     }
+    /* Content area with title and buttons */
     #collection-1602 .cs-content {
         text-align: center;
         width: 100%;
@@ -42,11 +44,13 @@
         align-items: center;
         gap: 1.5rem;
     }
+    /* Title styling */
     #collection-1602 .cs-title {
         margin: 0;
         font-size: clamp(2.5rem, 5vw, 4rem);
         color: var(--bodyTextColorWhite);
     }
+    /* Button group for filters */
     #collection-1602 .cs-button-group {
         margin: 0;
         display: flex;
@@ -54,6 +58,7 @@
         flex-wrap: wrap;
         gap: clamp(1rem, 4vw, 2rem);
     }
+    /* Individual button styling */
     #collection-1602 .cs-button {
         font-size: 1rem;
         font-weight: 700;
@@ -67,6 +72,7 @@
         transition: color 0.3s;
         z-index: 2;
     }
+    /* Underline effect for buttons */
     #collection-1602 .cs-button:before {
         content: "";
         width: 0;
@@ -78,6 +84,7 @@
         left: 0;
         transition: width 0.3s;
     }
+    /* Hover effect for buttons */
     #collection-1602 .cs-button:hover {
         color: var(--primary);
         cursor: pointer;
@@ -85,6 +92,7 @@
     #collection-1602 .cs-button:hover:before {
         width: 100%;
     }
+    /* Active button styling */
     #collection-1602 .cs-button.cs-active {
         color: var(--primary);
     }
@@ -127,19 +135,19 @@
     #collection-1602 .cs-dropdown:hover .cs-dropdown-content {
         display: block;
     }
+    /* Wrapper for the listing grid */
     #collection-1602 .cs-listing-wrapper {
         width: 100%;
         position: relative;
         z-index: 1;
     }
-    /* Grid for figures, 2-3 columns on mobile */
+    /* Main grid for figures, 5 columns per series */
     #collection-1602 .cs-listing {
         width: 100%;
         margin: 0;
         padding: 0;
         display: grid;
-        justify-items: center;
-        grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+        grid-template-columns: repeat(5, minmax(12rem, 1fr));
         gap: clamp(1rem, 1.5vw, 1.25rem);
         position: relative;
         transition: transform 0.7s, opacity 0.3s, visibility 0.5s;
@@ -154,10 +162,14 @@
     }
     /* Series section within All */
     #collection-1602 .cs-series-section {
-        scroll-snap-align: start;
-        margin-bottom: 3rem;
-        padding-bottom: 3rem;
-        min-height: 30rem;
+        display: grid;
+        grid-template-columns: subgrid; /* Inherit parent grid columns */
+        grid-column: 1 / -1; /* Span all 5 columns */
+        gap: clamp(1rem, 1.5vw, 1.25rem);
+    }
+    /* Ensure logo and figures fit 5-across */
+    #collection-1602 .cs-series-section .cs-item {
+        width: 100%;
     }
     /* Padding for first card after logo */
     #collection-1602 .cs-series-section .cs-item:not(.cs-logo-item):first-child {
@@ -181,7 +193,7 @@
         transform: rotateY(0);
         transform-style: preserve-3d;
         perspective: 700px;
-        transition: transform 0.7s, opacity 0.3s;
+        transition: transform 0.7s, opacity 0.3s; /* Preserve animation */
         position: relative;
     }
     #collection-1602 .cs-listing.cs-hidden .cs-item {
@@ -256,7 +268,7 @@
         word-wrap: break-word;
     }
     #collection-1602 .cs-actions {
-        margin-top: 1.25rem;
+        margin-top: 1.5rem; /* Adjusted for consistency */
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -297,11 +309,12 @@
         margin: 0 auto;
     }
     /* Divider between series in All */
-    /* EDIT THIS LINE FOR DIVIDER STYLE */
+    /* EDIT THIS LINE FOR DIVIDER STYLE - Reduced padding by half */
     #collection-1602 .cs-series-divider {
         border: none;
         border-top: 3px solid var(--accent); /* Visible greyish line */
-        margin: 3rem 0;
+        margin: 1.5rem 0; /* Reduced from 3rem to 1.5rem */
+        grid-column: 1 / -1; /* Span all columns */
     }
     /* Image pop-up overlay */
     .image-overlay {

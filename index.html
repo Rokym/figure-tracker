@@ -1,43 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Define character set and responsive viewport -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weeb Corner - Collection</title>
-    <!-- Link core and custom styles -->
+    <title>Weeb Corner</title>
     <link rel="stylesheet" href="corestyles.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Main section for the collection gallery -->
     <section id="collection-1602">
         <div class="cs-container">
-            <!-- Header and filter buttons -->
             <div class="cs-content">
-                <h2 class="cs-title">Weeb Corner</h2>
+                <h1 class="cs-title">Weeb Corner</h1>
                 <div class="cs-button-group">
-                    <!-- Dropdown for series selection -->
+                    <button class="cs-button cs-active" data-filter="all">All</button>
                     <div class="cs-dropdown">
                         <button class="cs-button" data-filter="series">Series</button>
-                        <div class="cs-dropdown-content">
-                            <!-- Series buttons populated by script.js -->
-                        </div>
+                        <div class="cs-dropdown-content"></div>
                     </div>
-                    <!-- Filter for purchased figures -->
-                    <button class="cs-button" data-filter="purchased">Purchased</button>
-                    <!-- Filter for all figures -->
-                    <button class="cs-button" data-filter="all">All</button>
                 </div>
             </div>
-            <!-- Container for figure cards -->
-            <div class="cs-listing-wrapper">
-                <!-- Listings populated by script.js -->
-            </div>
+            <div class="cs-listing-wrapper"></div>
         </div>
     </section>
-    <!-- Load JavaScript for dynamic content and interactions -->
     <script src="script.js"></script>
 </body>
-
 </html>

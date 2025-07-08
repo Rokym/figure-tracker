@@ -1,16 +1,16 @@
 // GalleryFilter class to manage filtering, rendering, and interactions
 class GalleryFilter {
     // CSS selectors and class names
-    filtersSelector = ".cs-button";
-    imagesSelector = ".cs-listing";
-    activeClass = "cs-active";
-    hiddenClass = "cs-hidden";
+    filtersSelector = ".cs-button"; // Selector for filter buttons
+    imagesSelector = ".cs-listing"; // Selector for the listing grid
+    activeClass = "cs-active"; // Class for active filter button
+    hiddenClass = "cs-hidden"; // Class to hide inactive listings
 
     constructor() {
         // DOM elements
-        this.$buttonGroup = document.querySelector('.cs-button-group');
-        this.$listingWrapper = document.querySelector('.cs-listing-wrapper');
-        this.$dropdown = document.querySelector('.cs-dropdown-content');
+        this.$buttonGroup = document.querySelector('.cs-button-group'); // Button group container
+        this.$listingWrapper = document.querySelector('.cs-listing-wrapper'); // Wrapper for the grid
+        this.$dropdown = document.querySelector('.cs-dropdown-content'); // Dropdown menu
 
         // Load figures and initialize
         this.loadFigures().then(figures => {
@@ -19,7 +19,7 @@ class GalleryFilter {
             // Populate dropdown with series
             this.renderDropdown(figures);
 
-            // Create all listings (series, purchased, all)
+            // Create single all listing with series sections
             this.renderAllListings(figures);
 
             // Default to All tab
@@ -33,7 +33,7 @@ class GalleryFilter {
                 this.$activeFilter.classList.add(this.activeClass);
             }
             for (const $filter of this.$filters) {
-                $filter.addEventListener("click", () => this.onClick($filter));
+                $filter.addEventListener("click", () => this.onClick($filter)); // Add click handler for filters
             }
 
             // Setup image pop-up and zoom listeners
@@ -66,135 +66,27 @@ class GalleryFilter {
         Object.keys(figures).forEach(series => {
             const button = document.createElement('button');
             button.className = 'cs-button';
-            button.dataset.filter = `series-${series}`;
+            button.dataset.filter = series; // Use series name directly as filter
             button.textContent = series;
             button.addEventListener('click', () => this.onClick(button));
             this.$dropdown.appendChild(button);
         });
     }
 
-    // Render all listings (one per series, purchased, all)
+    // Render single all listing with series sections
     renderAllListings(figures) {
         this.$listingWrapper.innerHTML = '';
 
-        // Render listing for each series
-        Object.keys(figures).forEach(series => {
-            const listing = document.createElement('div');
-            listing.className = `cs-listing cs-hidden`;
-            listing.dataset.category = `series-${series}`;
-
-            // Add logo card
-            const logoItem = document.createElement('div');
-            logoItem.className = 'cs-item cs-logo-item';
-            // Use series-level logo
-            const logoUrl = figures[series].logo || 'https://placehold.co/150x60?text=Logo+Missing';
-            logoItem.innerHTML = `
-                <img class="cs-series-logo" src="${logoUrl}" alt="${series} Logo">
-            `;
-            listing.appendChild(logoItem);
-            console.log(`Rendered logo for ${series}: ${logoUrl}`);
-
-            // Add figures
-            figures[series].figures.forEach(figure => {
-                const item = document.createElement('div');
-                item.className = 'cs-item';
-                item.innerHTML = `
-                    <div class="cs-item-content">
-                        <div class="cs-picture-group">
-                            <picture class="cs-picture">
-                                <img loading="lazy" decoding="async" src="${figure.image}" alt="${figure.name}" width="305" height="400" onerror="this.src='https://placehold.co/305x400?text=Image+Failed'" class="clickable-image">
-                            </picture>
-                        </div>
-                        <div class="cs-details">
-                            <span class="cs-category">${figure.type}</span>
-                            <h3 class="cs-name">${figure.name}</h3>
-                            <p class="cs-description">${figure.description || 'No description available'}</p>
-                            <div class="cs-actions">
-                                <div class="cs-flex">
-                                    <span class="cs-price">${figure.company}</span>
-                                    <span class="cs-was-price">${figure.released}</span>
-                                </div>
-                                <a href="${figure.link || '#'}" class="cs-buy">
-                                    <img class="cs-basket" src="https://csimg.nyc3.cdn.digitaloceanspaces.com/Images/Icons/ecomm-bag-icon.svg" alt="buy" height="24" width="24" loading="lazy" decoding="async">
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                listing.appendChild(item);
-            });
-            this.$listingWrapper.appendChild(listing);
-        });
-
-        // Render purchased listing
-        const purchasedListing = document.createElement('div');
-        purchasedListing.className = `cs-listing cs-hidden`;
-        purchasedListing.dataset.category = 'purchased';
-        const purchasedTitle = document.createElement('h3');
-        purchasedTitle.className = 'cs-series-title';
-        purchasedTitle.textContent = 'Purchased Figures';
-        purchasedListing.appendChild(purchasedTitle);
-
-        // Group purchased figures by series
-        const purchasedBySeries = {};
-        Object.keys(figures).forEach(series => {
-            purchasedBySeries[series] = figures[series].figures.filter(figure => figure.purchased);
-        });
-
-        Object.keys(purchasedBySeries).forEach(series => {
-            if (purchasedBySeries[series].length > 0) {
-                // Add logo card
-                const logoItem = document.createElement('div');
-                logoItem.className = 'cs-item cs-logo-item';
-                const logoUrl = figures[series].logo || 'https://placehold.co/150x60?text=Logo+Missing';
-                logoItem.innerHTML = `
-                    <img class="cs-series-logo" src="${logoUrl}" alt="${series} Logo">
-                `;
-                purchasedListing.appendChild(logoItem);
-                console.log(`Rendered purchased logo for ${series}: ${logoUrl}`);
-
-                // Add figures
-                purchasedBySeries[series].forEach(figure => {
-                    const item = document.createElement('div');
-                    item.className = 'cs-item';
-                    item.innerHTML = `
-                        <div class="cs-item-content">
-                            <div class="cs-picture-group">
-                                <picture class="cs-picture">
-                                    <img loading="lazy" decoding="async" src="${figure.image}" alt="${figure.name}" width="305" height="400" onerror="this.src='https://placehold.co/305x400?text=Image+Failed'" class="clickable-image">
-                                </picture>
-                            </div>
-                            <div class="cs-details">
-                                <span class="cs-category">${figure.type}</span>
-                                <h3 class="cs-name">${figure.name}</h3>
-                                <p class="cs-description">${figure.description || 'No description available'}</p>
-                                <div class="cs-actions">
-                                    <div class="cs-flex">
-                                        <span class="cs-price">${figure.company}</span>
-                                        <span class="cs-was-price">${figure.released}</span>
-                                    </div>
-                                    <a href="${figure.link || '#'}" class="cs-buy">
-                                        <img class="cs-basket" src="https://csimg.nyc3.cdn.digitaloceanspaces.com/Images/Icons/ecomm-bag-icon.svg" alt="buy" height="24" width="24" loading="lazy" decoding="async">
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    purchasedListing.appendChild(item);
-                });
-            }
-        });
-        this.$listingWrapper.appendChild(purchasedListing);
-
-        // Render all listing with series sections and logos
         const allListing = document.createElement('div');
-        allListing.className = `cs-listing cs-hidden`;
+        allListing.className = `cs-listing`;
         allListing.dataset.category = 'all';
+
         Object.keys(figures).forEach(series => {
             const seriesSection = document.createElement('section');
             seriesSection.className = 'cs-series-section';
+            seriesSection.dataset.category = series; // Add data-category for filtering
 
-            // Add logo card
+            // Add logo card as first item
             const logoItem = document.createElement('div');
             logoItem.className = 'cs-item cs-logo-item';
             const logoUrl = figures[series].logo || 'https://placehold.co/150x60?text=Logo+Missing';
@@ -202,10 +94,10 @@ class GalleryFilter {
                 <img class="cs-series-logo" src="${logoUrl}" alt="${series} Logo">
             `;
             seriesSection.appendChild(logoItem);
-            console.log(`Rendered all logo for ${series}: ${logoUrl}`);
+            console.log(`Rendered logo for ${series}: ${logoUrl}`);
 
-            // Add figures
-            figures[series].figures.forEach(figure => {
+            // Add all figure cards, with first row limited to 4 after logo
+            figures[series].figures.forEach((figure, index) => {
                 const item = document.createElement('div');
                 item.className = 'cs-item';
                 item.innerHTML = `
@@ -234,10 +126,13 @@ class GalleryFilter {
                 seriesSection.appendChild(item);
             });
             allListing.appendChild(seriesSection);
-            // Add divider
-            const divider = document.createElement('hr');
-            divider.className = 'cs-series-divider';
-            allListing.appendChild(divider);
+
+            // Add divider (except after the last series)
+            if (series !== Object.keys(figures)[Object.keys(figures).length - 1]) {
+                const divider = document.createElement('hr');
+                divider.className = 'cs-series-divider';
+                allListing.appendChild(divider);
+            }
         });
         this.$listingWrapper.appendChild(allListing);
 
@@ -256,10 +151,8 @@ class GalleryFilter {
         const images = document.querySelectorAll('.clickable-image');
         images.forEach(image => {
             image.addEventListener('click', () => {
-                // Lock background scrolling
                 document.body.classList.add('cs-overlay-open');
 
-                // Create overlay
                 const overlay = document.createElement('div');
                 overlay.className = 'image-overlay';
                 overlay.innerHTML = `
@@ -269,7 +162,6 @@ class GalleryFilter {
                 document.body.appendChild(overlay);
                 console.log('Overlay opened:', image.src);
 
-                // Close on click outside
                 overlay.addEventListener('click', (e) => {
                     if (e.target === overlay) {
                         overlay.remove();
@@ -278,7 +170,6 @@ class GalleryFilter {
                     }
                 });
 
-                // Close on close button
                 const closeButton = overlay.querySelector('.cs-close-overlay');
                 closeButton.addEventListener('click', () => {
                     overlay.remove();
@@ -286,7 +177,6 @@ class GalleryFilter {
                     console.log('Overlay closed: close button');
                 });
 
-                // Close on ESC key
                 const onKeydown = (e) => {
                     if (e.key === 'Escape') {
                         overlay.remove();
@@ -341,6 +231,27 @@ class GalleryFilter {
                     console.log(`Card ${index + 1} in ${$image.dataset.category}: transform ${item.style.transform || 'none'}`);
                 });
             }
+        }
+
+        // Show only the selected series section
+        if (!showAll) {
+            console.log('Selected filter value:', filter); // Debug the filter value
+            const allSections = document.querySelectorAll('.cs-series-section');
+            allSections.forEach(section => {
+                const sectionCategory = section.dataset.category;
+                console.log('Section category to check:', sectionCategory); // Debug each section's category
+                const shouldShow = sectionCategory === filter;
+                section.classList.remove(hiddenClass); // Remove hidden class
+                if (!shouldShow) section.classList.add(hiddenClass); // Add only if hiding
+                section.offsetHeight; // Force reflow for transition
+                section.style.display = shouldShow ? 'grid' : 'none'; // Force display state
+                console.log(`Section ${sectionCategory} final visibility: ${section.style.display}, classList: ${Array.from(section.classList)}`); // Confirm final state and classes
+            });
+        } else {
+            document.querySelectorAll('.cs-series-section').forEach(section => {
+                section.classList.remove(hiddenClass);
+                section.style.display = 'grid';
+            });
         }
     }
 }
