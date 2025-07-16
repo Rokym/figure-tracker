@@ -1,374 +1,309 @@
-/* Define dark mode variables */
-:root {
-    --medium: #2a2a2a;
-    --accent: #4e4b66;
+/* Define dark theme variables */
+#collection-1602 {
+    --background: #1a1a1a;
+    --card-background: #2a2a2a;
+    --text-color: #e0e0e0;
+    --primary: #1e90ff;
+    --primary-dark: #104e8b;
+    --border-color: #444;
+    --divider-color: #444;
 }
 
-/*-- -------------------------- -->
-<---        Collection          -->
-<--- -------------------------- -*/
+/* Reset default margins and padding */
+#collection-1602 * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-/* Mobile - 360px */
-@media only screen and (min-width: 0rem) {
-    /* Permanent dark mode background */
-    body {
-        background: #1a1a1a;
-    }
-    /* Lock scrolling when overlay is open */
-    body.cs-overlay-open {
-        overflow: hidden;
-    }
-    /* Main section styling */
-    #collection-1602 {
-        padding: var(--sectionPadding);
-        background: var(--medium);
-    }
-    /* Container for content and button group */
-    #collection-1602 .cs-container {
-        width: 100%;
-        max-width: 80rem;
-        margin: auto;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: clamp(3rem, 6vw, 4rem);
-        position: relative;
-        z-index: 1;
-    }
-    /* Content area with title and buttons */
-    #collection-1602 .cs-content {
-        text-align: center;
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 1.5rem;
-    }
-    /* Title styling */
-    #collection-1602 .cs-title {
-        margin: 0;
-        font-size: clamp(2.5rem, 5vw, 4rem);
-        color: var(--bodyTextColorWhite);
-    }
-    /* Button group for filters */
-    #collection-1602 .cs-button-group {
-        margin: 0;
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: clamp(1rem, 4vw, 2rem);
-    }
-    /* Individual button styling */
-    #collection-1602 .cs-button {
-        font-size: 1rem;
-        font-weight: 700;
-        line-height: 1.2em;
-        text-transform: uppercase;
-        padding: 0;
-        color: var(--bodyTextColorWhite);
-        background-color: transparent;
-        border: none;
-        position: relative;
-        transition: color 0.3s;
-        z-index: 2;
-    }
-    /* Underline effect for buttons */
-    #collection-1602 .cs-button:before {
-        content: "";
-        width: 0;
-        height: 1px;
-        background: var(--primary);
-        display: block;
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        transition: width 0.3s;
-    }
-    /* Hover effect for buttons */
-    #collection-1602 .cs-button:hover {
-        color: var(--primary);
-        cursor: pointer;
-    }
-    #collection-1602 .cs-button:hover:before {
-        width: 100%;
-    }
-    /* Active button styling */
-    #collection-1602 .cs-button.cs-active {
-        color: var(--primary);
-    }
-    #collection-1602 .cs-button.cs-active:before {
-        width: 100%;
-    }
-    /* Dropdown menu styling */
-    #collection-1602 .cs-dropdown {
-        position: relative;
-        z-index: 10;
-    }
-    #collection-1602 .cs-dropdown-content {
-        display: none;
-        position: absolute;
-        background: var(--medium);
-        min-width: 10rem;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-        z-index: 11;
-        top: 100%;
-        left: 0;
-    }
-    #collection-1602 .cs-dropdown-content button {
-        font-size: 1rem;
-        font-weight: 700;
-        line-height: 1.2em;
-        text-transform: uppercase;
-        padding: 0.5rem 1rem;
-        color: var(--bodyTextColorWhite);
-        background: none;
-        border: none;
-        display: block;
-        width: 100%;
-        text-align: left;
-        transition: background 0.3s, color 0.3s;
-    }
-    #collection-1602 .cs-dropdown-content button:hover {
-        background: var(--accent);
-        color: var(--primary);
-    }
-    #collection-1602 .cs-dropdown:hover .cs-dropdown-content {
-        display: block;
-    }
-    /* Wrapper for the listing grid */
-    #collection-1602 .cs-listing-wrapper {
-        width: 100%;
-        position: relative;
-        z-index: 1;
-    }
-    /* Main grid for figures, 5 columns per series */
+/* Prevent scrolling when modal is open */
+body.cs-modal-open {
+    overflow: hidden !important;
+}
+
+/* Main collection container */
+#collection-1602 {
+    width: 100%;
+    max-width: 1800px;
+    margin: 0 auto;
+    padding: 1rem;
+    background: var(--background);
+    color: var(--text-color);
+}
+
+/* Grid layout for listings */
+#collection-1602 .cs-listing {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(280px, 1fr));
+    gap: 1rem;
+}
+
+/* Responsive grid for smaller screens */
+@media only screen and (max-width: 1800px) {
     #collection-1602 .cs-listing {
-        width: 100%;
-        margin: 0;
-        padding: 0;
-        display: grid;
-        grid-template-columns: repeat(5, minmax(12rem, 1fr));
-        gap: clamp(1rem, 1.5vw, 1.25rem);
-        position: relative;
-        transition: transform 0.7s, opacity 0.3s, visibility 0.5s;
-        transform-origin: center;
+        grid-template-columns: repeat(5, minmax(280px, 1fr));
     }
-    /* Snap scrolling for All section */
-    #collection-1602 .cs-listing[data-category="all"] {
-        height: auto;
-        overflow-y: auto;
-        scroll-snap-type: y mandatory;
-        padding: 2rem 0;
+}
+@media only screen and (max-width: 1500px) {
+    #collection-1602 .cs-listing {
+        grid-template-columns: repeat(4, minmax(280px, 1fr));
     }
-    /* Series section within All */
-    #collection-1602 .cs-series-section {
-        display: grid;
-        grid-template-columns: subgrid; /* Inherit parent grid columns */
-        grid-column: 1 / -1; /* Span all 5 columns */
-        gap: clamp(1rem, 1.5vw, 1.25rem);
+}
+@media only screen and (max-width: 1200px) {
+    #collection-1602 .cs-listing {
+        grid-template-columns: repeat(3, minmax(280px, 1fr));
     }
-    /* Ensure logo and figures fit 5-across */
-    #collection-1602 .cs-series-section .cs-item {
-        width: 100%;
+}
+@media only screen and (max-width: 900px) {
+    #collection-1602 .cs-listing {
+        grid-template-columns: repeat(2, minmax(280px, 1fr));
     }
-    /* Padding for first card after logo */
-    #collection-1602 .cs-series-section .cs-item:not(.cs-logo-item):first-child {
-        padding-top: 1rem;
-    }
-    #collection-1602 .cs-listing.cs-hidden {
-        opacity: 0;
-        visibility: hidden;
-        position: absolute;
-        top: 0;
-        left: 0;
-        transform: scale(0);
-        pointer-events: none;
-    }
-    /* Individual figure card */
-    #collection-1602 .cs-item {
-        width: 100%;
-        max-width: 23.4375rem;
-        min-width: 0;
-        padding: 0;
-        transform: rotateY(0);
-        transform-style: preserve-3d;
-        perspective: 700px;
-        transition: transform 0.7s, opacity 0.3s; /* Preserve animation */
-        position: relative;
-    }
-    #collection-1602 .cs-listing.cs-hidden .cs-item {
-        transform: rotateY(180deg);
-    }
-    /* Content wrapper for background and border */
-    #collection-1602 .cs-item-content {
-        background: var(--medium);
-        border: 1px solid var(--accent);
-        padding: 1rem;
-    }
-    /* Logo card styling */
-    #collection-1602 .cs-logo-item {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background: var(--medium);
-        border: 1px solid var(--accent);
-        padding: 1rem;
-        height: 6rem; /* Adjusted for logo */
-    }
-    /* Zoom-in on hover */
-    #collection-1602 .cs-picture:hover img {
-        transform: scale(1.1) !important;
-    }
-    #collection-1602 .cs-picture-group {
-        width: auto;
-        height: 22rem;
-        margin-bottom: 1.25rem;
-        position: relative;
-    }
-    #collection-1602 .cs-picture {
-        width: 100%;
-        height: 100%;
-        background-color: #333333;
-        overflow: hidden;
-        display: block;
-        cursor: pointer;
-    }
-    #collection-1602 .cs-picture img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        transition: transform 0.6s;
-    }
-    #collection-1602 .cs-details {
-        max-height: 10rem;
-        overflow: auto;
-    }
-    #collection-1602 .cs-category {
-        font-size: 1rem;
-        line-height: 1.5em;
-        color: var(--bodyTextColorWhite);
-        opacity: 0.8;
-    }
-    #collection-1602 .cs-name {
-        font-size: clamp(1.25rem, 1vw, 1.5625rem);
-        font-weight: 700;
-        line-height: 1.2em;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        width: 100%;
-        margin: 0;
-        color: var(--bodyTextColorWhite);
-        overflow: hidden;
-    }
-    #collection-1602 .cs-description {
-        font-size: 0.875rem;
-        line-height: 1.5em;
-        color: var(--bodyTextColorWhite);
-        margin: 0.5rem 0;
-        word-wrap: break-word;
-    }
-    #collection-1602 .cs-actions {
-        margin-top: 1.5rem; /* Adjusted for consistency */
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    #collection-1602 .cs-price {
-        font-size: 1.25rem;
-        font-weight: 700;
-        line-height: 1.2em;
-        color: var(--secondary);
-    }
-    #collection-1602 .cs-was-price {
-        font-size: 1rem;
-        font-weight: 700;
-        line-height: 1.2em;
-        text-decoration: line-through;
-        color: var(--bodyTextColorWhite);
-        opacity: 0.8;
-    }
-    #collection-1602 .cs-buy {
-        max-height: 2.5rem;
-        padding: 0.5rem;
-        background: none;
-        border: 2px solid var(--primary);
-        border-radius: 0.25rem;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-    #collection-1602 .cs-basket {
-        width: 1.5rem;
-        height: auto;
-    }
-    /* Series logo styling */
-    #collection-1602 .cs-series-logo {
-        max-height: 4rem;
-        width: auto;
-        display: block;
-        margin: 0 auto;
-    }
-    /* Divider between series in All */
-    /* EDIT THIS LINE FOR DIVIDER STYLE - Reduced padding by half */
-    #collection-1602 .cs-series-divider {
-        border: none;
-        border-top: 3px solid var(--accent); /* Visible greyish line */
-        margin: 1.5rem 0; /* Reduced from 3rem to 1.5rem */
-        grid-column: 1 / -1; /* Span all columns */
-    }
-    /* Image pop-up overlay */
-    .image-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 100;
-    }
-    .enlarged-image {
-        max-width: 90%;
-        max-height: 90%;
-        object-fit: contain;
-    }
-    /* Close button for overlay */
-    .cs-close-overlay {
-        position: absolute;
-        top: 1rem;
-        right: 1rem;
-        background: rgba(0, 0, 0, 0.5);
-        border: none;
-        color: var(--bodyTextColorWhite);
-        font-size: 1.5rem;
-        font-weight: 700;
-        cursor: pointer;
-        padding: 0.5rem 1rem;
-        border-radius: 0.25rem;
-        z-index: 101;
-        transition: background 0.3s;
-    }
-    .cs-close-overlay:hover {
-        background: rgba(0, 0, 0, 0.8);
+}
+@media only screen and (max-width: 600px) {
+    #collection-1602 .cs-listing {
+        grid-template-columns: minmax(280px, 1fr);
     }
 }
 
-/* Tablet and Desktop - 768px */
-@media only screen and (min-width: 48rem) {
-    #collection-1602 .cs-content {
-        flex-direction: row;
-        justify-content: space-between;
+/* Hide non-visible listings */
+#collection-1602 .cs-listing.cs-hidden {
+    display: none !important;
+}
+
+/* Series section (transparent to grid) */
+#collection-1602 .cs-series-section {
+    display: contents;
+}
+
+/* Individual figure card */
+#collection-1602 .cs-item {
+    position: relative;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background: var(--card-background);
+    width: 280px;
+}
+
+/* Logo item */
+#collection-1602 .cs-item.cs-logo-item {
+    width: 280px;
+    height: 112px;
+}
+
+/* Logo image */
+#collection-1602 .cs-series-logo {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: var(--card-background);
+}
+
+/* Picture group */
+#collection-1602 .cs-picture-group {
+    width: 100%;
+}
+
+/* Figure image */
+#collection-1602 .cs-picture img {
+    width: 280px;
+    height: 513px;
+    object-fit: cover;
+    display: block;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: opacity 0.3s;
+    image-rendering: optimizeQuality;
+}
+
+#collection-1602 .cs-picture img:hover {
+    opacity: 0.7;
+}
+
+/* Overlay for card title and button */
+#collection-1602 .cs-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.8);
+    color: var(--text-color);
+    padding: 0.5rem;
+    text-align: center;
+}
+
+/* Card title */
+#collection-1602 .cs-name {
+    font-size: 1.4rem;
+    margin: 0;
+}
+
+/* Show More Info button */
+#collection-1602 .cs-show-more {
+    background: var(--primary);
+    color: var(--text-color);
+    border: none;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-size: 1.1rem;
+    margin-top: 0.5rem;
+    border-radius: 0.25rem;
+}
+
+#collection-1602 .cs-show-more:hover {
+    background: var(--primary-dark);
+}
+
+/* Info panel */
+#collection-1602 .cs-info-panel {
+    background: var(--card-background);
+    padding: 0.5rem;
+    display: none;
+    font-size: 1.1rem;
+    color: var(--text-color);
+}
+
+/* Show info panel when expanded */
+#collection-1602 .cs-item.cs-expanded .cs-info-panel {
+    display: block;
+}
+
+/* Series divider */
+#collection-1602 .cs-series-divider {
+    grid-column: 1 / -1;
+    border: none;
+    height: 2px;
+    background-color: var(--divider-color);
+    margin: 0.5rem 0;
+}
+
+/* Modal for enlarged images */
+html body #myModal.modal {
+    display: none !important;
+    position: fixed !important;
+    z-index: 1000 !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background-color: rgba(0, 0, 0, 0.9) !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    flex-direction: column !important;
+    pointer-events: auto !important;
+}
+
+/* Modal content (image) */
+html body #myModal.modal .modal-content {
+    display: block;
+    width: 80%;
+    max-width: 700px;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 5px;
+    animation-name: zoom;
+    animation-duration: 0.6s;
+    image-rendering: optimizeQuality;
+}
+
+/* Caption */
+html body #myModal.modal #caption {
+    margin: 10px auto 0;
+    display: block;
+    width: 80%;
+    max-width: 700px;
+    text-align: center;
+    color: #ccc;
+    padding: 10px 0;
+    font-size: 1.2rem;
+}
+
+/* Zoom animation */
+@keyframes zoom {
+    from { transform: scale(0); }
+    to { transform: scale(1); }
+}
+
+/* Close button */
+html body #myModal.modal .close {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    transition: opacity 0.3s;
+    cursor: pointer;
+    z-index: 10000 !important;
+    pointer-events: auto !important;
+}
+
+html body #myModal.modal .close:hover,
+html body #myModal.modal .close:focus {
+    color: #bbb;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Responsive modal for smaller screens */
+@media only screen and (max-width: 700px) {
+    html body #myModal.modal .modal-content {
+        width: 100%;
+        max-height: 80vh;
     }
-    /* 5 columns for figures */
-    #collection-1602 .cs-listing {
-        grid-template-columns: repeat(5, minmax(12rem, 18rem));
+    html body #myModal.modal #caption {
+        width: 100%;
     }
-    #collection-1602 .cs-item {
-        max-width: 23.4375rem;
-    }
-    #collection-1602 .cs-picture-group {
-        height: 22rem;
-    }
+}
+
+/* Button group for filters */
+#collection-1602 .cs-button-group {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Filter buttons */
+#collection-1602 .cs-button {
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-size: 1.1rem;
+    color: var(--text-color);
+    border-radius: 0.25rem;
+}
+
+#collection-1602 .cs-button.cs-active {
+    background: var(--primary);
+    color: var(--text-color);
+}
+
+#collection-1602 .cs-button:hover {
+    background: var(--primary-dark);
+}
+
+/* Dropdown for series filters */
+#collection-1602 .cs-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+#collection-1602 .cs-dropdown-content {
+    display: none;
+    position: absolute;
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    z-index: 1;
+    min-width: 150px;
+}
+
+#collection-1602 .cs-dropdown:hover .cs-dropdown-content {
+    display: block;
+}
+
+#collection-1602 .cs-dropdown-content .cs-button {
+    display: block;
+    width: 100%;
+    text-align: left;
 }
