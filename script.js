@@ -5,10 +5,9 @@ class GalleryFilter {
     hiddenClass = "cs-hidden";
     hiddenDividerClass = "cs-hidden-divider";
     expandedClass = "cs-expanded";
-    isImagePopupsSetup = false; // Track setup to prevent duplicates
+    isImagePopupsSetup = false;
 
     constructor() {
-        // Create modal
         this.$modal = document.createElement('div');
         this.$modal.id = 'myModal';
         this.$modal.className = 'modal';
@@ -21,17 +20,14 @@ class GalleryFilter {
         document.body.insertBefore(this.$modal, document.body.firstChild);
         console.log('Modal created and prepended to body, initial display: none');
 
-        // Modal elements
         this.$modalImg = this.$modal.querySelector('#img01');
         this.$captionText = this.$modal.querySelector('#caption');
         this.$closeBtn = this.$modal.querySelector('.close');
 
-        // Other elements
         this.$buttonGroup = document.querySelector('.cs-button-group');
         this.$listingWrapper = document.querySelector('.cs-listing-wrapper');
         this.$dropdown = document.querySelector('.cs-dropdown-content');
 
-        // Log initial DOM state
         console.log('Modal parent:', this.$modal.parentElement.tagName);
         console.log('Modal initial styles:', {
             display: window.getComputedStyle(this.$modal).display,
@@ -41,7 +37,19 @@ class GalleryFilter {
         console.log('Initial DOM state: cs-listing-wrapper children:', this.$listingWrapper ? this.$listingWrapper.children.length : 'Not found');
         console.log('Initial cs-listing count:', document.querySelectorAll('.cs-listing').length);
 
-        // Force hide modal on DOMContentLoaded
+        // Set up event delegation for .cs-show-more clicks
+        this.$listingWrapper.addEventListener('click', (e) => {
+            const button = e.target.closest('.cs-show-more');
+            if (button) {
+                const item = button.closest('.cs-item:not(.cs-logo-item)');
+                if (item) {
+                    this.handleShowMoreClick(item, e);
+                    console.log(`Delegated click on Show More for card: ${item.querySelector('.cs-name').textContent}`);
+                }
+            }
+        });
+        console.log('Event delegation set up for .cs-show-more clicks on .cs-listing-wrapper');
+
         document.addEventListener('DOMContentLoaded', () => {
             if (this.$modal.style.display !== 'none' || window.getComputedStyle(this.$modal).display !== 'none') {
                 console.warn('Modal visible after DOMContentLoaded, forcing hide');
@@ -53,7 +61,6 @@ class GalleryFilter {
             }
         });
 
-        // Load figures and initialize
         this.loadFigures().then(figures => {
             this.figures = figures;
             if (!figures || !Object.keys(figures).length) {
@@ -84,7 +91,6 @@ class GalleryFilter {
             }
 
             this.setupImagePopups();
-            this.setupCardInteractions();
             this.setupOutsideClick();
             console.log('Initial card count:', document.querySelectorAll('.cs-item').length);
             console.log('Listing wrapper width:', window.getComputedStyle(this.$listingWrapper).width);
@@ -149,7 +155,17 @@ class GalleryFilter {
                     </div>
                     <div class="cs-overlay">
                         <h3 class="cs-name">${figure.name}</h3>
-                        <button class="cs-show-more">Show More Info</button>
+                        <button class="cs-show-more" aria-expanded="false">Show More Info</button>
+                    </div>
+                    <div class="cs-details-overlay">
+                        <div class="cs-details-content">
+                            <p><strong>Set:</strong> ${figure.set || 'N/A'}</p>
+                            <p><strong>Company:</strong> ${figure.company || 'N/A'}</p>
+                            <p><strong>Release Date:</strong> ${figure.released || 'N/A'}</p>
+                            <p><strong>Description:</strong> ${figure.description || 'No description available'}</p>
+                            <p class="cs-pinned"><strong>Pinned:</strong> ${figure.pinned ? 'Yes' : 'No'}</p>
+                            <button class="cs-buy-now">Buy Now</button>
+                        </div>
                     </div>
                     <div class="cs-info-panel">
                         <p><strong>Set:</strong> ${figure.set || 'N/A'}</p>
@@ -195,7 +211,17 @@ class GalleryFilter {
                     </div>
                     <div class="cs-overlay">
                         <h3 class="cs-name">${figure.name}</h3>
-                        <button class="cs-show-more">Show More Info</button>
+                        <button class="cs-show-more" aria-expanded="false">Show More Info</button>
+                    </div>
+                    <div class="cs-details-overlay">
+                        <div class="cs-details-content">
+                            <p><strong>Set:</strong> ${figure.set || 'N/A'}</p>
+                            <p><strong>Company:</strong> ${figure.company || 'N/A'}</p>
+                            <p><strong>Release Date:</strong> ${figure.released || 'N/A'}</p>
+                            <p><strong>Description:</strong> ${figure.description || 'No description available'}</p>
+                            <p class="cs-pinned"><strong>Pinned:</strong> ${figure.pinned ? 'Yes' : 'No'}</p>
+                            <button class="cs-buy-now">Buy Now</button>
+                        </div>
                     </div>
                     <div class="cs-info-panel">
                         <p><strong>Set:</strong> ${figure.set || 'N/A'}</p>
@@ -221,7 +247,17 @@ class GalleryFilter {
                         </div>
                         <div class="cs-overlay">
                             <h3 class="cs-name">${figure.name}</h3>
-                            <button class="cs-show-more">Show More Info</button>
+                            <button class="cs-show-more" aria-expanded="false">Show More Info</button>
+                        </div>
+                        <div class="cs-details-overlay">
+                            <div class="cs-details-content">
+                                <p><strong>Set:</strong> ${figure.set || 'N/A'}</p>
+                                <p><strong>Company:</strong> ${figure.company || 'N/A'}</p>
+                                <p><strong>Release Date:</strong> ${figure.released || 'N/A'}</p>
+                                <p><strong>Description:</strong> ${figure.description || 'No description available'}</p>
+                                <p class="cs-pinned"><strong>Pinned:</strong> ${figure.pinned ? 'Yes' : 'No'}</p>
+                                <button class="cs-buy-now">Buy Now</button>
+                            </div>
                         </div>
                         <div class="cs-info-panel">
                             <p><strong>Set:</strong> ${figure.set || 'N/A'}</p>
@@ -338,9 +374,9 @@ class GalleryFilter {
         this.$captionText.innerHTML = image.alt;
         setTimeout(() => {
             this.$modal.style.display = 'block';
-            this.$modal.removeAttribute('style'); // Remove inline to use CSS
+            this.$modal.removeAttribute('style');
             document.body.classList.add('cs-modal-open');
-            window.getComputedStyle(this.$modal).display; // Force reflow
+            window.getComputedStyle(this.$modal).display;
             console.log('Modal opened for:', image.src, 'Caption:', image.alt);
             console.log('Modal parent:', this.$modal.parentElement.tagName);
             console.log('Modal styles:', {
@@ -377,13 +413,18 @@ class GalleryFilter {
     }
 
     setupCardInteractions() {
-        const items = document.querySelectorAll('.cs-item:not(.cs-logo-item)');
-        console.log(`Found ${items.length} items for interactions`);
+        const visibleListing = document.querySelector('.cs-listing:not(.cs-hidden)');
+        const items = visibleListing
+            ? visibleListing.querySelectorAll('.cs-item:not(.cs-logo-item)')
+            : document.querySelectorAll('.cs-item:not(.cs-logo-item)');
+        console.log(`Setting up interactions for ${items.length} items in ${visibleListing ? `visible listing: ${visibleListing.dataset.category}` : 'all listings'}`);
         items.forEach(item => {
             const button = item.querySelector('.cs-show-more');
             if (button) {
-                button.removeEventListener('click', this.handleShowMoreClick);
-                button.addEventListener('click', this.handleShowMoreClick.bind(this, item));
+                // Note: Event listeners are now handled via delegation in constructor
+                console.log(`Found Show More button for card: ${item.querySelector('.cs-name').textContent}`);
+            } else {
+                console.warn(`No .cs-show-more button found in card: ${item.querySelector('.cs-name').textContent}`);
             }
         });
     }
@@ -395,7 +436,10 @@ class GalleryFilter {
                 if (!item.contains(e.target) && !e.target.closest('.modal')) {
                     item.classList.remove(this.expandedClass);
                     const button = item.querySelector('.cs-show-more');
-                    if (button) button.textContent = 'Show More Info';
+                    if (button) {
+                        button.textContent = 'Show More Info';
+                        button.setAttribute('aria-expanded', 'false');
+                    }
                     console.log(`Card ${item.querySelector('.cs-name').textContent} collapsed via outside click`);
                 }
             });
@@ -407,7 +451,10 @@ class GalleryFilter {
                 if (!item.contains(e.target) && !e.target.closest('.modal')) {
                     item.classList.remove(this.expandedClass);
                     const button = item.querySelector('.cs-show-more');
-                    if (button) button.textContent = 'Show More Info';
+                    if (button) {
+                        button.textContent = 'Show More Info';
+                        button.setAttribute('aria-expanded', 'false');
+                    }
                     console.log(`Card ${item.querySelector('.cs-name').textContent} collapsed via outside touch`);
                 }
             });
@@ -420,13 +467,32 @@ class GalleryFilter {
             if (otherItem !== item) {
                 otherItem.classList.remove(this.expandedClass);
                 const otherButton = otherItem.querySelector('.cs-show-more');
-                if (otherButton) otherButton.textContent = 'Show More Info';
+                if (otherButton) {
+                    otherButton.textContent = 'Show More Info';
+                    otherButton.setAttribute('aria-expanded', 'false');
+                }
             }
         });
         item.classList.toggle(this.expandedClass);
         const button = item.querySelector('.cs-show-more');
-        if (button) button.textContent = item.classList.contains(this.expandedClass) ? 'Show Less' : 'Show More Info';
-        console.log(`Card ${item.querySelector('.cs-name').textContent} ${item.classList.contains(this.expandedClass) ? 'expanded' : 'collapsed'}`);
+        if (button) {
+            const isExpanded = item.classList.contains(this.expandedClass);
+            button.textContent = isExpanded ? 'Show Less' : 'Show More Info';
+            button.setAttribute('aria-expanded', isExpanded.toString());
+            console.log(`Card ${item.querySelector('.cs-name').textContent} ${isExpanded ? 'expanded' : 'collapsed'}`);
+            const detailsOverlay = item.querySelector('.cs-details-overlay');
+            const detailsContent = item.querySelector('.cs-details-content');
+            console.log(`Details overlay styles for ${item.querySelector('.cs-name').textContent}:`, {
+                top: window.getComputedStyle(detailsOverlay).top,
+                height: window.getComputedStyle(detailsOverlay).height,
+                transition: window.getComputedStyle(detailsOverlay).transition
+            });
+            console.log(`Details content styles for ${item.querySelector('.cs-name').textContent}:`, {
+                paddingTop: window.getComputedStyle(detailsContent).paddingTop,
+                maxHeight: window.getComputedStyle(detailsContent).maxHeight,
+                height: window.getComputedStyle(detailsContent).height
+            });
+        }
     }
 
     onClick($filter) {

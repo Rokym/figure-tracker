@@ -82,6 +82,7 @@ body.cs-modal-open {
     overflow: hidden;
     background: var(--card-background);
     width: 280px;
+    height: 513px; /* Fixed height to match image */
 }
 
 /* Logo item */
@@ -101,6 +102,7 @@ body.cs-modal-open {
 /* Picture group */
 #collection-1602 .cs-picture-group {
     width: 100%;
+    height: 100%;
 }
 
 /* Figure image */
@@ -129,6 +131,7 @@ body.cs-modal-open {
     color: var(--text-color);
     padding: 0.5rem;
     text-align: center;
+    z-index: 2; /* Above details-overlay and image */
 }
 
 /* Card title */
@@ -153,18 +156,44 @@ body.cs-modal-open {
     background: var(--primary-dark);
 }
 
-/* Info panel */
-#collection-1602 .cs-info-panel {
-    background: var(--card-background);
-    padding: 0.5rem;
-    display: none;
-    font-size: 1.1rem;
+/* Details overlay for sliding content */
+#collection-1602 .cs-details-overlay {
+    position: absolute;
+    top: 100%; /* Start below card */
+    left: 0;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.9);
     color: var(--text-color);
+    transform: translateY(0); /* Initial position */
+    transition: top 300ms ease-in-out; /* Animate top property */
+    z-index: 1; /* Below cs-overlay */
+    display: flex;
+    flex-direction: column;
 }
 
-/* Show info panel when expanded */
-#collection-1602 .cs-item.cs-expanded .cs-info-panel {
-    display: block;
+/* Show details overlay when expanded */
+#collection-1602 .cs-item.cs-expanded .cs-details-overlay {
+    top: 0; /* Slide to top */
+    height: calc(100% - 50px); /* Extend to top of cs-overlay */
+}
+
+/* Inner content container */
+#collection-1602 .cs-details-content {
+    padding: 1rem;
+    padding-top: 50px; /* Position content 50px from top */
+    max-height: calc(513px - 100px); /* Card height minus cs-overlay (~50px) and top offset (50px) */
+    overflow-y: auto; /* Scroll if content overflows */
+}
+
+/* Details overlay content */
+#collection-1602 .cs-details-content p {
+    margin: 0.5rem 0;
+    font-size: 1.1rem;
+}
+
+/* Info panel (hidden, used for content source) */
+#collection-1602 .cs-info-panel {
+    display: none; /* Always hidden */
 }
 
 /* Series divider */
