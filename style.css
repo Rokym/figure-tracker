@@ -156,6 +156,27 @@ body.cs-modal-open {
     background: var(--primary-dark);
 }
 
+/* Buy Now button */
+#collection-1602 .cs-buy-now {
+    display: none; /* Hidden by default */
+    background: var(--primary);
+    color: var(--text-color);
+    border: none;
+    padding: 0.3rem 0.8rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    border-radius: 0.25rem;
+}
+
+#collection-1602 .cs-item.cs-expanded .cs-buy-now {
+    display: inline-block; /* Show when expanded */
+}
+
+#collection-1602 .cs-buy-now:hover {
+    background: var(--primary-dark);
+}
+
 /* Details overlay for sliding content */
 #collection-1602 .cs-details-overlay {
     position: absolute;
