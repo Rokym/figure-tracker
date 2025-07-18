@@ -16,6 +16,11 @@
     box-sizing: border-box;
 }
 
+/* Body background to match dark theme */
+body {
+    background: #1a1a1a;
+}
+
 /* Prevent scrolling when modal is open */
 body.cs-modal-open {
     overflow: hidden !important;
@@ -63,6 +68,23 @@ body.cs-modal-open {
     #collection-1602 .cs-listing {
         grid-template-columns: minmax(280px, 1fr);
     }
+    #collection-1602 .cs-button-group {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    #collection-1602 .cs-button,
+    #collection-1602 .cs-select-wrapper {
+        width: 100%;
+        max-width: 280px; /* Match card width */
+    }
+    #collection-1602 .cs-search-select {
+        width: 100%;
+        max-width: 280px;
+    }
+    #collection-1602 .cs-dropdown-arrow {
+        right: 8px; /* Adjust for stacked layout */
+    }
 }
 
 /* Hide non-visible listings */
@@ -82,7 +104,7 @@ body.cs-modal-open {
     overflow: hidden;
     background: var(--card-background);
     width: 280px;
-    height: 513px; /* Fixed height to match image */
+    height: 513px;
 }
 
 /* Logo item */
@@ -131,7 +153,7 @@ body.cs-modal-open {
     color: var(--text-color);
     padding: 0.5rem;
     text-align: center;
-    z-index: 2; /* Above details-overlay and image */
+    z-index: 2;
 }
 
 /* Card title */
@@ -158,7 +180,7 @@ body.cs-modal-open {
 
 /* Buy Now button */
 #collection-1602 .cs-buy-now {
-    display: none; /* Hidden by default */
+    display: none;
     background: var(--primary);
     color: var(--text-color);
     border: none;
@@ -170,7 +192,7 @@ body.cs-modal-open {
 }
 
 #collection-1602 .cs-item.cs-expanded .cs-buy-now {
-    display: inline-block; /* Show when expanded */
+    display: inline-block;
 }
 
 #collection-1602 .cs-buy-now:hover {
@@ -180,30 +202,30 @@ body.cs-modal-open {
 /* Details overlay for sliding content */
 #collection-1602 .cs-details-overlay {
     position: absolute;
-    top: 100%; /* Start below card */
+    top: 100%;
     left: 0;
     width: 100%;
     background: rgba(0, 0, 0, 0.9);
     color: var(--text-color);
-    transform: translateY(0); /* Initial position */
-    transition: top 300ms ease-in-out; /* Animate top property */
-    z-index: 1; /* Below cs-overlay */
+    transform: translateY(0);
+    transition: top 300ms ease-in-out;
+    z-index: 1;
     display: flex;
     flex-direction: column;
 }
 
 /* Show details overlay when expanded */
 #collection-1602 .cs-item.cs-expanded .cs-details-overlay {
-    top: 0; /* Slide to top */
-    height: calc(100% - 50px); /* Extend to top of cs-overlay */
+    top: 0;
+    height: calc(100% - 50px);
 }
 
 /* Inner content container */
 #collection-1602 .cs-details-content {
     padding: 1rem;
-    padding-top: 50px; /* Position content 50px from top */
-    max-height: calc(513px - 100px); /* Card height minus cs-overlay (~50px) and top offset (50px) */
-    overflow-y: auto; /* Scroll if content overflows */
+    padding-top: 50px;
+    max-height: calc(513px - 100px);
+    overflow-y: auto;
 }
 
 /* Details overlay content */
@@ -214,7 +236,7 @@ body.cs-modal-open {
 
 /* Info panel (hidden, used for content source) */
 #collection-1602 .cs-info-panel {
-    display: none; /* Always hidden */
+    display: none;
 }
 
 /* Series divider */
@@ -311,6 +333,8 @@ html body #myModal.modal .close:focus {
     display: flex;
     gap: 0.5rem;
     margin-bottom: 1rem;
+    align-items: center;
+    justify-content: flex-start;
 }
 
 /* Filter buttons */
@@ -322,6 +346,8 @@ html body #myModal.modal .close:focus {
     font-size: 1.1rem;
     color: var(--text-color);
     border-radius: 0.25rem;
+    height: 36px;
+    line-height: 1.1rem;
 }
 
 #collection-1602 .cs-button.cs-active {
@@ -333,27 +359,51 @@ html body #myModal.modal .close:focus {
     background: var(--primary-dark);
 }
 
-/* Dropdown for series filters */
-#collection-1602 .cs-dropdown {
+/* Select dropdown */
+#collection-1602 .cs-select-wrapper {
     position: relative;
     display: inline-block;
+    height: 36px;
 }
 
-#collection-1602 .cs-dropdown-content {
-    display: none;
-    position: absolute;
+#collection-1602 .cs-search-select {
     background: var(--card-background);
     border: 1px solid var(--border-color);
-    z-index: 1;
-    min-width: 150px;
-}
-
-#collection-1602 .cs-dropdown:hover .cs-dropdown-content {
-    display: block;
-}
-
-#collection-1602 .cs-dropdown-content .cs-button {
-    display: block;
+    color: var(--text-color);
+    font-size: 1.1rem;
+    padding: 0.5rem 1.5rem 0.5rem 1rem;
+    border-radius: 0.25rem;
+    min-width: 200px;
+    max-width: 300px;
     width: 100%;
-    text-align: left;
+    height: 36px;
+    line-height: 1.1rem;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    cursor: pointer;
+}
+
+#collection-1602 .cs-search-select:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: var(--card-background);
+}
+
+#collection-1602 .cs-search-select::-webkit-list-button,
+#collection-1602 .cs-search-select::-webkit-calendar-picker-indicator {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+
+#collection-1602 .cs-dropdown-arrow {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    pointer-events: none;
+    opacity: 1; /* Always visible */
 }

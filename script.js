@@ -8,6 +8,7 @@ class GalleryFilter {
     isImagePopupsSetup = false;
 
     constructor() {
+        console.log('Initializing GalleryFilter at:', new Date().toLocaleString());
         this.$modal = document.createElement('div');
         this.$modal.id = 'myModal';
         this.$modal.className = 'modal';
@@ -22,20 +23,25 @@ class GalleryFilter {
 
         this.$modalImg = this.$modal.querySelector('#img01');
         this.$captionText = this.$modal.querySelector('#caption');
-        this.$closeBtn = this.$modal.querySelector('.close');
+        this.$modal.querySelector('.close').addEventListener('click', this.handleCloseClick.bind(this));
+        console.log('Close button event listener added');
 
         this.$buttonGroup = document.querySelector('.cs-button-group');
         this.$listingWrapper = document.querySelector('.cs-listing-wrapper');
-        this.$dropdown = document.querySelector('.cs-dropdown-content');
+        this.$searchSelect = document.querySelector('.cs-search-select');
 
-        console.log('Modal parent:', this.$modal.parentElement.tagName);
-        console.log('Modal initial styles:', {
-            display: window.getComputedStyle(this.$modal).display,
-            position: window.getComputedStyle(this.$modal).position,
-            zIndex: window.getComputedStyle(this.$modal).zIndex
+        // Debug DOM elements
+        console.log('DOM elements:', {
+            buttonGroup: !!this.$buttonGroup,
+            listingWrapper: !!this.$listingWrapper,
+            searchSelect: !!this.$searchSelect
         });
-        console.log('Initial DOM state: cs-listing-wrapper children:', this.$listingWrapper ? this.$listingWrapper.children.length : 'Not found');
-        console.log('Initial cs-listing count:', document.querySelectorAll('.cs-listing').length);
+
+        if (!this.$listingWrapper || !this.$searchSelect || !this.$buttonGroup) {
+            console.error('Required DOM elements missing. Check index.html structure.');
+            this.$listingWrapper.innerHTML = '<p style="color: var(--text-color); text-align: center;">Error: Required elements (button group, listing wrapper, or select) not found. Check HTML structure.</p>';
+            return;
+        }
 
         // Set up event delegation for .cs-show-more clicks
         this.$listingWrapper.addEventListener('click', (e) => {
@@ -44,28 +50,34 @@ class GalleryFilter {
                 const item = button.closest('.cs-item:not(.cs-logo-item)');
                 if (item) {
                     this.handleShowMoreClick(item, e);
-                    console.log(`Delegated click on Show More for card: ${item.querySelector('.cs-name').textContent}`);
+                    console.log(`Delegated click on Show More for card: ${item.querySelector('.cs-name')?.textContent || 'Unknown'}`);
                 }
             }
         });
         console.log('Event delegation set up for .cs-show-more clicks on .cs-listing-wrapper');
 
-        document.addEventListener('DOMContentLoaded', () => {
-            if (this.$modal.style.display !== 'none' || window.getComputedStyle(this.$modal).display !== 'none') {
-                console.warn('Modal visible after DOMContentLoaded, forcing hide');
-                this.$modal.style.display = 'none';
-                this.$modal.setAttribute('style', 'display: none !important;');
-                console.log('Modal styles after force hide:', {
-                    display: window.getComputedStyle(this.$modal).display
-                });
+        // Set up select change event
+        this.$searchSelect.addEventListener('change', () => {
+            const value = this.$searchSelect.value;
+            console.log('Select changed:', value);
+            this.filter(value || 'all');
+            // Update active filter for "All" button
+            this.$filters = document.querySelectorAll(this.filtersSelector);
+            this.$activeFilter = Array.from(this.$filters).find(f => f.dataset.filter === (value !== 'all' ? `series-${value}` : 'all')) || this.$filters[0];
+            this.$filters.forEach(f => f.classList.remove(this.activeClass));
+            if (value === 'all') {
+                this.$activeFilter.classList.add(this.activeClass);
+                console.log('Active filter set to All via select change');
             }
         });
+        console.log('Select change event listener added');
 
+        // Load figures and initialize
         this.loadFigures().then(figures => {
             this.figures = figures;
             if (!figures || !Object.keys(figures).length) {
-                console.error('No figures loaded from figures.json');
-                this.$listingWrapper.innerHTML = '<p style="color: var(--text-color); text-align: center;">Failed to initialize gallery. Please check figures.json.</p>';
+                console.error('No figures loaded from figures.json. File may be empty or invalid.');
+                this.$listingWrapper.innerHTML = '<p style="color: var(--text-color); text-align: center;">No figures loaded. Ensure figures.json exists and contains valid data (e.g., {"Naruto":{"logo":"url","figures":[{"name":"Naruto Uzumaki","image":"url"}]}}).</p>';
                 return;
             }
 
@@ -73,12 +85,18 @@ class GalleryFilter {
 
             this.renderDropdown(figures);
             this.renderAllListings(figures);
-            this.filter('all');
-
-            this.$filters = document.querySelectorAll(this.filtersSelector);
             this.$images = document.querySelectorAll(this.imagesSelector) || [];
+            console.log('Listings after render:', this.$images.length, Array.from(this.$images).map(img => img.dataset.category));
+
+            if (this.$images.length === 0) {
+                console.error('No listings rendered. Check figures.json or renderAllListings logic.');
+                this.$listingWrapper.innerHTML = '<p style="color: var(--text-color); text-align: center;">No listings rendered. Ensure figures.json contains valid series and figures.</p>';
+                return;
+            }
+
+            // Set up filter buttons after confirming listings exist
+            this.$filters = document.querySelectorAll(this.filtersSelector);
             console.log('Filters found:', this.$filters.length);
-            console.log('Listings found after render:', this.$images.length);
 
             if (this.$filters.length > 0) {
                 this.$activeFilter = Array.from(this.$filters).find(f => f.dataset.filter === 'all') || this.$filters[0];
@@ -90,41 +108,74 @@ class GalleryFilter {
                 $filter.addEventListener('click', () => this.onClick($filter));
             }
 
+            // Only filter after listings are confirmed
+            this.filter('all');
+
             this.setupImagePopups();
             this.setupOutsideClick();
             console.log('Initial card count:', document.querySelectorAll('.cs-item').length);
             console.log('Listing wrapper width:', window.getComputedStyle(this.$listingWrapper).width);
         }).catch(error => {
-            console.error('Initialization failed:', error);
-            this.$listingWrapper.innerHTML = '<p style="color: var(--text-color); text-align: center;">Failed to initialize gallery. Please check figures.json.</p>';
+            console.error('Initialization failed:', error.message);
+            this.$listingWrapper.innerHTML = '<p style="color: var(--text-color); text-align: center;">Failed to initialize gallery: ' + error.message + '. Ensure figures.json exists, is accessible, and is valid JSON (e.g., {"Naruto":{"logo":"url","figures":[{"name":"Naruto Uzumaki","image":"url"}]}}).</p>';
         });
     }
 
     async loadFigures() {
         try {
-            const response = await fetch('figures.json');
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            console.log('Fetching figures.json at:', new Date().toLocaleString());
+            const response = await fetch('figures.json', { cache: 'no-cache' });
+            console.log('Fetch response:', {
+                url: response.url,
+                status: response.status,
+                statusText: response.statusText,
+                ok: response.ok
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}, URL: ${response.url}, Status Text: ${response.statusText}`);
+            }
             const data = await response.json();
-            console.log('Figures loaded successfully. Series count:', Object.keys(data).length);
+            console.log('Raw figures.json data:', JSON.stringify(data, null, 2));
+            if (!data || typeof data !== 'object') {
+                throw new Error('Invalid figures.json: Data is not an object');
+            }
+            const seriesCount = Object.keys(data).length;
+            if (seriesCount === 0) {
+                throw new Error('figures.json is empty');
+            }
+            console.log('Figures loaded successfully. Series count:', seriesCount, 'Series:', Object.keys(data).sort());
             return data;
         } catch (error) {
-            console.error('Error loading figures.json:', error);
+            console.error('Error loading figures.json:', error.message);
+            if (error.message.includes('Failed to fetch')) {
+                console.error('Possible causes: figures.json not found, server not running, CORS issue, or network error.');
+            }
+            this.$listingWrapper.innerHTML = '<p style="color: var(--text-color); text-align: center;">Failed to load figures.json: ' + error.message + '. Ensure the file exists in the project root, is accessible, and is valid JSON (e.g., {"Naruto":{"logo":"url","figures":[{"name":"Naruto Uzumaki","image":"url"}]}}).</p>';
             return {};
         }
     }
 
     renderDropdown(figures) {
-        this.$dropdown.innerHTML = '';
-        Object.keys(figures).forEach(series => {
-            const button = document.createElement('button');
-            button.className = 'cs-button';
-            button.dataset.filter = `series-${series}`;
-            button.textContent = series;
-            button.addEventListener('click', () => this.onClick(button));
-            this.$dropdown.appendChild(button);
-            console.log(`Dropdown button added for series: ${series}`);
+        this.$searchSelect.innerHTML = '<option value="all">All Series</option>';
+        const seriesNames = Object.keys(figures).sort();
+        seriesNames.forEach(series => {
+            const option = document.createElement('option');
+            option.value = series;
+            option.textContent = series;
+            this.$searchSelect.appendChild(option);
+            console.log(`Select option added for series: ${series}`);
         });
-        console.log('Dropdown buttons rendered:', this.$dropdown.children.length);
+        console.log('Select options rendered:', this.$searchSelect.children.length);
+
+        // Dynamically set select width based on longest series name
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        context.font = '1.1rem sans-serif';
+        const longestName = seriesNames.reduce((a, b) => a.length > b.length ? a : b, 'All Series');
+        const textWidth = context.measureText(longestName).width;
+        const selectWidth = Math.min(Math.max(textWidth + 50, 200), 300);
+        this.$searchSelect.style.width = `${selectWidth}px`;
+        console.log(`Select width set to ${selectWidth}px for longest series: ${longestName}`);
     }
 
     renderAllListings(figures) {
@@ -132,6 +183,10 @@ class GalleryFilter {
         console.log('Cleared cs-listing-wrapper to prevent duplication');
 
         Object.keys(figures).forEach(series => {
+            if (!figures[series] || !figures[series].figures || !Array.isArray(figures[series].figures)) {
+                console.warn(`Skipping invalid series: ${series} (missing or invalid figures array)`);
+                return;
+            }
             const listing = document.createElement('div');
             listing.className = `cs-listing cs-hidden`;
             listing.dataset.category = `series-${series}`;
@@ -144,6 +199,10 @@ class GalleryFilter {
             console.log(`Rendered logo for ${series}: ${logoUrl}`);
 
             figures[series].figures.forEach(figure => {
+                if (!figure.name || !figure.image) {
+                    console.warn(`Invalid figure in ${series}:`, figure);
+                    return;
+                }
                 console.log(`Rendering figure for ${series}: ${figure.name}, Image: ${figure.image}`);
                 const item = document.createElement('div');
                 item.className = 'cs-item';
@@ -187,6 +246,10 @@ class GalleryFilter {
 
         const sortedSeries = Object.keys(figures).sort();
         sortedSeries.forEach((series, index) => {
+            if (!figures[series] || !figures[series].figures || !Array.isArray(figures[series].figures)) {
+                console.warn(`Skipping invalid series in all listing: ${series}`);
+                return;
+            }
             const seriesSection = document.createElement('section');
             seriesSection.className = 'cs-series-section';
             seriesSection.dataset.category = series;
@@ -200,6 +263,10 @@ class GalleryFilter {
 
             const figuresToShow = figures[series].figures.slice(0, index === 0 ? 5 : figures[series].figures.length);
             figuresToShow.forEach(figure => {
+                if (!figure.name || !figure.image) {
+                    console.warn(`Invalid figure in ${series} (all listing):`, figure);
+                    return;
+                }
                 console.log(`Rendering all figure for ${series}: ${figure.name}, Image: ${figure.image}`);
                 const item = document.createElement('div');
                 item.className = 'cs-item';
@@ -234,8 +301,12 @@ class GalleryFilter {
                 seriesSection.appendChild(item);
             });
 
-            if (index === 0 && figures[series].figures.length > 5) {
+            if (index === 0 && figures[series].figures && figures[series].figures.length > 5) {
                 figures[series].figures.slice(5).forEach(figure => {
+                    if (!figure.name || !figure.image) {
+                        console.warn(`Invalid additional figure in ${series}:`, figure);
+                        return;
+                    }
                     console.log(`Rendering additional figure for ${series}: ${figure.name}, Image: ${figure.image}`);
                     const item = document.createElement('div');
                     item.className = 'cs-item';
@@ -282,17 +353,6 @@ class GalleryFilter {
         });
         this.$listingWrapper.appendChild(allListing);
         console.log(`All listing rendered, items: ${allListing.querySelectorAll('.cs-item').length}, sections: ${allListing.querySelectorAll('.cs-series-section').length}`);
-
-        this.$images = document.querySelectorAll(this.imagesSelector) || [];
-        console.log(`Total listings rendered: ${this.$images.length}`);
-        console.log('Listing categories:', Array.from(this.$images).map(img => img.dataset.category));
-
-        console.log('DOM structure of cs-listing-wrapper (truncated):', this.$listingWrapper.innerHTML.substring(0, 500) + '...');
-        if (!this.isImagePopupsSetup) {
-            this.setupImagePopups();
-        }
-        this.setupCardInteractions();
-        this.setupOutsideClick();
     }
 
     setupImagePopups() {
@@ -311,10 +371,6 @@ class GalleryFilter {
             image.addEventListener('click', this.handleImageClick.bind(this));
             console.log(`Event listener added to image: ${image.src}`);
         });
-
-        this.$closeBtn.removeEventListener('click', this.handleCloseClick);
-        this.$closeBtn.addEventListener('click', this.handleCloseClick.bind(this));
-        console.log('Event listener added to close button');
 
         this.$modal.removeEventListener('click', this.handleOutsideClick);
         this.$modal.addEventListener('click', this.handleOutsideClick.bind(this));
@@ -356,7 +412,7 @@ class GalleryFilter {
         if (e.key === 'Escape' && this.$modal.style.display === 'block') {
             setTimeout(() => {
                 this.$modal.style.display = 'none';
-                this.$modal.setAttribute('style', 'display: none !important;');
+                this.$modal.setAttribute('スタイル', 'display: none !important;');
                 document.body.classList.remove('cs-modal-open');
                 console.log('Modal closed: ESC key');
                 console.log('Modal styles after close:', {
@@ -421,10 +477,9 @@ class GalleryFilter {
         items.forEach(item => {
             const button = item.querySelector('.cs-show-more');
             if (button) {
-                // Note: Event listeners are now handled via delegation in constructor
-                console.log(`Found Show More button for card: ${item.querySelector('.cs-name').textContent}`);
+                console.log(`Found Show More button for card: ${item.querySelector('.cs-name')?.textContent || 'Unknown'}`);
             } else {
-                console.warn(`No .cs-show-more button found in card: ${item.querySelector('.cs-name').textContent}`);
+                console.warn(`No .cs-show-more button found in card: ${item.querySelector('.cs-name')?.textContent || 'Unknown'}`);
             }
         });
     }
@@ -440,7 +495,7 @@ class GalleryFilter {
                         button.textContent = 'Show More Info';
                         button.setAttribute('aria-expanded', 'false');
                     }
-                    console.log(`Card ${item.querySelector('.cs-name').textContent} collapsed via outside click`);
+                    console.log(`Card ${item.querySelector('.cs-name')?.textContent || 'Unknown'} collapsed via outside click`);
                 }
             });
         }, { capture: true });
@@ -455,7 +510,7 @@ class GalleryFilter {
                         button.textContent = 'Show More Info';
                         button.setAttribute('aria-expanded', 'false');
                     }
-                    console.log(`Card ${item.querySelector('.cs-name').textContent} collapsed via outside touch`);
+                    console.log(`Card ${item.querySelector('.cs-name')?.textContent || 'Unknown'} collapsed via outside touch`);
                 }
             });
         }, { capture: true });
@@ -479,15 +534,15 @@ class GalleryFilter {
             const isExpanded = item.classList.contains(this.expandedClass);
             button.textContent = isExpanded ? 'Show Less' : 'Show More Info';
             button.setAttribute('aria-expanded', isExpanded.toString());
-            console.log(`Card ${item.querySelector('.cs-name').textContent} ${isExpanded ? 'expanded' : 'collapsed'}`);
+            console.log(`Card ${item.querySelector('.cs-name')?.textContent || 'Unknown'} ${isExpanded ? 'expanded' : 'collapsed'}`);
             const detailsOverlay = item.querySelector('.cs-details-overlay');
             const detailsContent = item.querySelector('.cs-details-content');
-            console.log(`Details overlay styles for ${item.querySelector('.cs-name').textContent}:`, {
+            console.log(`Details overlay styles for ${item.querySelector('.cs-name')?.textContent || 'Unknown'}:`, {
                 top: window.getComputedStyle(detailsOverlay).top,
                 height: window.getComputedStyle(detailsOverlay).height,
                 transition: window.getComputedStyle(detailsOverlay).transition
             });
-            console.log(`Details content styles for ${item.querySelector('.cs-name').textContent}:`, {
+            console.log(`Details content styles for ${item.querySelector('.cs-name')?.textContent || 'Unknown'}:`, {
                 paddingTop: window.getComputedStyle(detailsContent).paddingTop,
                 maxHeight: window.getComputedStyle(detailsContent).maxHeight,
                 height: window.getComputedStyle(detailsContent).height
@@ -496,31 +551,31 @@ class GalleryFilter {
     }
 
     onClick($filter) {
-        if ($filter === this.$activeFilter) {
-            console.log('Filter already active:', $filter.dataset.filter);
-            return;
-        }
-        console.log('Filter clicked:', $filter.dataset.filter);
-        this.filter($filter.dataset.filter);
-        this.$activeFilter.classList.remove(this.activeClass);
+        console.log('Filter clicked:', $filter.dataset.filter, 'at:', new Date().toLocaleString());
+        this.$filters.forEach(f => f.classList.remove(this.activeClass));
         $filter.classList.add(this.activeClass);
         this.$activeFilter = $filter;
+        if ($filter.dataset.filter === 'all') {
+            this.$searchSelect.value = 'all';
+            console.log('Select reset to All Series via All button');
+        }
+        this.filter($filter.dataset.filter);
     }
 
     filter(filter) {
-        console.log('Filtering:', filter);
+        console.log('Filtering:', filter, 'at:', new Date().toLocaleString());
         const images = document.querySelectorAll(this.imagesSelector) || [];
+        if (!images.length) {
+            console.error('No .cs-listing elements found. Check figures.json or renderAllListings logic.');
+            this.$listingWrapper.innerHTML = '<p style="color: var(--text-color); text-align: center;">No listings found. Ensure figures.json exists and contains valid series and figures (e.g., {"Naruto":{"logo":"url","figures":[{"name":"Naruto Uzumaki","image":"url"}]}}).</p>';
+            return;
+        }
+
         console.log(`Found ${images.length} listings:`, Array.from(images).map(img => ({
             category: img.dataset.category,
             hidden: img.classList.contains(this.hiddenClass),
             items: img.querySelectorAll('.cs-item').length
         })));
-
-        if (!images.length) {
-            console.error('No .cs-listing elements found. Check renderAllListings.');
-            this.$listingWrapper.innerHTML = '<p style="color: var(--text-color); text-align: center;">No listings found. Check DOM.</p>';
-            return;
-        }
 
         images.forEach($image => {
             $image.classList.add(this.hiddenClass);
@@ -533,7 +588,8 @@ class GalleryFilter {
         });
 
         images.forEach($image => {
-            const shouldShow = filter === 'all' ? $image.dataset.category === 'all' : $image.dataset.category === filter;
+            const effectiveFilter = filter === 'all' ? 'all' : `series-${filter}`;
+            const shouldShow = $image.dataset.category === effectiveFilter;
             if (shouldShow) {
                 $image.classList.remove(this.hiddenClass);
                 $image.style.opacity = '1';
@@ -544,6 +600,17 @@ class GalleryFilter {
                 console.log(`Listing ${$image.dataset.category} shown, items: ${$image.querySelectorAll('.cs-item').length}`);
             }
         });
+
+        if (filter === 'all') {
+            this.$searchSelect.value = 'all';
+            this.$filters.forEach(f => f.classList.remove(this.activeClass));
+            const allButton = Array.from(this.$filters).find(f => f.dataset.filter === 'all');
+            if (allButton) {
+                allButton.classList.add(this.activeClass);
+                this.$activeFilter = allButton;
+                console.log('Active filter reset to All');
+            }
+        }
 
         const dividers = document.querySelectorAll('.cs-series-divider');
         console.log(`Found ${dividers.length} dividers`);
@@ -566,7 +633,7 @@ class GalleryFilter {
             const allListing = document.querySelector('.cs-listing[data-category="all"]');
             if (allListing) {
                 console.log('All listing sections:', Array.from(allListing.querySelectorAll('.cs-series-section')).map(s => s.dataset.category));
-                console.log('All listing items:', Array.from(allListing.querySelectorAll('.cs-item:not(.cs-logo-item)')).map(i => i.querySelector('.cs-name').textContent));
+                console.log('All listing items:', Array.from(allListing.querySelectorAll('.cs-item:not(.cs-logo-item)')).map(i => i.querySelector('.cs-name')?.textContent || 'Unknown'));
                 const allListingStyles = window.getComputedStyle(allListing);
                 console.log('All listing CSS styles:', {
                     display: allListingStyles.display,
@@ -601,6 +668,8 @@ class GalleryFilter {
                         });
                     }
                 }
+            } else {
+                console.error('All listing not found after filtering to all');
             }
         }
         if (visibleListings.length > 0) {
