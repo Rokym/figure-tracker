@@ -43,6 +43,31 @@ body.cs-modal-open {
     gap: 1rem;
 }
 
+/* Back to Top button */
+#collection-1602 .cs-back-to-top {
+    display: none; /* Hidden by default */
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--primary);
+    color: var(--text-color);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    font-size: 1rem;
+    cursor: pointer;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+#collection-1602 .cs-back-to-top.visible {
+    display: block;
+    opacity: 1;
+}
+#collection-1602 .cs-back-to-top:hover {
+    background: var(--primary-dark);
+}
+
 /* Responsive grid for smaller screens */
 @media only screen and (max-width: 1800px) {
     #collection-1602 .cs-listing {
@@ -66,11 +91,13 @@ body.cs-modal-open {
 }
 @media only screen and (max-width: 600px) {
     #collection-1602 .cs-listing {
-        grid-template-columns: minmax(280px, 1fr);
+        grid-template-columns: 1fr; /* One figure per row */
+        justify-items: center; /* Center the figure */
+        padding: 0 0.5rem; /* Reduce padding for centering */
     }
     #collection-1602 .cs-button-group {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: center; /* Center buttons */
         gap: 0.5rem;
     }
     #collection-1602 .cs-button,
@@ -83,7 +110,7 @@ body.cs-modal-open {
         max-width: 280px;
     }
     #collection-1602 .cs-dropdown-arrow {
-        right: 8px; /* Adjust for stacked layout */
+        right: 8px; /* Adjust for centered layout */
     }
 }
 
@@ -189,14 +216,25 @@ body.cs-modal-open {
     font-size: 0.9rem;
     margin-top: 0.5rem;
     border-radius: 0.25rem;
+    text-decoration: none;
+    text-align: center;
 }
 
+/* Show Buy Now when card is expanded */
 #collection-1602 .cs-item.cs-expanded .cs-buy-now {
     display: inline-block;
 }
 
-#collection-1602 .cs-buy-now:hover {
+/* Hover effect for enabled Buy Now */
+#collection-1602 .cs-buy-now:hover:not(:disabled) {
     background: var(--primary-dark);
+}
+
+/* Disabled Buy Now button */
+#collection-1602 .cs-buy-now:disabled {
+    background: #666;
+    cursor: not-allowed;
+    opacity: 0.6;
 }
 
 /* Details overlay for sliding content */

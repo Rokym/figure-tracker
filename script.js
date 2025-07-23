@@ -43,6 +43,34 @@ class GalleryFilter {
             return;
         }
 
+        // Create Back to Top button
+        this.$backToTop = document.createElement('button');
+        this.$backToTop.className = 'cs-back-to-top';
+        this.$backToTop.textContent = 'Top';
+        this.$backToTop.setAttribute('aria-label', 'Scroll back to top');
+        document.querySelector('#collection-1602').appendChild(this.$backToTop);
+        console.log('Back to Top button created and appended to #collection-1602');
+
+        // Set up scroll event for Back to Top button
+        window.addEventListener('scroll', () => {
+            const scrollPosition = window.scrollY;
+            if (scrollPosition > 100) {
+                this.$backToTop.classList.add('visible');
+                console.log('Back to Top button shown, scrollY:', scrollPosition);
+            } else {
+                this.$backToTop.classList.remove('visible');
+                console.log('Back to Top button hidden, scrollY:', scrollPosition);
+            }
+        });
+        console.log('Scroll event listener added for Back to Top button');
+
+        // Set up click event for Back to Top
+        this.$backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            console.log('Back to Top clicked, scrolling to top');
+        });
+        console.log('Click event listener added for Back to Top button');
+
         // Set up event delegation for .cs-show-more clicks
         this.$listingWrapper.addEventListener('click', (e) => {
             const button = e.target.closest('.cs-show-more');
@@ -206,6 +234,7 @@ class GalleryFilter {
                 console.log(`Rendering figure for ${series}: ${figure.name}, Image: ${figure.image}`);
                 const item = document.createElement('div');
                 item.className = 'cs-item';
+                const buyNowLink = figure.link ? `<a class="cs-buy-now" href="${figure.link}" target="_blank" aria-label="Buy ${figure.name} now">Buy Now</a>` : `<button class="cs-buy-now" disabled>Buy Now (No Link)</button>`;
                 item.innerHTML = `
                     <div class="cs-picture-group">
                         <picture class="cs-picture">
@@ -223,7 +252,7 @@ class GalleryFilter {
                             <p><strong>Release Date:</strong> ${figure.released || 'N/A'}</p>
                             <p><strong>Description:</strong> ${figure.description || 'No description available'}</p>
                             <p class="cs-pinned"><strong>Pinned:</strong> ${figure.pinned ? 'Yes' : 'No'}</p>
-                            <button class="cs-buy-now">Buy Now</button>
+                            ${buyNowLink}
                         </div>
                     </div>
                     <div class="cs-info-panel">
@@ -270,6 +299,7 @@ class GalleryFilter {
                 console.log(`Rendering all figure for ${series}: ${figure.name}, Image: ${figure.image}`);
                 const item = document.createElement('div');
                 item.className = 'cs-item';
+                const buyNowLink = figure.link ? `<a class="cs-buy-now" href="${figure.link}" target="_blank" aria-label="Buy ${figure.name} now">Buy Now</a>` : `<button class="cs-buy-now" disabled>Buy Now (No Link)</button>`;
                 item.innerHTML = `
                     <div class="cs-picture-group">
                         <picture class="cs-picture">
@@ -287,7 +317,7 @@ class GalleryFilter {
                             <p><strong>Release Date:</strong> ${figure.released || 'N/A'}</p>
                             <p><strong>Description:</strong> ${figure.description || 'No description available'}</p>
                             <p class="cs-pinned"><strong>Pinned:</strong> ${figure.pinned ? 'Yes' : 'No'}</p>
-                            <button class="cs-buy-now">Buy Now</button>
+                            ${buyNowLink}
                         </div>
                     </div>
                     <div class="cs-info-panel">
@@ -310,6 +340,7 @@ class GalleryFilter {
                     console.log(`Rendering additional figure for ${series}: ${figure.name}, Image: ${figure.image}`);
                     const item = document.createElement('div');
                     item.className = 'cs-item';
+                    const buyNowLink = figure.link ? `<a class="cs-buy-now" href="${figure.link}" target="_blank" aria-label="Buy ${figure.name} now">Buy Now</a>` : `<button class="cs-buy-now" disabled>Buy Now (No Link)</button>`;
                     item.innerHTML = `
                         <div class="cs-picture-group">
                             <picture class="cs-picture">
@@ -327,7 +358,7 @@ class GalleryFilter {
                                 <p><strong>Release Date:</strong> ${figure.released || 'N/A'}</p>
                                 <p><strong>Description:</strong> ${figure.description || 'No description available'}</p>
                                 <p class="cs-pinned"><strong>Pinned:</strong> ${figure.pinned ? 'Yes' : 'No'}</p>
-                                <button class="cs-buy-now">Buy Now</button>
+                                ${buyNowLink}
                             </div>
                         </div>
                         <div class="cs-info-panel">
@@ -409,16 +440,9 @@ class GalleryFilter {
     }
 
     handleEscKey(e) {
-        if (e.key === 'Escape' && this.$modal.style.display === 'block') {
-            setTimeout(() => {
-                this.$modal.style.display = 'none';
-                this.$modal.setAttribute('スタイル', 'display: none !important;');
-                document.body.classList.remove('cs-modal-open');
-                console.log('Modal closed: ESC key');
-                console.log('Modal styles after close:', {
-                    display: window.getComputedStyle(this.$modal).display
-                });
-            }, 0);
+        if (e.key === 'Escape') {
+            this.handleCloseClick(e);
+            console.log('Modal closed: ESC key triggered close button action');
         }
     }
 
