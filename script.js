@@ -6,6 +6,7 @@ class GalleryFilter {
     hiddenDividerClass = "cs-hidden-divider";
     expandedClass = "cs-expanded";
     isImagePopupsSetup = false;
+    originalSectionOrder = [];
 
     constructor() {
         console.log('Initializing GalleryFilter at:', new Date().toLocaleString());
@@ -14,7 +15,7 @@ class GalleryFilter {
         this.$modal.className = 'modal';
         this.$modal.setAttribute('style', 'display: none !important;');
         this.$modal.innerHTML = `
-            <span class="close">×</span>
+            <span class="close" tabindex="0" aria-label="Close modal">×</span>
             <img class="modal-content" id="img01" loading="lazy" decoding="async">
             <div id="caption"></div>
         `;
@@ -23,23 +24,51 @@ class GalleryFilter {
 
         this.$modalImg = this.$modal.querySelector('#img01');
         this.$captionText = this.$modal.querySelector('#caption');
-        this.$modal.querySelector('.close').addEventListener('click', this.handleCloseClick.bind(this));
-        console.log('Close button event listener added');
+        this.$modalClose = this.$modal.querySelector('.close');
+        this.$modalClose.addEventListener('click', this.handleCloseClick.bind(this));
+        this.$modalClose.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                this.handleCloseClick(e);
+                console.log('Modal closed: Enter or Space on close button');
+            }
+        });
+        console.log('Close button event listeners added');
 
         this.$buttonGroup = document.querySelector('.cs-button-group');
         this.$listingWrapper = document.querySelector('.cs-listing-wrapper');
         this.$searchSelect = document.querySelector('.cs-search-select');
 
+        // Create search input
+        this.$searchInput = document.createElement('input');
+        this.$searchInput.type = 'text';
+        this.$searchInput.className = 'cs-search-input';
+        this.$searchInput.placeholder = 'Search figures...';
+        this.$searchInput.setAttribute('aria-label', 'Search figures by name');
+        this.$buttonGroup.insertBefore(this.$searchInput, this.$searchSelect.parentElement);
+        console.log('Search input created and prepended to button group');
+
+        // Create clear search button
+        this.$clearButton = document.createElement('button');
+        this.$clearButton.className = 'cs-clear-search';
+        this.$clearButton.textContent = '×';
+        this.$clearButton.setAttribute('aria-label', 'Clear search');
+        this.$clearButton.style.display = 'none';
+        this.$buttonGroup.insertBefore(this.$clearButton, this.$searchSelect.parentElement);
+        console.log('Clear search button created and inserted before select');
+
         // Debug DOM elements
         console.log('DOM elements:', {
             buttonGroup: !!this.$buttonGroup,
             listingWrapper: !!this.$listingWrapper,
-            searchSelect: !!this.$searchSelect
+            searchSelect: !!this.$searchSelect,
+            searchInput: !!this.$searchInput,
+            clearButton: !!this.$clearButton
         });
 
-        if (!this.$listingWrapper || !this.$searchSelect || !this.$buttonGroup) {
+        if (!this.$listingWrapper || !this.$searchSelect || !this.$buttonGroup || !this.$searchInput || !this.$clearButton) {
             console.error('Required DOM elements missing. Check index.html structure.');
-            this.$listingWrapper.innerHTML = '<p style="color: var(--text-color); text-align: center;">Error: Required elements (button group, listing wrapper, or select) not found. Check HTML structure.</p>';
+            this.$listingWrapper.innerHTML = '<p style="color: var(--text-color); text-align: center;">Error: Required elements (button group, listing wrapper, select, search input, or clear button) not found. Check HTML structure.</p>';
             return;
         }
 
@@ -71,6 +100,24 @@ class GalleryFilter {
         });
         console.log('Click event listener added for Back to Top button');
 
+        // Set up search input event
+        this.$searchInput.addEventListener('input', () => {
+            const query = this.$searchInput.value.trim().toLowerCase();
+            this.$clearButton.style.display = query ? 'inline-block' : 'none';
+            console.log('Search input changed:', query, 'Clear button display:', this.$clearButton.style.display);
+            this.filter(this.$activeFilter?.dataset.filter || 'all', query);
+        });
+        console.log('Search input event listener added');
+
+        // Set up clear search button event
+        this.$clearButton.addEventListener('click', () => {
+            this.$searchInput.value = '';
+            this.$clearButton.style.display = 'none';
+            console.log('Clear search button clicked, input cleared');
+            this.filter(this.$activeFilter?.dataset.filter || 'all', '');
+        });
+        console.log('Clear search button event listener added');
+
         // Set up event delegation for .cs-show-more clicks
         this.$listingWrapper.addEventListener('click', (e) => {
             const button = e.target.closest('.cs-show-more');
@@ -88,7 +135,7 @@ class GalleryFilter {
         this.$searchSelect.addEventListener('change', () => {
             const value = this.$searchSelect.value;
             console.log('Select changed:', value);
-            this.filter(value || 'all');
+            this.filter(value || 'all', this.$searchInput.value.trim().toLowerCase());
             // Update active filter for "All" button
             this.$filters = document.querySelectorAll(this.filtersSelector);
             this.$activeFilter = Array.from(this.$filters).find(f => f.dataset.filter === (value !== 'all' ? `series-${value}` : 'all')) || this.$filters[0];
@@ -204,10 +251,19 @@ class GalleryFilter {
         const selectWidth = Math.min(Math.max(textWidth + 50, 200), 300);
         this.$searchSelect.style.width = `${selectWidth}px`;
         console.log(`Select width set to ${selectWidth}px for longest series: ${longestName}`);
+
+        // Add Pinned filter button
+        const pinnedButton = document.createElement('button');
+        pinnedButton.className = 'cs-button';
+        pinnedButton.dataset.filter = 'pinned';
+        pinnedButton.textContent = 'Pinned';
+        this.$buttonGroup.insertBefore(pinnedButton, this.$searchSelect.parentElement);
+        console.log('Pinned filter button added');
     }
 
     renderAllListings(figures) {
         this.$listingWrapper.innerHTML = '';
+        this.originalSectionOrder = [];
         console.log('Cleared cs-listing-wrapper to prevent duplication');
 
         Object.keys(figures).forEach(series => {
@@ -234,7 +290,11 @@ class GalleryFilter {
                 console.log(`Rendering figure for ${series}: ${figure.name}, Image: ${figure.image}`);
                 const item = document.createElement('div');
                 item.className = 'cs-item';
-                const buyNowLink = figure.link ? `<a class="cs-buy-now" href="${figure.link}" target="_blank" aria-label="Buy ${figure.name} now">Buy Now</a>` : `<button class="cs-buy-now" disabled>Buy Now (No Link)</button>`;
+                item.dataset.name = figure.name.toLowerCase();
+                item.dataset.pinned = figure.pinned ? 'true' : 'false';
+                const buyNowLink = figure.link
+                    ? `<a class="cs-buy-now" href="${figure.link}" target="_blank" aria-label="Buy ${figure.name} now" data-tooltip="Go to purchase page">Buy Now</a>`
+                    : `<button class="cs-buy-now" disabled data-tooltip="No purchase link available">Buy Now</button>`;
                 item.innerHTML = `
                     <div class="cs-picture-group">
                         <picture class="cs-picture">
@@ -299,7 +359,11 @@ class GalleryFilter {
                 console.log(`Rendering all figure for ${series}: ${figure.name}, Image: ${figure.image}`);
                 const item = document.createElement('div');
                 item.className = 'cs-item';
-                const buyNowLink = figure.link ? `<a class="cs-buy-now" href="${figure.link}" target="_blank" aria-label="Buy ${figure.name} now">Buy Now</a>` : `<button class="cs-buy-now" disabled>Buy Now (No Link)</button>`;
+                item.dataset.name = figure.name.toLowerCase();
+                item.dataset.pinned = figure.pinned ? 'true' : 'false';
+                const buyNowLink = figure.link
+                    ? `<a class="cs-buy-now" href="${figure.link}" target="_blank" aria-label="Buy ${figure.name} now" data-tooltip="Go to purchase page">Buy Now</a>`
+                    : `<button class="cs-buy-now" disabled data-tooltip="No purchase link available">Buy Now</button>`;
                 item.innerHTML = `
                     <div class="cs-picture-group">
                         <picture class="cs-picture">
@@ -340,7 +404,11 @@ class GalleryFilter {
                     console.log(`Rendering additional figure for ${series}: ${figure.name}, Image: ${figure.image}`);
                     const item = document.createElement('div');
                     item.className = 'cs-item';
-                    const buyNowLink = figure.link ? `<a class="cs-buy-now" href="${figure.link}" target="_blank" aria-label="Buy ${figure.name} now">Buy Now</a>` : `<button class="cs-buy-now" disabled>Buy Now (No Link)</button>`;
+                    item.dataset.name = figure.name.toLowerCase();
+                    item.dataset.pinned = figure.pinned ? 'true' : 'false';
+                    const buyNowLink = figure.link
+                        ? `<a class="cs-buy-now" href="${figure.link}" target="_blank" aria-label="Buy ${figure.name} now" data-tooltip="Go to purchase page">Buy Now</a>`
+                        : `<button class="cs-buy-now" disabled data-tooltip="No purchase link available">Buy Now</button>`;
                     item.innerHTML = `
                         <div class="cs-picture-group">
                             <picture class="cs-picture">
@@ -374,6 +442,8 @@ class GalleryFilter {
             }
 
             allListing.appendChild(seriesSection);
+            this.originalSectionOrder.push({ category: series, element: seriesSection });
+            console.log(`Stored section for ${series} in originalSectionOrder`);
 
             if (index < sortedSeries.length - 1) {
                 const divider = document.createElement('hr');
@@ -384,6 +454,7 @@ class GalleryFilter {
         });
         this.$listingWrapper.appendChild(allListing);
         console.log(`All listing rendered, items: ${allListing.querySelectorAll('.cs-item').length}, sections: ${allListing.querySelectorAll('.cs-series-section').length}`);
+        console.log('Original section order:', this.originalSectionOrder.map(s => s.category));
     }
 
     setupImagePopups() {
@@ -418,6 +489,10 @@ class GalleryFilter {
             this.$modal.style.display = 'none';
             this.$modal.setAttribute('style', 'display: none !important;');
             document.body.classList.remove('cs-modal-open');
+            if (this.lastFocusedElement) {
+                this.lastFocusedElement.focus();
+                console.log('Focus restored to:', this.lastFocusedElement.tagName);
+            }
             console.log('Modal closed: close button');
             console.log('Modal styles after close:', {
                 display: window.getComputedStyle(this.$modal).display
@@ -431,6 +506,10 @@ class GalleryFilter {
                 this.$modal.style.display = 'none';
                 this.$modal.setAttribute('style', 'display: none !important;');
                 document.body.classList.remove('cs-modal-open');
+                if (this.lastFocusedElement) {
+                    this.lastFocusedElement.focus();
+                    console.log('Focus restored to:', this.lastFocusedElement.tagName);
+                }
                 console.log('Modal closed: click outside');
                 console.log('Modal styles after close:', {
                     display: window.getComputedStyle(this.$modal).display
@@ -449,6 +528,7 @@ class GalleryFilter {
     handleImageClick(event) {
         event.stopPropagation();
         const image = event.target;
+        this.lastFocusedElement = document.activeElement;
         this.$modalImg.src = '';
         this.$modalImg.src = image.src;
         this.$captionText.innerHTML = image.alt;
@@ -456,6 +536,7 @@ class GalleryFilter {
             this.$modal.style.display = 'block';
             this.$modal.removeAttribute('style');
             document.body.classList.add('cs-modal-open');
+            this.$modalClose.focus();
             window.getComputedStyle(this.$modal).display;
             console.log('Modal opened for:', image.src, 'Caption:', image.alt);
             console.log('Modal parent:', this.$modal.parentElement.tagName);
@@ -583,11 +664,11 @@ class GalleryFilter {
             this.$searchSelect.value = 'all';
             console.log('Select reset to All Series via All button');
         }
-        this.filter($filter.dataset.filter);
+        this.filter($filter.dataset.filter, this.$searchInput.value.trim().toLowerCase());
     }
 
-    filter(filter) {
-        console.log('Filtering:', filter, 'at:', new Date().toLocaleString());
+    filter(filter, searchQuery = '') {
+        console.log('Filtering:', filter, 'Search query:', searchQuery, 'at:', new Date().toLocaleString());
         const images = document.querySelectorAll(this.imagesSelector) || [];
         if (!images.length) {
             console.error('No .cs-listing elements found. Check figures.json or renderAllListings logic.');
@@ -612,52 +693,152 @@ class GalleryFilter {
         });
 
         images.forEach($image => {
-            const effectiveFilter = filter === 'all' ? 'all' : `series-${filter}`;
-            const shouldShow = $image.dataset.category === effectiveFilter;
-            if (shouldShow) {
-                $image.classList.remove(this.hiddenClass);
-                $image.style.opacity = '1';
-                $image.style.visibility = 'visible';
-                $image.style.transform = 'scale(1)';
-                $image.style.position = 'relative';
-                $image.style.pointerEvents = 'auto';
-                console.log(`Listing ${$image.dataset.category} shown, items: ${$image.querySelectorAll('.cs-item').length}`);
+            const effectiveFilter = filter === 'all' || filter === 'pinned' ? 'all' : `series-${filter}`;
+            const shouldShowListing = $image.dataset.category === effectiveFilter;
+            const items = $image.querySelectorAll('.cs-item:not(.cs-logo-item)');
+            let hasVisibleItems = false;
+
+            if (shouldShowListing) {
+                items.forEach(item => {
+                    const nameMatch = !searchQuery || item.dataset.name.includes(searchQuery);
+                    const pinnedMatch = filter !== 'pinned' || item.dataset.pinned === 'true';
+                    if (nameMatch && pinnedMatch) {
+                        item.style.display = 'block';
+                        hasVisibleItems = true;
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+
+                // For 'all' or 'pinned' listing, handle section visibility and no-results
+                if ($image.dataset.category === 'all') {
+                    const allListing = $image;
+                    // Remove any existing no-results message
+                    const noResultsMessage = allListing.querySelector('.cs-no-results');
+                    if (noResultsMessage) {
+                        noResultsMessage.remove();
+                        console.log('Removed existing no-results message');
+                    }
+
+                    if (filter === 'pinned' && !hasVisibleItems) {
+                        // Show no-results message for pinned view with no matches
+                        const noResults = document.createElement('div');
+                        noResults.className = 'cs-no-results';
+                        noResults.innerHTML = '<p style="color: var(--text-color); text-align: center; grid-column: 1 / -1;">No pinned figures found.</p>';
+                        allListing.appendChild(noResults);
+                        console.log('Appended no-results message for pinned view');
+                    } else if (filter === 'all' && searchQuery && !hasVisibleItems) {
+                        // Show no-results message for all view with search and no matches
+                        const noResults = document.createElement('div');
+                        noResults.className = 'cs-no-results';
+                        noResults.innerHTML = '<p style="color: var(--text-color); text-align: center; grid-column: 1 / -1;">No figures found.</p>';
+                        allListing.appendChild(noResults);
+                        console.log('Appended no-results message for all view');
+                    } else if (filter === 'all' && !searchQuery) {
+                        // No search: restore original alphabetical order with dividers
+                        allListing.innerHTML = '';
+                        this.originalSectionOrder.forEach((sectionData, index) => {
+                            allListing.appendChild(sectionData.element);
+                            sectionData.element.style.display = 'contents';
+                            const logo = sectionData.element.querySelector('.cs-logo-item');
+                            if (logo) {
+                                logo.style.display = 'block';
+                            }
+                            console.log(`Restored section: ${sectionData.category} at position ${index + 1}`);
+                            if (index < this.originalSectionOrder.length - 1) {
+                                const divider = document.createElement('hr');
+                                divider.className = 'cs-series-divider';
+                                allListing.appendChild(divider);
+                                console.log(`Added divider after restored section ${sectionData.category}`);
+                            }
+                        });
+                    } else if (searchQuery) {
+                        // During search: show only matching sections, reordered to top
+                        const visibleSections = [];
+                        const hiddenSections = [];
+
+                        const sections = Array.from(allListing.querySelectorAll('.cs-series-section'));
+                        sections.forEach(section => {
+                            const visibleItems = section.querySelectorAll('.cs-item:not(.cs-logo-item)[style*="display: block"]');
+                            if (visibleItems.length > 0) {
+                                visibleSections.push(section);
+                                section.style.display = 'contents';
+                                console.log(`Section for series: ${section.dataset.category} marked visible (${visibleItems.length} figures)`);
+                            } else {
+                                hiddenSections.push(section);
+                                section.style.display = 'none';
+                                console.log(`Section for series: ${section.dataset.category} marked hidden (no visible figures)`);
+                            }
+                        });
+
+                        // Reorder: append visible sections first, then hidden sections, no dividers
+                        allListing.innerHTML = '';
+                        visibleSections.forEach((section, index) => {
+                            allListing.appendChild(section);
+                            console.log(`Appended visible section: ${section.dataset.category} at position ${index + 1}`);
+                        });
+                        hiddenSections.forEach((section, index) => {
+                            allListing.appendChild(section);
+                            console.log(`Appended hidden section: ${section.dataset.category} at position ${visibleSections.length + index + 1}`);
+                        });
+                    }
+                }
+
+                if (hasVisibleItems || $image.dataset.category !== 'all') {
+                    $image.classList.remove(this.hiddenClass);
+                    $image.style.opacity = '1';
+                    $image.style.visibility = 'visible';
+                    $image.style.transform = 'scale(1)';
+                    $image.style.position = 'relative';
+                    $image.style.pointerEvents = 'auto';
+                    console.log(`Listing ${$image.dataset.category} shown, visible items: ${$image.querySelectorAll('.cs-item:not(.cs-logo-item)[style*="display: block"]').length}`);
+                }
             }
         });
 
-        if (filter === 'all') {
+        if (filter === 'all' || filter === 'pinned') {
             this.$searchSelect.value = 'all';
             this.$filters.forEach(f => f.classList.remove(this.activeClass));
-            const allButton = Array.from(this.$filters).find(f => f.dataset.filter === 'all');
-            if (allButton) {
-                allButton.classList.add(this.activeClass);
-                this.$activeFilter = allButton;
-                console.log('Active filter reset to All');
+            const targetButton = Array.from(this.$filters).find(f => f.dataset.filter === filter);
+            if (targetButton) {
+                targetButton.classList.add(this.activeClass);
+                this.$activeFilter = targetButton;
+                console.log(`Active filter set to ${filter}`);
             }
         }
 
+        // Divider visibility logic
         const dividers = document.querySelectorAll('.cs-series-divider');
         console.log(`Found ${dividers.length} dividers`);
 
         dividers.forEach((divider, index) => {
-            if (filter === 'all') {
-                divider.classList.remove(this.hiddenDividerClass);
-                console.log(`Divider ${index} shown`);
+            if (filter === 'all' || filter === 'pinned') {
+                if (searchQuery) {
+                    divider.classList.add(this.hiddenDividerClass);
+                    console.log(`Divider ${index} hidden (search active)`);
+                } else {
+                    divider.classList.remove(this.hiddenDividerClass);
+                    console.log(`Divider ${index} shown (no search, All/Pinned view)`);
+                }
             } else {
                 divider.classList.add(this.hiddenDividerClass);
-                console.log(`Divider ${index} hidden`);
+                console.log(`Divider ${index} hidden (series-specific filter)`);
             }
         });
 
         const visibleListings = document.querySelectorAll(`.cs-listing:not(.${this.hiddenClass})`);
         console.log(`Visible listings after filter: ${visibleListings.length}`, Array.from(visibleListings).map(l => l.dataset.category));
-        const visibleCards = document.querySelectorAll(`.cs-listing:not(.${this.hiddenClass}) .cs-item`);
+        const visibleCards = document.querySelectorAll(`.cs-listing:not(.${this.hiddenClass}) .cs-item:not(.cs-logo-item)[style*="display: block"]`);
         console.log(`Visible cards after filtering: ${visibleCards.length}`);
-        if (filter === 'all') {
+        if (filter === 'all' || filter === 'pinned') {
             const allListing = document.querySelector('.cs-listing[data-category="all"]');
             if (allListing) {
-                console.log('All listing sections:', Array.from(allListing.querySelectorAll('.cs-series-section')).map(s => s.dataset.category));
-                console.log('All listing items:', Array.from(allListing.querySelectorAll('.cs-item:not(.cs-logo-item)')).map(i => i.querySelector('.cs-name')?.textContent || 'Unknown'));
+                console.log('All listing sections:', Array.from(allListing.querySelectorAll('.cs-series-section')).map(s => ({
+                    category: s.dataset.category,
+                    visibleItems: s.querySelectorAll('.cs-item:not(.cs-logo-item)[style*="display: block"]').length,
+                    sectionVisible: s.style.display !== 'none'
+                })));
+                console.log('All listing items:', Array.from(allListing.querySelectorAll('.cs-item:not(.cs-logo-item)[style*="display: block"]')).map(i => i.querySelector('.cs-name')?.textContent || 'Unknown'));
                 const allListingStyles = window.getComputedStyle(allListing);
                 console.log('All listing CSS styles:', {
                     display: allListingStyles.display,
@@ -665,15 +846,15 @@ class GalleryFilter {
                     gap: allListingStyles.gap,
                     width: allListingStyles.width
                 });
-                const firstSection = allListing.querySelector('.cs-series-section');
+                const firstSection = allListing.querySelector('.cs-series-section[style*="display: contents"]');
                 if (firstSection) {
                     const sectionStyles = window.getComputedStyle(firstSection);
-                    console.log('First series section CSS styles:', {
+                    console.log('First visible series section CSS styles:', {
                         display: sectionStyles.display,
                         width: sectionStyles.width
                     });
                 }
-                const firstItem = allListing.querySelector('.cs-item:not(.cs-logo-item)');
+                const firstItem = allListing.querySelector('.cs-item:not(.cs-logo-item)[style*="display: block"]');
                 if (firstItem) {
                     const itemStyles = window.getComputedStyle(firstItem);
                     console.log('First item CSS styles:', {
@@ -693,7 +874,7 @@ class GalleryFilter {
                     }
                 }
             } else {
-                console.error('All listing not found after filtering to all');
+                console.error('All listing not found after filtering to all or pinned');
             }
         }
         if (visibleListings.length > 0) {

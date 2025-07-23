@@ -68,6 +68,111 @@ body.cs-modal-open {
     background: var(--primary-dark);
 }
 
+/* Search bar */
+#collection-1602 .cs-search-input {
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    font-size: 1.1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    width: 100%;
+    max-width: 300px;
+    height: 36px;
+    line-height: 1.1rem; /* Match buttons and select */
+    margin: 0; /* Remove margin for alignment */
+}
+
+/* Focus state for search input */
+#collection-1602 .cs-search-input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+/* Button group for filters, search, and select */
+#collection-1602 .cs-button-group {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    align-items: center; /* Vertically align all elements */
+    justify-content: flex-start;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+}
+
+/* Filter buttons */
+#collection-1602 .cs-button {
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-size: 1.1rem;
+    color: var(--text-color);
+    border-radius: 0.25rem;
+    height: 36px;
+    line-height: 1.1rem;
+    margin: 0; /* Remove margin for alignment */
+}
+
+#collection-1602 .cs-button.cs-active {
+    background: var(--primary);
+    color: var(--text-color);
+}
+
+#collection-1602 .cs-button:hover {
+    background: var(--primary-dark);
+}
+
+/* Select wrapper */
+#collection-1602 .cs-select-wrapper {
+    position: relative;
+    display: inline-block;
+    height: 36px;
+    margin: 0; /* Remove margin for alignment */
+}
+
+/* Select dropdown */
+#collection-1602 .cs-search-select {
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    font-size: 1.1rem;
+    padding: 0.5rem 1.5rem 0.5rem 1rem;
+    border-radius: 0.25rem;
+    min-width: 200px;
+    max-width: 300px;
+    width: 100%;
+    height: 36px;
+    line-height: 1.1rem;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    cursor: pointer;
+}
+
+#collection-1602 .cs-search-select:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: var(--card-background);
+}
+
+#collection-1602 .cs-search-select::-webkit-list-button,
+#collection-1602 .cs-search-select::-webkit-calendar-picker-indicator {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+
+#collection-1602 .cs-dropdown-arrow {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    pointer-events: none;
+    opacity: 1;
+}
+
 /* Responsive grid for smaller screens */
 @media only screen and (max-width: 1800px) {
     #collection-1602 .cs-listing {
@@ -101,7 +206,8 @@ body.cs-modal-open {
         gap: 0.5rem;
     }
     #collection-1602 .cs-button,
-    #collection-1602 .cs-select-wrapper {
+    #collection-1602 .cs-select-wrapper,
+    #collection-1602 .cs-search-input {
         width: 100%;
         max-width: 280px; /* Match card width */
     }
@@ -132,6 +238,11 @@ body.cs-modal-open {
     background: var(--card-background);
     width: 280px;
     height: 513px;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Hover effect */
+}
+#collection-1602 .cs-item:hover {
+    transform: scale(1.05); /* Slight scale-up on hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Subtle shadow */
 }
 
 /* Logo item */
@@ -218,11 +329,33 @@ body.cs-modal-open {
     border-radius: 0.25rem;
     text-decoration: none;
     text-align: center;
+    position: relative; /* For tooltip */
 }
 
 /* Show Buy Now when card is expanded */
 #collection-1602 .cs-item.cs-expanded .cs-buy-now {
     display: inline-block;
+}
+
+/* Tooltip for Buy Now */
+#collection-1602 .cs-buy-now:hover:after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: var(--text-color);
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.25rem;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+#collection-1602 .cs-buy-now:hover:after {
+    opacity: 1;
 }
 
 /* Hover effect for enabled Buy Now */
@@ -366,82 +499,49 @@ html body #myModal.modal .close:focus {
     }
 }
 
-/* Button group for filters */
-#collection-1602 .cs-button-group {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-    align-items: center;
-    justify-content: flex-start;
-}
-
-/* Filter buttons */
-#collection-1602 .cs-button {
-    background: var(--card-background);
+/* Clear Search Button */
+.cs-clear-search {
+    display: none; /* Hidden by default, shown via JS when input has text */
+    margin-left: 8px;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    background-color: #0052cc; /* Matches .cs-button blue from corestyles.css */
+    color: var(--button-text);
     border: 1px solid var(--border-color);
-    padding: 0.5rem 1rem;
+    border-radius: 4px;
     cursor: pointer;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
+    line-height: 1;
+    vertical-align: middle;
+}
+
+.cs-clear-search:hover {
+    background-color: #003d99; /* Darker blue for hover, matching .cs-button:hover */
+}
+
+.cs-clear-search:focus {
+    outline: 2px solid var(--focus-color);
+    outline-offset: 2px;
+}
+
+/* Ensure no-results message remains styled */
+.cs-no-results {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 20px;
     color: var(--text-color);
-    border-radius: 0.25rem;
-    height: 36px;
-    line-height: 1.1rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
-#collection-1602 .cs-button.cs-active {
-    background: var(--primary);
-    color: var(--text-color);
+.cs-no-results.visible {
+    opacity: 1;
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .cs-clear-search {
+        margin: 8px auto;
+    }
 }
 
-#collection-1602 .cs-button:hover {
-    background: var(--primary-dark);
-}
-
-/* Select dropdown */
-#collection-1602 .cs-select-wrapper {
-    position: relative;
-    display: inline-block;
-    height: 36px;
-}
-
-#collection-1602 .cs-search-select {
-    background: var(--card-background);
-    border: 1px solid var(--border-color);
-    color: var(--text-color);
-    font-size: 1.1rem;
-    padding: 0.5rem 1.5rem 0.5rem 1rem;
-    border-radius: 0.25rem;
-    min-width: 200px;
-    max-width: 300px;
-    width: 100%;
-    height: 36px;
-    line-height: 1.1rem;
-    appearance: none !important;
-    -webkit-appearance: none !important;
-    -moz-appearance: none !important;
-    cursor: pointer;
-}
-
-#collection-1602 .cs-search-select:focus {
-    outline: none;
-    border-color: var(--primary);
-    background: var(--card-background);
-}
-
-#collection-1602 .cs-search-select::-webkit-list-button,
-#collection-1602 .cs-search-select::-webkit-calendar-picker-indicator {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-}
-
-#collection-1602 .cs-dropdown-arrow {
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 16px;
-    height: 16px;
-    pointer-events: none;
-    opacity: 1; /* Always visible */
-}
