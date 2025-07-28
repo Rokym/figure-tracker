@@ -281,6 +281,22 @@ body.cs-modal-open {
     opacity: 0.7;
 }
 
+/* Pinned indicator */
+#collection-1602 .cs-pinned-indicator {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.5rem;
+    color: #ffba43;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    transition: transform 0.2s, opacity 0.3s;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+#collection-1602 .cs-pinned-indicator:hover {
+    transform: scale(1.2);
+}
+
 /* Overlay for card title and button */
 #collection-1602 .cs-overlay {
     position: absolute;
@@ -537,6 +553,7 @@ html body #myModal.modal .close:focus {
 
 .cs-no-results.visible {
     opacity: 1;
+}
 
 /* Responsive adjustments */
 @media (max-width: 600px) {
@@ -545,3 +562,66 @@ html body #myModal.modal .close:focus {
     }
 }
 
+/* Fade-In Animation for Cards */
+#collection-1602 .cs-item:not(.cs-logo-item) {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+#collection-1602 .cs-item:not(.cs-logo-item)[style*="display: block"] {
+    opacity: 1;
+}
+
+/* Pin/Unpin Button */
+#collection-1602 .cs-pin-button {
+    background: #c20000; /* Corrected from #9b2643 to match previous yellow */
+    color: var(--text-color);
+    border: none;
+    padding: 0.3rem 0.8rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    border-radius: 0.25rem;
+    display: inline-block;
+    position: relative; /* For tooltip */
+}
+
+#collection-1602 .cs-pin-button:hover:not(:disabled) {
+    background: #cc9335; /* Darker shade of #ffba43 */
+}
+
+#collection-1602 .cs-pin-button:disabled {
+    background: #666;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+#collection-1602 .cs-pin-button:hover:after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: var(--text-color);
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.25rem;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+#collection-1602 .cs-pin-button:hover:after {
+    opacity: 1;
+}
+
+/* Responsive adjustments for pinned indicator */
+@media only screen and (max-width: 600px) {
+    #collection-1602 .cs-pinned-indicator {
+        font-size: 1.2rem;
+        top: 8px;
+        right: 8px;
+    }
+}
