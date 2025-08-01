@@ -44,7 +44,7 @@ class GalleryFilter {
         this.$searchInput.type = 'text';
         this.$searchInput.className = 'cs-search-input';
         this.$searchInput.placeholder = 'Search figures...';
-        this.$searchInput.setAttribute('aria-label', 'Search figures by name');
+        this.$searchInput.setAttribute('aria-label', 'Search figures by name, description, set, or company');
         this.$buttonGroup.insertBefore(this.$searchInput, this.$searchSelect.parentElement);
         console.log('Search input created and prepended to button group');
 
@@ -142,14 +142,13 @@ class GalleryFilter {
         this.$searchSelect.addEventListener('change', () => {
             const value = this.$searchSelect.value;
             console.log('Select changed:', value);
-            this.filter(value || 'all', this.$searchInput.value.trim().toLowerCase());
+            const filterValue = value !== 'all' ? `series-${value}` : 'all';
+            this.filter(filterValue, this.$searchInput.value.trim().toLowerCase());
             this.$filters = document.querySelectorAll(this.filtersSelector);
-            this.$activeFilter = Array.from(this.$filters).find(f => f.dataset.filter === (value !== 'all' ? `series-${value}` : 'all')) || this.$filters[0];
+            this.$activeFilter = Array.from(this.$filters).find(f => f.dataset.filter === filterValue) || this.$filters[0];
             this.$filters.forEach(f => f.classList.remove(this.activeClass));
-            if (value === 'all') {
-                this.$activeFilter.classList.add(this.activeClass);
-                console.log('Active filter set to All via select change');
-            }
+            this.$activeFilter.classList.add(this.activeClass);
+            console.log(`Active filter set to ${filterValue} via select change`);
         });
         console.log('Select change event listener added');
 
@@ -270,12 +269,13 @@ class GalleryFilter {
             listing.className = `cs-listing cs-hidden`;
             listing.dataset.category = `series-${series}`;
 
-            const logoItem = document.createElement('div');
-            logoItem.className = 'cs-item cs-logo-item';
-            const logoUrl = figures[series].logo || 'https://placehold.co/280x112?text=Logo+Missing';
-            logoItem.innerHTML = `<img class="cs-series-logo" src="${logoUrl}" alt="${series} Logo">`;
-            listing.appendChild(logoItem);
-            console.log(`Rendered logo for ${series}: ${logoUrl}`);
+            // Add series logo container
+            const logoContainer = document.createElement('div');
+            logoContainer.className = 'cs-series-logo-container';
+            const logoUrl = figures[series].logo || 'placehold.co/280x112?text=Logo+Missing';
+            logoContainer.innerHTML = `<img class="cs-series-logo" src="${logoUrl}" alt="${series} Logo">`;
+            listing.appendChild(logoContainer);
+            console.log(`Rendered logo container for ${series}: ${logoUrl}`);
 
             figures[series].figures.forEach(figure => {
                 if (!figure.name || !figure.image) {
@@ -286,6 +286,9 @@ class GalleryFilter {
                 const item = document.createElement('div');
                 item.className = 'cs-item';
                 item.dataset.name = figure.name.toLowerCase();
+                item.dataset.description = (figure.description || 'No description available').toLowerCase();
+                item.dataset.set = (figure.set || 'N/A').toLowerCase();
+                item.dataset.company = (figure.company || 'N/A').toLowerCase();
                 const localPinned = localStorage.getItem(`pinned_${figure.name}`);
                 const isPinned = localPinned !== null ? JSON.parse(localPinned) : !!figure.pinned;
                 item.dataset.pinned = isPinned.toString();
@@ -298,7 +301,7 @@ class GalleryFilter {
                 item.innerHTML = `
                     <div class="cs-picture-group">
                         <picture class="cs-picture">
-                            <img loading="lazy" decoding="async" src="${figure.image}" alt="${figure.name}" width="280" height="513" onerror="this.src='https://placehold.co/280x513?text=Image+Failed'" class="clickable-image">
+                            <img loading="lazy" decoding="async" src="${figure.image}" alt="${figure.name}" width="280" height="513" onerror="this.src='placehold.co/280x513?text=Image+Failed'" class="clickable-image">
                         </picture>
                         ${pinnedIndicator}
                     </div>
@@ -347,15 +350,15 @@ class GalleryFilter {
             seriesSection.className = 'cs-series-section';
             seriesSection.dataset.category = series;
 
-            const logoItem = document.createElement('div');
-            logoItem.className = 'cs-item cs-logo-item';
-            const logoUrl = figures[series].logo || 'https://placehold.co/280x112?text=Logo+Missing';
-            logoItem.innerHTML = `<img class="cs-series-logo" src="${logoUrl}" alt="${series} Logo">`;
-            seriesSection.appendChild(logoItem);
-            console.log(`Rendered all logo for ${series}: ${logoUrl}`);
+            // Add series logo container
+            const logoContainer = document.createElement('div');
+            logoContainer.className = 'cs-series-logo-container';
+            const logoUrl = figures[series].logo || 'placehold.co/280x112?text=Logo+Missing';
+            logoContainer.innerHTML = `<img class="cs-series-logo" src="${logoUrl}" alt="${series} Logo">`;
+            seriesSection.appendChild(logoContainer);
+            console.log(`Rendered logo container for ${series} in all listing: ${logoUrl}`);
 
-            const figuresToShow = figures[series].figures.slice(0, index === 0 ? 5 : figures[series].figures.length);
-            figuresToShow.forEach(figure => {
+            figures[series].figures.forEach(figure => {
                 if (!figure.name || !figure.image) {
                     console.warn(`Invalid figure in ${series} (all listing):`, figure);
                     return;
@@ -364,6 +367,9 @@ class GalleryFilter {
                 const item = document.createElement('div');
                 item.className = 'cs-item';
                 item.dataset.name = figure.name.toLowerCase();
+                item.dataset.description = (figure.description || 'No description available').toLowerCase();
+                item.dataset.set = (figure.set || 'N/A').toLowerCase();
+                item.dataset.company = (figure.company || 'N/A').toLowerCase();
                 const localPinned = localStorage.getItem(`pinned_${figure.name}`);
                 const isPinned = localPinned !== null ? JSON.parse(localPinned) : !!figure.pinned;
                 item.dataset.pinned = isPinned.toString();
@@ -376,7 +382,7 @@ class GalleryFilter {
                 item.innerHTML = `
                     <div class="cs-picture-group">
                         <picture class="cs-picture">
-                            <img loading="lazy" decoding="async" src="${figure.image}" alt="${figure.name}" width="280" height="513" onerror="this.src='https://placehold.co/280x513?text=Image+Failed'" class="clickable-image">
+                            <img loading="lazy" decoding="async" src="${figure.image}" alt="${figure.name}" width="280" height="513" onerror="this.src='placehold.co/280x513?text=Image+Failed'" class="clickable-image">
                         </picture>
                         ${pinnedIndicator}
                     </div>
@@ -403,6 +409,7 @@ class GalleryFilter {
                         <p class="cs-pinned"><strong>Pinned:</strong> ${isPinned ? 'Yes' : 'No'}</p>
                         ${buyNowLink}
                         <button class="cs-pin-button" data-tooltip="${pinTooltip}">${pinButtonText}</button>
+                        </div>
                     </div>
                 `;
                 seriesSection.appendChild(item);
@@ -418,6 +425,9 @@ class GalleryFilter {
                     const item = document.createElement('div');
                     item.className = 'cs-item';
                     item.dataset.name = figure.name.toLowerCase();
+                    item.dataset.description = (figure.description || 'No description available').toLowerCase();
+                    item.dataset.set = (figure.set || 'N/A').toLowerCase();
+                    item.dataset.company = (figure.company || 'N/A').toLowerCase();
                     const localPinned = localStorage.getItem(`pinned_${figure.name}`);
                     const isPinned = localPinned !== null ? JSON.parse(localPinned) : !!figure.pinned;
                     item.dataset.pinned = isPinned.toString();
@@ -430,7 +440,7 @@ class GalleryFilter {
                     item.innerHTML = `
                         <div class="cs-picture-group">
                             <picture class="cs-picture">
-                                <img loading="lazy" decoding="async" src="${figure.image}" alt="${figure.name}" width="280" height="513" onerror="this.src='https://placehold.co/280x513?text=Image+Failed'" class="clickable-image">
+                                <img loading="lazy" decoding="async" src="${figure.image}" alt="${figure.name}" width="280" height="513" onerror="this.src='placehold.co/280x513?text=Image+Failed'" class="clickable-image">
                             </picture>
                             ${pinnedIndicator}
                         </div>
@@ -556,7 +566,7 @@ class GalleryFilter {
         }, 0);
         this.$modalImg.onerror = () => {
             console.error('Modal image failed to load:', image.src);
-            this.$modalImg.src = 'https://placehold.co/700x1280?text=Image+Failed';
+            this.$modalImg.src = 'placehold.co/700x1280?text=Image+Failed';
         };
         this.$modalImg.onload = () => {
             console.log('Modal image loaded:', image.src);
@@ -565,28 +575,50 @@ class GalleryFilter {
 
     handlePinClick(item, event) {
         event.stopPropagation();
+        event.preventDefault();
+        const scrollPosition = window.scrollY;
+        console.log(`Saving scroll position before pin action: ${scrollPosition}`);
+
         const figureName = item.querySelector('.cs-name').textContent;
         const currentPinned = item.dataset.pinned === 'true';
         const newPinned = !currentPinned;
 
-        // Update localStorage
         localStorage.setItem(`pinned_${figureName}`, JSON.stringify(newPinned));
         console.log(`Updated pinned state for ${figureName}: ${newPinned}`);
 
-        // Update dataset and UI
-        item.dataset.pinned = newPinned.toString();
-        const pinnedText = item.querySelector('.cs-details-content .cs-pinned');
-        pinnedText.innerHTML = `<strong>Pinned:</strong> ${newPinned ? 'Yes' : 'No'}`;
-        const pinnedTextInfo = item.querySelector('.cs-info-panel .cs-pinned');
-        pinnedTextInfo.innerHTML = `<strong>Pinned:</strong> ${newPinned ? 'Yes' : 'No'}`;
-        const pinButton = item.querySelector('.cs-pin-button');
-        pinButton.textContent = newPinned ? 'Unpin' : 'Pin';
-        pinButton.setAttribute('data-tooltip', newPinned ? 'Remove from pinned' : 'Add to pinned');
-        const pinnedIndicator = item.querySelector('.cs-pinned-indicator');
-        pinnedIndicator.style.display = newPinned ? 'block' : 'none';
+        const allItems = document.querySelectorAll(`.cs-item:not(.cs-logo-item)[data-name="${figureName.toLowerCase()}"]`);
+        allItems.forEach(item => {
+            item.dataset.pinned = newPinned.toString();
+            const pinnedText = item.querySelector('.cs-details-content .cs-pinned');
+            if (pinnedText) {
+                pinnedText.innerHTML = `<strong>Pinned:</strong> ${newPinned ? 'Yes' : 'No'}`;
+            }
+            const pinnedTextInfo = item.querySelector('.cs-info-panel .cs-pinned');
+            if (pinnedTextInfo) {
+                pinnedTextInfo.innerHTML = `<strong>Pinned:</strong> ${newPinned ? 'Yes' : 'No'}`;
+            }
+            const pinButtons = item.querySelectorAll('.cs-pin-button');
+            pinButtons.forEach(pinButton => {
+                pinButton.textContent = newPinned ? 'Unpin' : 'Pin';
+                pinButton.setAttribute('data-tooltip', newPinned ? 'Remove from pinned' : 'Add to pinned');
+            });
+            const pinnedIndicator = item.querySelector('.cs-pinned-indicator');
+            if (pinnedIndicator) {
+                pinnedIndicator.style.display = newPinned ? 'block' : 'none';
+                if (newPinned) {
+                    pinnedIndicator.classList.add('cs-pulse');
+                    setTimeout(() => pinnedIndicator.classList.remove('cs-pulse'), 500); // Remove after animation
+                }
+            }
+        });
+        console.log(`Synced pinned state for ${figureName} across ${allItems.length} instances`);
 
-        // Refresh the filter to update Pinned view
-        this.filter(this.$activeFilter?.dataset.filter || 'all', this.$searchInput.value.trim().toLowerCase());
+        const currentFilter = this.$searchSelect.value !== 'all' ? `series-${this.$searchSelect.value}` : (this.$activeFilter?.dataset.filter || 'all');
+        console.log(`Maintaining current filter: ${currentFilter}`);
+
+        this.filter(currentFilter, this.$searchInput.value.trim().toLowerCase(), true);
+        window.scrollTo({ top: scrollPosition, behavior: 'auto' });
+        console.log(`Restored scroll position after pin action: ${scrollPosition}`);
     }
 
     setupCardInteractions() {
@@ -679,8 +711,8 @@ class GalleryFilter {
         this.filter(targetFilter, this.$searchInput.value.trim().toLowerCase());
     }
 
-    filter(filter, searchQuery = '') {
-        console.log('Filtering:', filter, 'Search query:', searchQuery);
+    filter(filter, searchQuery = '', preserveFilterState = false) {
+        console.log('Filtering:', filter, 'Search query:', searchQuery, 'Preserve filter state:', preserveFilterState);
         const images = document.querySelectorAll(this.imagesSelector) || [];
         if (!images.length) {
             console.error('No .cs-listing elements found.');
@@ -696,15 +728,20 @@ class GalleryFilter {
             console.log(`Listing ${$image.dataset.category} hidden by default`);
         });
 
+        const isSeriesFilter = filter.startsWith('series-');
+        const targetListingCategory = preserveFilterState && isSeriesFilter ? filter : (filter === 'all' || filter === 'pinned' ? 'all' : filter);
         images.forEach($image => {
-            const effectiveFilter = filter === 'all' || filter === 'pinned' ? 'all' : `series-${filter}`;
-            const shouldShowListing = $image.dataset.category === effectiveFilter;
+            const shouldShowListing = $image.dataset.category === targetListingCategory;
             const items = Array.from($image.querySelectorAll('.cs-item:not(.cs-logo-item)'));
             let hasVisibleItems = false;
 
             if (shouldShowListing) {
                 items.forEach(item => {
-                    const nameMatch = !searchQuery || item.dataset.name.includes(searchQuery);
+                    const nameMatch = !searchQuery || 
+                        item.dataset.name.includes(searchQuery) || 
+                        item.dataset.description.includes(searchQuery) ||
+                        item.dataset.set.includes(searchQuery) ||
+                        item.dataset.company.includes(searchQuery);
                     const localPinned = localStorage.getItem(`pinned_${item.querySelector('.cs-name').textContent}`);
                     const isPinned = localPinned !== null ? JSON.parse(localPinned) : item.dataset.pinned === 'true';
                     const pinnedMatch = filter !== 'pinned' || isPinned;
@@ -715,6 +752,12 @@ class GalleryFilter {
                         item.style.display = 'none';
                     }
                 });
+
+                const logoContainer = $image.querySelector('.cs-series-logo-container');
+                if (logoContainer) {
+                    logoContainer.style.display = hasVisibleItems ? 'block' : 'none';
+                    console.log(`Logo container for ${$image.dataset.category} display: ${logoContainer.style.display}`);
+                }
 
                 if ($image.dataset.category === 'all') {
                     const allListing = $image;
@@ -741,7 +784,7 @@ class GalleryFilter {
                         this.originalSectionOrder.forEach((sectionData, index) => {
                             allListing.appendChild(sectionData.element);
                             sectionData.element.style.display = 'contents';
-                            const logo = sectionData.element.querySelector('.cs-logo-item');
+                            const logo = sectionData.element.querySelector('.cs-series-logo-container');
                             if (logo) {
                                 logo.style.display = 'block';
                             }
@@ -766,7 +809,7 @@ class GalleryFilter {
                             if (visibleItems.length > 0) {
                                 visibleSections.push(section);
                                 section.style.display = 'contents';
-                                const logo = section.querySelector('.cs-logo-item');
+                                const logo = section.querySelector('.cs-series-logo-container');
                                 if (logo) {
                                     logo.style.display = 'block';
                                 }
@@ -774,7 +817,7 @@ class GalleryFilter {
                             } else {
                                 hiddenSections.push(section);
                                 section.style.display = 'none';
-                                const logo = section.querySelector('.cs-logo-item');
+                                const logo = section.querySelector('.cs-series-logo-container');
                                 if (logo) {
                                     logo.style.display = 'none';
                                 }
@@ -808,7 +851,7 @@ class GalleryFilter {
             }
         });
 
-        if (filter === 'all' || filter === 'pinned') {
+        if (!preserveFilterState && (filter === 'all' || filter === 'pinned')) {
             this.$searchSelect.value = 'all';
             this.$filters.forEach(f => f.classList.remove(this.activeClass));
             const targetButton = Array.from(this.$filters).find(f => f.dataset.filter === filter);
