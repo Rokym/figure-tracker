@@ -118,10 +118,11 @@ class GalleryFilter {
         });
         console.log('Clear search button event listener added');
 
-        // Set up event delegation for .cs-show-more and .cs-pin-button clicks
+        // Set up event delegation for .cs-show-more, .cs-pin-button, and .cs-purchased-button clicks
         this.$listingWrapper.addEventListener('click', (e) => {
             const showMoreButton = e.target.closest('.cs-show-more');
             const pinButton = e.target.closest('.cs-pin-button');
+            const purchasedButton = e.target.closest('.cs-purchased-button');
             if (showMoreButton) {
                 const item = showMoreButton.closest('.cs-item:not(.cs-logo-item)');
                 if (item) {
@@ -134,9 +135,15 @@ class GalleryFilter {
                     this.handlePinClick(item, e);
                     console.log(`Delegated click on Pin/Unpin for card: ${item.querySelector('.cs-name')?.textContent || 'Unknown'}`);
                 }
+            } else if (purchasedButton) {
+                const item = purchasedButton.closest('.cs-item:not(.cs-logo-item)');
+                if (item) {
+                    this.handlePurchasedClick(item, e);
+                    console.log(`Delegated click on Purchased for card: ${item.querySelector('.cs-name')?.textContent || 'Unknown'}`);
+                }
             }
         });
-        console.log('Event delegation set up for .cs-show-more and .cs-pin-button clicks on .cs-listing-wrapper');
+        console.log('Event delegation set up for .cs-show-more, .cs-pin-button, and .cs-purchased-button clicks on .cs-listing-wrapper');
 
         // Set up select change event
         this.$searchSelect.addEventListener('change', () => {
@@ -247,12 +254,19 @@ class GalleryFilter {
         this.$searchSelect.style.width = `${selectWidth}px`;
         console.log(`Select width set to ${selectWidth}px for longest series: ${longestName}`);
 
+        // Add Pinned filter button after Purchased
+        const purchasedButton = this.$buttonGroup.querySelector('[data-filter="purchased"]');
         const pinnedButton = document.createElement('button');
         pinnedButton.className = 'cs-button';
         pinnedButton.dataset.filter = 'pinned';
         pinnedButton.textContent = 'Pinned';
-        this.$buttonGroup.insertBefore(pinnedButton, this.$searchSelect.parentElement);
-        console.log('Pinned filter button added');
+        if (purchasedButton) {
+            purchasedButton.insertAdjacentElement('afterend', pinnedButton);
+            console.log('Pinned filter button added after Purchased');
+        } else {
+            this.$buttonGroup.appendChild(pinnedButton);
+            console.log('Pinned filter button appended to button group (Purchased not found)');
+        }
     }
 
     renderAllListings(figures) {
@@ -260,23 +274,30 @@ class GalleryFilter {
         this.originalSectionOrder = [];
         console.log('Cleared cs-listing-wrapper');
 
-        Object.keys(figures).forEach(series => {
+        const allListing = document.createElement('div');
+        allListing.className = 'cs-listing';
+        allListing.dataset.category = 'all';
+
+        const sortedSeries = Object.keys(figures).sort();
+        sortedSeries.forEach((series, index) => {
             if (!figures[series] || !figures[series].figures || !Array.isArray(figures[series].figures)) {
                 console.warn(`Skipping invalid series: ${series}`);
                 return;
             }
-            const listing = document.createElement('div');
-            listing.className = `cs-listing cs-hidden`;
-            listing.dataset.category = `series-${series}`;
+
+            const seriesSection = document.createElement('div');
+            seriesSection.className = 'cs-series-section';
+            seriesSection.dataset.category = `series-${series}`;
 
             // Add series logo container
             const logoContainer = document.createElement('div');
             logoContainer.className = 'cs-series-logo-container';
             const logoUrl = figures[series].logo || 'placehold.co/280x112?text=Logo+Missing';
             logoContainer.innerHTML = `<img class="cs-series-logo" src="${logoUrl}" alt="${series} Logo">`;
-            listing.appendChild(logoContainer);
+            seriesSection.appendChild(logoContainer);
             console.log(`Rendered logo container for ${series}: ${logoUrl}`);
 
+            // Add figures
             figures[series].figures.forEach(figure => {
                 if (!figure.name || !figure.image) {
                     console.warn(`Invalid figure in ${series}:`, figure);
@@ -292,18 +313,25 @@ class GalleryFilter {
                 const localPinned = localStorage.getItem(`pinned_${figure.name}`);
                 const isPinned = localPinned !== null ? JSON.parse(localPinned) : !!figure.pinned;
                 item.dataset.pinned = isPinned.toString();
+                const localPurchased = localStorage.getItem(`purchased_${figure.name}`);
+                const isPurchased = localPurchased !== null ? JSON.parse(localPurchased) : false;
+                item.dataset.purchased = isPurchased.toString();
                 const buyNowLink = figure.link
                     ? `<a class="cs-buy-now" href="${figure.link}" target="_blank" aria-label="Buy ${figure.name} now" data-tooltip="Go to purchase page">Buy Now</a>`
                     : `<button class="cs-buy-now" disabled data-tooltip="No purchase link available">Buy Now</button>`;
                 const pinButtonText = isPinned ? 'Unpin' : 'Pin';
                 const pinTooltip = isPinned ? 'Remove from pinned' : 'Add to pinned';
+                const purchasedButtonText = isPurchased ? 'Unmark Purchased' : 'Mark Purchased';
+                const purchasedTooltip = isPurchased ? 'Unmark as purchased' : 'Mark as purchased';
                 const pinnedIndicator = isPinned ? `<span class="cs-pinned-indicator" aria-label="Pinned figure" style="display: block;">★</span>` : `<span class="cs-pinned-indicator" aria-label="Pinned figure" style="display: none;">★</span>`;
+                const purchasedIndicator = isPurchased ? `<span class="cs-purchased-indicator" aria-label="Purchased figure" style="display: block;">✓</span>` : `<span class="cs-purchased-indicator" aria-label="Purchased figure" style="display: none;">✓</span>`;
                 item.innerHTML = `
                     <div class="cs-picture-group">
                         <picture class="cs-picture">
                             <img loading="lazy" decoding="async" src="${figure.image}" alt="${figure.name}" width="280" height="513" onerror="this.src='placehold.co/280x513?text=Image+Failed'" class="clickable-image">
                         </picture>
                         ${pinnedIndicator}
+                        ${purchasedIndicator}
                     </div>
                     <div class="cs-overlay">
                         <h3 class="cs-name">${figure.name}</h3>
@@ -316,8 +344,10 @@ class GalleryFilter {
                             <p><strong>Release Date:</strong> ${figure.released || 'N/A'}</p>
                             <p><strong>Description:</strong> ${figure.description || 'No description available'}</p>
                             <p class="cs-pinned"><strong>Pinned:</strong> ${isPinned ? 'Yes' : 'No'}</p>
+                            <p class="cs-purchased"><strong>Purchased:</strong> ${isPurchased ? 'Yes' : 'No'}</p>
                             ${buyNowLink}
                             <button class="cs-pin-button" data-tooltip="${pinTooltip}">${pinButtonText}</button>
+                            <button class="cs-purchased-button" data-tooltip="${purchasedTooltip}">${purchasedButtonText}</button>
                         </div>
                     </div>
                     <div class="cs-info-panel">
@@ -326,152 +356,14 @@ class GalleryFilter {
                         <p><strong>Release Date:</strong> ${figure.released || 'N/A'}</p>
                         <p><strong>Description:</strong> ${figure.description || 'No description available'}</p>
                         <p class="cs-pinned"><strong>Pinned:</strong> ${isPinned ? 'Yes' : 'No'}</p>
+                        <p class="cs-purchased"><strong>Purchased:</strong> ${isPurchased ? 'Yes' : 'No'}</p>
                         ${buyNowLink}
                         <button class="cs-pin-button" data-tooltip="${pinTooltip}">${pinButtonText}</button>
-                    </div>
-                `;
-                listing.appendChild(item);
-            });
-            this.$listingWrapper.appendChild(listing);
-            console.log(`Series listing rendered: series-${series}, items: ${listing.querySelectorAll('.cs-item').length}`);
-        });
-
-        const allListing = document.createElement('div');
-        allListing.className = `cs-listing cs-hidden`;
-        allListing.dataset.category = 'all';
-
-        const sortedSeries = Object.keys(figures).sort();
-        sortedSeries.forEach((series, index) => {
-            if (!figures[series] || !figures[series].figures || !Array.isArray(figures[series].figures)) {
-                console.warn(`Skipping invalid series in all listing: ${series}`);
-                return;
-            }
-            const seriesSection = document.createElement('section');
-            seriesSection.className = 'cs-series-section';
-            seriesSection.dataset.category = series;
-
-            // Add series logo container
-            const logoContainer = document.createElement('div');
-            logoContainer.className = 'cs-series-logo-container';
-            const logoUrl = figures[series].logo || 'placehold.co/280x112?text=Logo+Missing';
-            logoContainer.innerHTML = `<img class="cs-series-logo" src="${logoUrl}" alt="${series} Logo">`;
-            seriesSection.appendChild(logoContainer);
-            console.log(`Rendered logo container for ${series} in all listing: ${logoUrl}`);
-
-            figures[series].figures.forEach(figure => {
-                if (!figure.name || !figure.image) {
-                    console.warn(`Invalid figure in ${series} (all listing):`, figure);
-                    return;
-                }
-                console.log(`Rendering all figure for ${series}: ${figure.name}`);
-                const item = document.createElement('div');
-                item.className = 'cs-item';
-                item.dataset.name = figure.name.toLowerCase();
-                item.dataset.description = (figure.description || 'No description available').toLowerCase();
-                item.dataset.set = (figure.set || 'N/A').toLowerCase();
-                item.dataset.company = (figure.company || 'N/A').toLowerCase();
-                const localPinned = localStorage.getItem(`pinned_${figure.name}`);
-                const isPinned = localPinned !== null ? JSON.parse(localPinned) : !!figure.pinned;
-                item.dataset.pinned = isPinned.toString();
-                const buyNowLink = figure.link
-                    ? `<a class="cs-buy-now" href="${figure.link}" target="_blank" aria-label="Buy ${figure.name} now" data-tooltip="Go to purchase page">Buy Now</a>`
-                    : `<button class="cs-buy-now" disabled data-tooltip="No purchase link available">Buy Now</button>`;
-                const pinButtonText = isPinned ? 'Unpin' : 'Pin';
-                const pinTooltip = isPinned ? 'Remove from pinned' : 'Add to pinned';
-                const pinnedIndicator = isPinned ? `<span class="cs-pinned-indicator" aria-label="Pinned figure" style="display: block;">★</span>` : `<span class="cs-pinned-indicator" aria-label="Pinned figure" style="display: none;">★</span>`;
-                item.innerHTML = `
-                    <div class="cs-picture-group">
-                        <picture class="cs-picture">
-                            <img loading="lazy" decoding="async" src="${figure.image}" alt="${figure.name}" width="280" height="513" onerror="this.src='placehold.co/280x513?text=Image+Failed'" class="clickable-image">
-                        </picture>
-                        ${pinnedIndicator}
-                    </div>
-                    <div class="cs-overlay">
-                        <h3 class="cs-name">${figure.name}</h3>
-                        <button class="cs-show-more" aria-expanded="false">Show More Info</button>
-                    </div>
-                    <div class="cs-details-overlay">
-                        <div class="cs-details-content">
-                            <p><strong>Set:</strong> ${figure.set || 'N/A'}</p>
-                            <p><strong>Company:</strong> ${figure.company || 'N/A'}</p>
-                            <p><strong>Release Date:</strong> ${figure.released || 'N/A'}</p>
-                            <p><strong>Description:</strong> ${figure.description || 'No description available'}</p>
-                            <p class="cs-pinned"><strong>Pinned:</strong> ${isPinned ? 'Yes' : 'No'}</p>
-                            ${buyNowLink}
-                            <button class="cs-pin-button" data-tooltip="${pinTooltip}">${pinButtonText}</button>
-                        </div>
-                    </div>
-                    <div class="cs-info-panel">
-                        <p><strong>Set:</strong> ${figure.set || 'N/A'}</p>
-                        <p><strong>Company:</strong> ${figure.company || 'N/A'}</p>
-                        <p><strong>Release Date:</strong> ${figure.released || 'N/A'}</p>
-                        <p><strong>Description:</strong> ${figure.description || 'No description available'}</p>
-                        <p class="cs-pinned"><strong>Pinned:</strong> ${isPinned ? 'Yes' : 'No'}</p>
-                        ${buyNowLink}
-                        <button class="cs-pin-button" data-tooltip="${pinTooltip}">${pinButtonText}</button>
-                        </div>
+                        <button class="cs-purchased-button" data-tooltip="${purchasedTooltip}">${purchasedButtonText}</button>
                     </div>
                 `;
                 seriesSection.appendChild(item);
             });
-
-            if (index === 0 && figures[series].figures && figures[series].figures.length > 5) {
-                figures[series].figures.slice(5).forEach(figure => {
-                    if (!figure.name || !figure.image) {
-                        console.warn(`Invalid additional figure in ${series}:`, figure);
-                        return;
-                    }
-                    console.log(`Rendering additional figure for ${series}: ${figure.name}`);
-                    const item = document.createElement('div');
-                    item.className = 'cs-item';
-                    item.dataset.name = figure.name.toLowerCase();
-                    item.dataset.description = (figure.description || 'No description available').toLowerCase();
-                    item.dataset.set = (figure.set || 'N/A').toLowerCase();
-                    item.dataset.company = (figure.company || 'N/A').toLowerCase();
-                    const localPinned = localStorage.getItem(`pinned_${figure.name}`);
-                    const isPinned = localPinned !== null ? JSON.parse(localPinned) : !!figure.pinned;
-                    item.dataset.pinned = isPinned.toString();
-                    const buyNowLink = figure.link
-                        ? `<a class="cs-buy-now" href="${figure.link}" target="_blank" aria-label="Buy ${figure.name} now" data-tooltip="Go to purchase page">Buy Now</a>`
-                        : `<button class="cs-buy-now" disabled data-tooltip="No purchase link available">Buy Now</button>`;
-                    const pinButtonText = isPinned ? 'Unpin' : 'Pin';
-                    const pinTooltip = isPinned ? 'Remove from pinned' : 'Add to pinned';
-                    const pinnedIndicator = isPinned ? `<span class="cs-pinned-indicator" aria-label="Pinned figure" style="display: block;">★</span>` : `<span class="cs-pinned-indicator" aria-label="Pinned figure" style="display: none;">★</span>`;
-                    item.innerHTML = `
-                        <div class="cs-picture-group">
-                            <picture class="cs-picture">
-                                <img loading="lazy" decoding="async" src="${figure.image}" alt="${figure.name}" width="280" height="513" onerror="this.src='placehold.co/280x513?text=Image+Failed'" class="clickable-image">
-                            </picture>
-                            ${pinnedIndicator}
-                        </div>
-                        <div class="cs-overlay">
-                            <h3 class="cs-name">${figure.name}</h3>
-                            <button class="cs-show-more" aria-expanded="false">Show More Info</button>
-                        </div>
-                        <div class="cs-details-overlay">
-                            <div class="cs-details-content">
-                                <p><strong>Set:</strong> ${figure.set || 'N/A'}</p>
-                                <p><strong>Company:</strong> ${figure.company || 'N/A'}</p>
-                                <p><strong>Release Date:</strong> ${figure.released || 'N/A'}</p>
-                                <p><strong>Description:</strong> ${figure.description || 'No description available'}</p>
-                                <p class="cs-pinned"><strong>Pinned:</strong> ${isPinned ? 'Yes' : 'No'}</p>
-                                ${buyNowLink}
-                                <button class="cs-pin-button" data-tooltip="${pinTooltip}">${pinButtonText}</button>
-                            </div>
-                        </div>
-                        <div class="cs-info-panel">
-                            <p><strong>Set:</strong> ${figure.set || 'N/A'}</p>
-                            <p><strong>Company:</strong> ${figure.company || 'N/A'}</p>
-                            <p><strong>Release Date:</strong> ${figure.released || 'N/A'}</p>
-                            <p><strong>Description:</strong> ${figure.description || 'No description available'}</p>
-                            <p class="cs-pinned"><strong>Pinned:</strong> ${isPinned ? 'Yes' : 'No'}</p>
-                            ${buyNowLink}
-                            <button class="cs-pin-button" data-tooltip="${pinTooltip}">${pinButtonText}</button>
-                        </div>
-                    `;
-                    seriesSection.appendChild(item);
-                });
-            }
 
             allListing.appendChild(seriesSection);
             this.originalSectionOrder.push({ category: series, element: seriesSection });
@@ -484,6 +376,7 @@ class GalleryFilter {
                 console.log(`Added divider after ${series}`);
             }
         });
+
         this.$listingWrapper.appendChild(allListing);
         console.log(`All listing rendered, items: ${allListing.querySelectorAll('.cs-item').length}, sections: ${allListing.querySelectorAll('.cs-series-section').length}`);
     }
@@ -607,7 +500,7 @@ class GalleryFilter {
                 pinnedIndicator.style.display = newPinned ? 'block' : 'none';
                 if (newPinned) {
                     pinnedIndicator.classList.add('cs-pulse');
-                    setTimeout(() => pinnedIndicator.classList.remove('cs-pulse'), 500); // Remove after animation
+                    setTimeout(() => pinnedIndicator.classList.remove('cs-pulse'), 700);
                 }
             }
         });
@@ -619,6 +512,65 @@ class GalleryFilter {
         this.filter(currentFilter, this.$searchInput.value.trim().toLowerCase(), true);
         window.scrollTo({ top: scrollPosition, behavior: 'auto' });
         console.log(`Restored scroll position after pin action: ${scrollPosition}`);
+    }
+
+    handlePurchasedClick(item, event) {
+        event.stopPropagation();
+        event.preventDefault();
+        const scrollPosition = window.scrollY;
+        console.log(`Saving scroll position before purchased action: ${scrollPosition}`);
+
+        const figureName = item.querySelector('.cs-name').textContent;
+        const currentPurchased = item.dataset.purchased === 'true';
+        const newPurchased = !currentPurchased;
+
+        if (newPurchased) {
+            if (!confirm('Mark this figure as purchased?')) return;
+            const enteredPin = prompt('Enter PIN to confirm:', '');
+            if (enteredPin !== '9241') {
+                alert('Incorrect PIN. Action cancelled.');
+                return;
+            }
+        } else {
+            if (!confirm('Unmark this figure as purchased?')) return;
+        }
+
+        localStorage.setItem(`purchased_${figureName}`, JSON.stringify(newPurchased));
+        console.log(`Updated purchased state for ${figureName}: ${newPurchased}`);
+
+        const allItems = document.querySelectorAll(`.cs-item:not(.cs-logo-item)[data-name="${figureName.toLowerCase()}"]`);
+        allItems.forEach(item => {
+            item.dataset.purchased = newPurchased.toString();
+            const purchasedText = item.querySelector('.cs-details-content .cs-purchased');
+            if (purchasedText) {
+                purchasedText.innerHTML = `<strong>Purchased:</strong> ${newPurchased ? 'Yes' : 'No'}`;
+            }
+            const purchasedTextInfo = item.querySelector('.cs-info-panel .cs-purchased');
+            if (purchasedTextInfo) {
+                purchasedTextInfo.innerHTML = `<strong>Purchased:</strong> ${newPurchased ? 'Yes' : 'No'}`;
+            }
+            const purchasedButtons = item.querySelectorAll('.cs-purchased-button');
+            purchasedButtons.forEach(button => {
+                button.textContent = newPurchased ? 'Unmark Purchased' : 'Mark Purchased';
+                button.setAttribute('data-tooltip', newPurchased ? 'Unmark as purchased' : 'Mark as purchased');
+            });
+            const purchasedIndicator = item.querySelector('.cs-purchased-indicator');
+            if (purchasedIndicator) {
+                purchasedIndicator.style.display = newPurchased ? 'block' : 'none';
+                if (newPurchased) {
+                    purchasedIndicator.classList.add('cs-pulse');
+                    setTimeout(() => purchasedIndicator.classList.remove('cs-pulse'), 700);
+                }
+            }
+        });
+        console.log(`Synced purchased state for ${figureName} across ${allItems.length} instances`);
+
+        const currentFilter = this.$searchSelect.value !== 'all' ? `series-${this.$searchSelect.value}` : (this.$activeFilter?.dataset.filter || 'all');
+        console.log(`Maintaining current filter: ${currentFilter}`);
+
+        this.filter(currentFilter, this.$searchInput.value.trim().toLowerCase(), true);
+        window.scrollTo({ top: scrollPosition, behavior: 'auto' });
+        console.log(`Restored scroll position after purchased action: ${scrollPosition}`);
     }
 
     setupCardInteractions() {
@@ -692,13 +644,21 @@ class GalleryFilter {
     onClick($filter) {
         console.log('Filter clicked:', $filter.dataset.filter);
         let targetFilter = $filter.dataset.filter;
-        if (targetFilter === 'pinned' && this.$activeFilter === $filter) {
-            targetFilter = 'all';
-            this.$filters.forEach(f => f.classList.remove(this.activeClass));
-            this.$activeFilter = Array.from(this.$filters).find(f => f.dataset.filter === 'all') || this.$filters[0];
-            this.$activeFilter.classList.add(this.activeClass);
-            this.$searchSelect.value = 'all';
-            console.log('Pinned filter toggled to All');
+        if (targetFilter === 'pinned' || targetFilter === 'purchased') {
+            if (this.$activeFilter === $filter) {
+                targetFilter = 'all';
+                this.$filters.forEach(f => f.classList.remove(this.activeClass));
+                this.$activeFilter = Array.from(this.$filters).find(f => f.dataset.filter === 'all') || this.$filters[0];
+                this.$activeFilter.classList.add(this.activeClass);
+                this.$searchSelect.value = 'all';
+                console.log(`${$filter.dataset.filter} filter toggled to All`);
+            } else {
+                this.$filters.forEach(f => f.classList.remove(this.activeClass));
+                $filter.classList.add(this.activeClass);
+                this.$activeFilter = $filter;
+                this.$searchSelect.value = 'all';
+                console.log(`Select reset to All Series via ${$filter.dataset.filter} button`);
+            }
         } else {
             this.$filters.forEach(f => f.classList.remove(this.activeClass));
             $filter.classList.add(this.activeClass);
@@ -729,121 +689,141 @@ class GalleryFilter {
         });
 
         const isSeriesFilter = filter.startsWith('series-');
-        const targetListingCategory = preserveFilterState && isSeriesFilter ? filter : (filter === 'all' || filter === 'pinned' ? 'all' : filter);
+        const targetSeries = isSeriesFilter ? filter : 'all';
         images.forEach($image => {
-            const shouldShowListing = $image.dataset.category === targetListingCategory;
+            const shouldShowListing = $image.dataset.category === 'all';
             const items = Array.from($image.querySelectorAll('.cs-item:not(.cs-logo-item)'));
             let hasVisibleItems = false;
 
             if (shouldShowListing) {
-                items.forEach(item => {
-                    const nameMatch = !searchQuery || 
-                        item.dataset.name.includes(searchQuery) || 
-                        item.dataset.description.includes(searchQuery) ||
-                        item.dataset.set.includes(searchQuery) ||
-                        item.dataset.company.includes(searchQuery);
-                    const localPinned = localStorage.getItem(`pinned_${item.querySelector('.cs-name').textContent}`);
-                    const isPinned = localPinned !== null ? JSON.parse(localPinned) : item.dataset.pinned === 'true';
-                    const pinnedMatch = filter !== 'pinned' || isPinned;
-                    if (nameMatch && pinnedMatch) {
-                        item.style.display = 'block';
-                        hasVisibleItems = true;
-                    } else {
-                        item.style.display = 'none';
+                const sections = Array.from($image.querySelectorAll('.cs-series-section'));
+                sections.forEach(section => {
+                    const sectionItems = Array.from(section.querySelectorAll('.cs-item:not(.cs-logo-item)'));
+                    let sectionHasVisibleItems = false;
+
+                    sectionItems.forEach(item => {
+                        const nameMatch = !searchQuery || 
+                            item.dataset.name.includes(searchQuery) || 
+                            item.dataset.description.includes(searchQuery) || 
+                            item.dataset.set.includes(searchQuery) || 
+                            item.dataset.company.includes(searchQuery);
+                        const localPinned = localStorage.getItem(`pinned_${item.querySelector('.cs-name').textContent}`);
+                        const isPinned = localPinned !== null ? JSON.parse(localPinned) : item.dataset.pinned === 'true';
+                        const pinnedMatch = filter !== 'pinned' || isPinned;
+                        const localPurchased = localStorage.getItem(`purchased_${item.querySelector('.cs-name').textContent}`);
+                        const isPurchased = localPurchased !== null ? JSON.parse(localPurchased) : item.dataset.purchased === 'true';
+                        const purchasedMatch = filter !== 'purchased' || isPurchased;
+                        const allViewMatch = filter !== 'all' || !isPurchased;
+                        const seriesMatch = !isSeriesFilter || section.dataset.category === targetSeries;
+
+                        if (nameMatch && pinnedMatch && purchasedMatch && allViewMatch && seriesMatch) {
+                            item.style.display = 'block';
+                            sectionHasVisibleItems = true;
+                            hasVisibleItems = true;
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+
+                    const logoContainer = section.querySelector('.cs-series-logo-container');
+                    if (logoContainer) {
+                        logoContainer.style.display = sectionHasVisibleItems ? 'block' : 'none';
+                        console.log(`Logo container for ${section.dataset.category} display: ${logoContainer.style.display}`);
                     }
+                    section.style.display = sectionHasVisibleItems ? 'contents' : 'none';
+                    console.log(`Section ${section.dataset.category} display: ${section.style.display}`);
                 });
 
-                const logoContainer = $image.querySelector('.cs-series-logo-container');
-                if (logoContainer) {
-                    logoContainer.style.display = hasVisibleItems ? 'block' : 'none';
-                    console.log(`Logo container for ${$image.dataset.category} display: ${logoContainer.style.display}`);
+                const allListing = $image;
+                const noResultsMessage = allListing.querySelector('.cs-no-results');
+                if (noResultsMessage) {
+                    noResultsMessage.remove();
+                    console.log('Removed existing no-results message');
                 }
 
-                if ($image.dataset.category === 'all') {
-                    const allListing = $image;
-                    const noResultsMessage = allListing.querySelector('.cs-no-results');
-                    if (noResultsMessage) {
-                        noResultsMessage.remove();
-                        console.log('Removed existing no-results message');
-                    }
+                if (filter === 'pinned' && !hasVisibleItems) {
+                    const noResults = document.createElement('div');
+                    noResults.className = 'cs-no-results visible';
+                    noResults.innerHTML = '<p style="color: var(--text-color); text-align: center; grid-column: 1 / -1;">No pinned figures found.</p>';
+                    allListing.appendChild(noResults);
+                    console.log('Appended no-results message for pinned view');
+                } else if (filter === 'purchased' && !hasVisibleItems) {
+                    const noResults = document.createElement('div');
+                    noResults.className = 'cs-no-results visible';
+                    noResults.innerHTML = '<p style="color: var(--text-color); text-align: center; grid-column: 1 / -1;">No purchased figures found.</p>';
+                    allListing.appendChild(noResults);
+                    console.log('Appended no-results message for purchased view');
+                } else if (searchQuery && !hasVisibleItems) {
+                    const noResults = document.createElement('div');
+                    noResults.className = 'cs-no-results visible';
+                    noResults.innerHTML = '<p style="color: var(--text-color); text-align: center; grid-column: 1 / -1;">No figures found.</p>';
+                    allListing.appendChild(noResults);
+                    console.log('Appended no-results message for search');
+                } else if (filter === 'all' && !searchQuery) {
+                    allListing.innerHTML = '';
+                    this.originalSectionOrder.forEach((sectionData, index) => {
+                        allListing.appendChild(sectionData.element);
+                        sectionData.element.style.display = 'contents';
+                        const logo = sectionData.element.querySelector('.cs-series-logo-container');
+                        if (logo) {
+                            logo.style.display = 'block';
+                        }
+                        console.log(`Restored section: ${sectionData.category} at ${index + 1}`);
+                        if (index < this.originalSectionOrder.length - 1) {
+                            const divider = document.createElement('hr');
+                            divider.className = 'cs-series-divider';
+                            allListing.appendChild(divider);
+                            console.log(`Added divider after ${sectionData.category}`);
+                        }
+                    });
+                } else if (isSeriesFilter || filter === 'pinned' || filter === 'purchased' || searchQuery) {
+                    const visibleSections = [];
+                    const hiddenSections = [];
 
-                    if (filter === 'pinned' && !hasVisibleItems) {
-                        const noResults = document.createElement('div');
-                        noResults.className = 'cs-no-results visible';
-                        noResults.innerHTML = '<p style="color: var(--text-color); text-align: center; grid-column: 1 / -1;">No pinned figures found.</p>';
-                        allListing.appendChild(noResults);
-                        console.log('Appended no-results message for pinned view');
-                    } else if (filter === 'all' && searchQuery && !hasVisibleItems) {
-                        const noResults = document.createElement('div');
-                        noResults.className = 'cs-no-results visible';
-                        noResults.innerHTML = '<p style="color: var(--text-color); text-align: center; grid-column: 1 / -1;">No figures found.</p>';
-                        allListing.appendChild(noResults);
-                        console.log('Appended no-results message for all view');
-                    } else if (filter === 'all' && !searchQuery) {
-                        allListing.innerHTML = '';
-                        this.originalSectionOrder.forEach((sectionData, index) => {
-                            allListing.appendChild(sectionData.element);
-                            sectionData.element.style.display = 'contents';
-                            const logo = sectionData.element.querySelector('.cs-series-logo-container');
+                    sections.forEach(section => {
+                        const selector = filter === 'pinned' 
+                            ? '.cs-item:not(.cs-logo-item)[data-pinned="true"]'
+                            : filter === 'purchased'
+                            ? '.cs-item:not(.cs-logo-item)[data-purchased="true"]'
+                            : '.cs-item:not(.cs-logo-item)[style*="display: block"]';
+                        const visibleItems = Array.from(section.querySelectorAll(selector));
+                        if (visibleItems.length > 0 && (!isSeriesFilter || section.dataset.category === targetSeries)) {
+                            visibleSections.push(section);
+                            section.style.display = 'contents';
+                            const logo = section.querySelector('.cs-series-logo-container');
                             if (logo) {
                                 logo.style.display = 'block';
                             }
-                            console.log(`Restored section: ${sectionData.category} at ${index + 1}`);
-                            if (index < this.originalSectionOrder.length - 1) {
-                                const divider = document.createElement('hr');
-                                divider.className = 'cs-series-divider';
-                                allListing.appendChild(divider);
-                                console.log(`Added divider after ${sectionData.category}`);
+                            console.log(`Section ${section.dataset.category} visible (${visibleItems.length} figures)`);
+                        } else {
+                            hiddenSections.push(section);
+                            section.style.display = 'none';
+                            const logo = section.querySelector('.cs-series-logo-container');
+                            if (logo) {
+                                logo.style.display = 'none';
                             }
-                        });
-                    } else if (filter === 'pinned' || searchQuery) {
-                        const visibleSections = [];
-                        const hiddenSections = [];
+                            console.log(`Section ${section.dataset.category} hidden`);
+                        }
+                    });
 
-                        const sections = Array.from(allListing.querySelectorAll('.cs-series-section'));
-                        sections.forEach(section => {
-                            const selector = filter === 'pinned' 
-                                ? '.cs-item:not(.cs-logo-item)[data-pinned="true"]'
-                                : '.cs-item:not(.cs-logo-item)[style*="display: block"]';
-                            const visibleItems = Array.from(section.querySelectorAll(selector));
-                            if (visibleItems.length > 0) {
-                                visibleSections.push(section);
-                                section.style.display = 'contents';
-                                const logo = section.querySelector('.cs-series-logo-container');
-                                if (logo) {
-                                    logo.style.display = 'block';
-                                }
-                                console.log(`Section ${section.dataset.category} visible (${visibleItems.length} figures)`);
-                            } else {
-                                hiddenSections.push(section);
-                                section.style.display = 'none';
-                                const logo = section.querySelector('.cs-series-logo-container');
-                                if (logo) {
-                                    logo.style.display = 'none';
-                                }
-                                console.log(`Section ${section.dataset.category} hidden`);
-                            }
-                        });
-
-                        allListing.innerHTML = '';
-                        visibleSections.forEach((section, index) => {
-                            allListing.appendChild(section);
-                            console.log(`Appended visible section: ${section.dataset.category} at ${index + 1}`);
-                            if (index < visibleSections.length - 1) {
-                                const divider = document.createElement('hr');
-                                divider.className = 'cs-series-divider';
-                                allListing.appendChild(divider);
-                                console.log(`Added divider after visible section ${section.dataset.category}`);
-                            }
-                        });
-                        hiddenSections.forEach((section, index) => {
-                            allListing.appendChild(section);
-                            console.log(`Appended hidden section: ${section.dataset.category} at ${visibleSections.length + index + 1}`);
-                        });
-                    }
+                    allListing.innerHTML = '';
+                    visibleSections.forEach((section, index) => {
+                        allListing.appendChild(section);
+                        console.log(`Appended visible section: ${section.dataset.category} at ${index + 1}`);
+                        if (index < visibleSections.length - 1) {
+                            const divider = document.createElement('hr');
+                            divider.className = 'cs-series-divider';
+                            allListing.appendChild(divider);
+                            console.log(`Added divider after visible section ${section.dataset.category}`);
+                        }
+                    });
+                    hiddenSections.forEach((section, index) => {
+                        allListing.appendChild(section);
+                        console.log(`Appended hidden section: ${section.dataset.category} at ${visibleSections.length + index + 1}`);
+                    });
                 }
 
-                if (hasVisibleItems || $image.dataset.category !== 'all') {
+                if (hasVisibleItems) {
                     $image.classList.remove(this.hiddenClass);
                     $image.style.display = 'grid';
                     console.log(`Listing ${$image.dataset.category} shown, visible items: ${items.filter(i => i.style.display === 'block').length}`);
@@ -851,7 +831,7 @@ class GalleryFilter {
             }
         });
 
-        if (!preserveFilterState && (filter === 'all' || filter === 'pinned')) {
+        if (!preserveFilterState && (filter === 'all' || filter === 'pinned' || filter === 'purchased')) {
             this.$searchSelect.value = 'all';
             this.$filters.forEach(f => f.classList.remove(this.activeClass));
             const targetButton = Array.from(this.$filters).find(f => f.dataset.filter === filter);
@@ -866,10 +846,10 @@ class GalleryFilter {
         console.log(`Found ${dividers.length} dividers`);
 
         dividers.forEach((divider, index) => {
-            if (filter === 'all' || filter === 'pinned') {
-                if (searchQuery || filter === 'pinned') {
+            if (filter === 'all' || filter === 'pinned' || filter === 'purchased') {
+                if (searchQuery || filter === 'pinned' || filter === 'purchased') {
                     divider.classList.add(this.hiddenDividerClass);
-                    console.log(`Divider ${index} hidden (search or pinned active)`);
+                    console.log(`Divider ${index} hidden (search or pinned/purchased active)`);
                 } else {
                     divider.classList.remove(this.hiddenDividerClass);
                     console.log(`Divider ${index} shown (no search, All view)`);
