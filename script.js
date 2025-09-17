@@ -10,6 +10,7 @@ class GalleryFilter {
 
     constructor() {
         console.log('Initializing GalleryFilter at:', new Date().toLocaleString());
+        this.currentFilter = 'all';
         this.$modal = document.createElement('div');
         this.$modal.id = 'myModal';
         this.$modal.className = 'modal';
@@ -39,6 +40,15 @@ class GalleryFilter {
         this.$listingWrapper = document.querySelector('.cs-listing-wrapper');
         this.$searchSelect = document.querySelector('.cs-search-select');
 
+        // Create mobile menu toggle button
+        this.$mobileToggle = document.createElement('button');
+        this.$mobileToggle.className = 'cs-mobile-toggle';
+        this.$mobileToggle.innerHTML = '☰';
+        this.$mobileToggle.setAttribute('aria-label', 'Toggle filters menu');
+        this.$mobileToggle.style.display = window.innerWidth <= 768 ? 'block' : 'none';
+        this.$buttonGroup.insertBefore(this.$mobileToggle, this.$buttonGroup.firstChild);
+        console.log('Mobile toggle button created and prepended to button group');
+
         // Create search input
         this.$searchInput = document.createElement('input');
         this.$searchInput.type = 'text';
@@ -63,10 +73,11 @@ class GalleryFilter {
             listingWrapper: !!this.$listingWrapper,
             searchSelect: !!this.$searchSelect,
             searchInput: !!this.$searchInput,
-            clearButton: !!this.$clearButton
+            clearButton: !!this.$clearButton,
+            mobileToggle: !!this.$mobileToggle
         });
 
-        if (!this.$listingWrapper || !this.$searchSelect || !this.$buttonGroup || !this.$searchInput || !this.$clearButton) {
+        if (!this.$listingWrapper || !this.$searchSelect || !this.$buttonGroup || !this.$searchInput || !this.$clearButton || !this.$mobileToggle) {
             console.error('Required DOM elements missing. Check index.html structure.');
             this.$listingWrapper.innerHTML = '<p style="color: var(--text-color); text-align: center;">Error: Required elements not found.</p>';
             return;
@@ -100,12 +111,75 @@ class GalleryFilter {
         });
         console.log('Click event listener added for Back to Top button');
 
+        // Create sort select
+        this.$sortSelect = document.createElement('select');
+        this.$sortSelect.className = 'cs-sort-select';
+        this.$sortSelect.innerHTML = `
+            <option value="default">Sort by...</option>
+            <option value="name-asc">Name A-Z</option>
+            <option value="name-desc">Name Z-A</option>
+            <option value="date-asc">Release Oldest First</option>
+            <option value="date-desc">Release Newest First</option>
+        `;
+        const sortWrapper = document.createElement('div');
+        sortWrapper.className = 'cs-select-wrapper';
+        sortWrapper.style.marginLeft = '15px';
+        sortWrapper.appendChild(this.$sortSelect);
+        this.$searchSelect.parentNode.insertBefore(sortWrapper, this.$searchSelect.nextSibling);
+        console.log('Sort select created and inserted after search select with 15px margin');
+
+        // Set up mobile toggle event
+        this.$mobileToggle.addEventListener('click', () => {
+                const isOpen = document.body.classList.toggle('cs-menu-open');
+                this.$mobileToggle.innerHTML = isOpen ? '✕' : '☰';
+                this.$mobileToggle.setAttribute('aria-label', isOpen ? 'Close filters menu' : 'Toggle filters menu');
+                console.log(`Mobile menu ${isOpen ? 'opened' : 'closed'}`);
+        });
+        console.log('Mobile toggle event listener added');
+
+        // Set up window resize event to toggle mobile menu visibility
+        this.handleLayout = () => {
+    const isMobile = window.innerWidth <= 768;
+    if (isMobile) {
+        this.$mobileToggle.style.display = 'block';
+        if (!this.sideMenu) {
+            this.sideMenu = document.createElement('div');
+            this.sideMenu.className = 'cs-side-menu';
+            document.body.appendChild(this.sideMenu);
+            this.sideMenu.appendChild(this.$buttonGroup);
+            console.log('Moved button group to side menu for mobile');
+        }
+        this.isMobileLayout = true;
+    } else {
+        this.$mobileToggle.style.display = 'none';
+        if (this.sideMenu) {
+            const collection = document.querySelector('#collection-1602');
+            if (collection) {
+                collection.insertBefore(this.$buttonGroup, this.$listingWrapper);
+                console.log('Moved button group back to collection for desktop');
+            }
+            document.body.removeChild(this.sideMenu);
+            this.sideMenu = null;
+        }
+        document.body.classList.remove('cs-menu-open');
+        this.$mobileToggle.innerHTML = '☰';
+        this.$mobileToggle.setAttribute('aria-label', 'Toggle filters menu');
+        console.log('Switched to desktop view, menu reset');
+        this.isMobileLayout = false;
+    }
+};
+this.handleLayout();  // Run once on init
+window.addEventListener('resize', this.handleLayout);
+console.log('Resize event listener added for mobile layout');
+
+    
+
         // Set up search input event
         this.$searchInput.addEventListener('input', () => {
             const query = this.$searchInput.value.trim().toLowerCase();
             this.$clearButton.style.display = query ? 'inline-block' : 'none';
             console.log('Search input changed:', query, 'Clear button display:', this.$clearButton.style.display);
-            this.filter(this.$activeFilter?.dataset.filter || 'all', query);
+            this.filter(this.currentFilter, query);
         });
         console.log('Search input event listener added');
 
@@ -114,7 +188,7 @@ class GalleryFilter {
             this.$searchInput.value = '';
             this.$clearButton.style.display = 'none';
             console.log('Clear search button clicked, input cleared');
-            this.filter(this.$activeFilter?.dataset.filter || 'all', '');
+            this.filter(this.currentFilter, '');
         });
         console.log('Clear search button event listener added');
 
@@ -150,14 +224,32 @@ class GalleryFilter {
             const value = this.$searchSelect.value;
             console.log('Select changed:', value);
             const filterValue = value !== 'all' ? `series-${value}` : 'all';
+            this.currentFilter = filterValue;
             this.filter(filterValue, this.$searchInput.value.trim().toLowerCase());
             this.$filters = document.querySelectorAll(this.filtersSelector);
-            this.$activeFilter = Array.from(this.$filters).find(f => f.dataset.filter === filterValue) || this.$filters[0];
             this.$filters.forEach(f => f.classList.remove(this.activeClass));
-            this.$activeFilter.classList.add(this.activeClass);
+            if (filterValue === 'all') {
+                this.$activeFilter = Array.from(this.$filters).find(f => f.dataset.filter === 'all') || this.$filters[0];
+                this.$activeFilter.classList.add(this.activeClass);
+            } else {
+                this.$activeFilter = null;
+            }
             console.log(`Active filter set to ${filterValue} via select change`);
         });
         console.log('Select change event listener added');
+
+        // Set up sort select change event
+        this.$sortSelect.addEventListener('change', () => {
+            this.currentSort = this.$sortSelect.value;
+            console.log('Sort changed:', this.currentSort);
+            this.filter(this.currentFilter, this.$searchInput.value.trim().toLowerCase());
+        });
+        console.log('Sort select change event listener added');
+
+        this.currentSort = 'default';
+
+        this.isMobileLayout = false;
+        this.sideMenu = null;
 
         // Load figures and initialize
         this.loadFigures().then(figures => {
@@ -310,6 +402,7 @@ class GalleryFilter {
                 item.dataset.description = (figure.description || 'No description available').toLowerCase();
                 item.dataset.set = (figure.set || 'N/A').toLowerCase();
                 item.dataset.company = (figure.company || 'N/A').toLowerCase();
+                item.dataset.released = figure.released || '';
                 const localPinned = localStorage.getItem(`pinned_${figure.name}`);
                 const isPinned = localPinned !== null ? JSON.parse(localPinned) : !!figure.pinned;
                 item.dataset.pinned = isPinned.toString();
@@ -506,10 +599,9 @@ class GalleryFilter {
         });
         console.log(`Synced pinned state for ${figureName} across ${allItems.length} instances`);
 
-        const currentFilter = this.$searchSelect.value !== 'all' ? `series-${this.$searchSelect.value}` : (this.$activeFilter?.dataset.filter || 'all');
-        console.log(`Maintaining current filter: ${currentFilter}`);
+        console.log(`Maintaining current filter: ${this.currentFilter}`);
 
-        this.filter(currentFilter, this.$searchInput.value.trim().toLowerCase(), true);
+        this.filter(this.currentFilter, this.$searchInput.value.trim().toLowerCase(), true);
         window.scrollTo({ top: scrollPosition, behavior: 'auto' });
         console.log(`Restored scroll position after pin action: ${scrollPosition}`);
     }
@@ -565,10 +657,9 @@ class GalleryFilter {
         });
         console.log(`Synced purchased state for ${figureName} across ${allItems.length} instances`);
 
-        const currentFilter = this.$searchSelect.value !== 'all' ? `series-${this.$searchSelect.value}` : (this.$activeFilter?.dataset.filter || 'all');
-        console.log(`Maintaining current filter: ${currentFilter}`);
+        console.log(`Maintaining current filter: ${this.currentFilter}`);
 
-        this.filter(currentFilter, this.$searchInput.value.trim().toLowerCase(), true);
+        this.filter(this.currentFilter, this.$searchInput.value.trim().toLowerCase(), true);
         window.scrollTo({ top: scrollPosition, behavior: 'auto' });
         console.log(`Restored scroll position after purchased action: ${scrollPosition}`);
     }
@@ -668,7 +759,84 @@ class GalleryFilter {
                 console.log('Select reset to All Series via All button');
             }
         }
+        this.currentFilter = targetFilter;
         this.filter(targetFilter, this.$searchInput.value.trim().toLowerCase());
+    }
+
+    parseDate(dateStr) {
+        if (!dateStr) return new Date(0);
+
+        dateStr = dateStr.replace(/,/g, '').trim();
+        const parts = dateStr.split(/[\s\/-]+/).filter(p => p.length > 0);
+        const len = parts.length;
+        if (len < 2 || len > 3) return new Date(0);
+
+        const months = {
+            'january': 0, 'february': 1, 'march': 2, 'april': 3, 'may': 4, 'june': 5,
+            'july': 6, 'august': 7, 'september': 8, 'october': 9, 'november': 10, 'december': 11,
+            'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'may': 4, 'jun': 5,
+            'jul': 6, 'aug': 7, 'sep': 8, 'sept': 8, 'oct': 9, 'nov': 10, 'dec': 11
+        };
+
+        let year, month, day = 1;
+
+        const nums = [];
+        let monthName = null;
+        parts.forEach(p => {
+            const num = parseInt(p, 10);
+            if (!isNaN(num)) {
+                nums.push(num);
+            } else {
+                const m = months[p.toLowerCase()];
+                if (m !== undefined) monthName = m;
+            }
+        });
+
+        if (monthName !== null) {
+            month = monthName;
+            if (len === 2) {
+                year = nums[0];
+            } else if (len === 3) {
+                if (parts[0].toLowerCase() in months) {
+                    day = nums[0];
+                    year = nums[1];
+                } else if (parts[1].toLowerCase() in months) {
+                    day = nums[0];
+                    year = nums[1];
+                } else {
+                    year = nums[0];
+                    day = nums[1];
+                }
+            }
+        } else {
+            if (len === 2) {
+                if (nums[0] > 31) {
+                    year = nums[0];
+                    month = nums[1] - 1;
+                } else {
+                    month = nums[0] - 1;
+                    year = nums[1];
+                }
+            } else if (len === 3) {
+                if (nums[0] > 31) {
+                    year = nums[0];
+                    month = nums[1] - 1;
+                    day = nums[2];
+                } else {
+                    month = nums[0] - 1;
+                    day = nums[1];
+                    year = nums[2];
+                }
+            }
+        }
+
+        if (year === undefined || month === undefined || isNaN(year) || isNaN(month)) {
+            return new Date(0);
+        }
+
+        if (year < 100) year += 2000;
+
+        return new Date(year, month, day);
     }
 
     filter(filter, searchQuery = '', preserveFilterState = false) {
@@ -714,9 +882,10 @@ class GalleryFilter {
                         const isPurchased = localPurchased !== null ? JSON.parse(localPurchased) : item.dataset.purchased === 'true';
                         const purchasedMatch = filter !== 'purchased' || isPurchased;
                         const allViewMatch = filter !== 'all' || !isPurchased;
+                        const seriesViewMatch = !isSeriesFilter || !isPurchased;
                         const seriesMatch = !isSeriesFilter || section.dataset.category === targetSeries;
 
-                        if (nameMatch && pinnedMatch && purchasedMatch && allViewMatch && seriesMatch) {
+                        if (nameMatch && pinnedMatch && purchasedMatch && allViewMatch && seriesMatch && seriesViewMatch) {
                             item.style.display = 'block';
                             sectionHasVisibleItems = true;
                             hasVisibleItems = true;
@@ -823,6 +992,32 @@ class GalleryFilter {
                     });
                 }
 
+                if (this.currentSort !== 'default') {
+                    const sections = document.querySelectorAll('.cs-series-section[style*="display: contents"]');
+                    sections.forEach(section => {
+                        const items = Array.from(section.querySelectorAll('.cs-item:not(.cs-logo-item)[style*="display: block"]'));
+                        if (items.length > 1) {
+                            items.sort((a, b) => {
+                                if (this.currentSort === 'name-asc') {
+                                    return a.dataset.name.localeCompare(b.dataset.name);
+                                } else if (this.currentSort === 'name-desc') {
+                                    return b.dataset.name.localeCompare(a.dataset.name);
+                                } else if (this.currentSort === 'date-asc') {
+                                    return this.parseDate(a.dataset.released) - this.parseDate(b.dataset.released);
+                                } else if (this.currentSort === 'date-desc') {
+                                    return this.parseDate(b.dataset.released) - this.parseDate(a.dataset.released);
+                                }
+                                return 0;
+                            });
+
+                            const logoContainer = section.querySelector('.cs-series-logo-container');
+                            const referenceNode = logoContainer ? logoContainer.nextSibling : null;
+                            items.forEach(item => section.insertBefore(item, referenceNode));
+                            console.log(`Sorted section ${section.dataset.category} with ${items.length} items by ${this.currentSort}`);
+                        }
+                    });
+                }
+
                 if (hasVisibleItems) {
                     $image.classList.remove(this.hiddenClass);
                     $image.style.display = 'grid';
@@ -831,7 +1026,7 @@ class GalleryFilter {
             }
         });
 
-        if (!preserveFilterState && (filter === 'all' || filter === 'pinned' || filter === 'purchased')) {
+        if (!preserveFilterState && !filter.startsWith('series-')) {
             this.$searchSelect.value = 'all';
             this.$filters.forEach(f => f.classList.remove(this.activeClass));
             const targetButton = Array.from(this.$filters).find(f => f.dataset.filter === filter);

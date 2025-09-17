@@ -1,4 +1,15 @@
-/* Define dark theme variables */
+/* Define global CSS variables from corestyles.css */
+:root {
+    --primary: #ff6a3e;
+    --primaryLight: #ffba43;
+    --secondary: #ffba43;
+    --secondaryLight: #ffba43;
+    --headerColor: #1a1a1a;
+    --bodyTextColor: #4e4b66;
+    --bodyTextColorWhite: #fafbfc;
+}
+
+/* Define dark theme variables for collection */
 #collection-1602 {
     --background: #1a1a1a;
     --card-background: #2a2a2a;
@@ -10,7 +21,7 @@
 }
 
 /* Reset default margins and padding */
-#collection-1602 * {
+*, *:before, *:after {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -21,8 +32,8 @@ body {
     background: #1a1a1a;
 }
 
-/* Prevent scrolling when modal is open */
-body.cs-modal-open {
+/* Prevent scrolling when modal or side menu is open */
+body.cs-modal-open, body.cs-menu-open {
     overflow: hidden !important;
 }
 
@@ -94,12 +105,10 @@ body.cs-modal-open {
     opacity: 0;
     transition: opacity 0.3s ease-in-out;
 }
-
 #collection-1602 .cs-back-to-top.visible {
     display: block;
     opacity: 1;
 }
-
 #collection-1602 .cs-back-to-top:hover {
     background: var(--primary-dark);
 }
@@ -219,28 +228,147 @@ body.cs-modal-open {
     opacity: 1;
 }
 
+/* Mobile hamburger button */
+.cs-mobile-toggle {
+    display: none;
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    font-size: 1.5rem;
+    background: var(--primary);
+    color: var(--text-color);
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    z-index: 1100;
+}
+
+/* Side menu */
+.cs-side-menu {
+    position: fixed;
+    top: 0;
+    left: -250px;
+    width: 250px;
+    height: 100%;
+    background: var(--card-background);
+    border-right: 1px solid var(--border-color);
+    padding: 60px 10px 20px;
+    transition: transform 0.3s ease-in-out;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+body.cs-menu-open .cs-side-menu {
+    transform: translateX(250px);
+}
+
+
+/* Move content when side menu is open */
+body.cs-menu-open #collection-1602 {
+    transform: translateX(250px);
+    transition: transform 0.3s ease-in-out;
+}
+
+/* Clear Search Button */
+.cs-clear-search {
+    display: none;
+    margin-left: 8px;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    background-color: #0052cc;
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    line-height: 1;
+    vertical-align: middle;
+}
+
+.cs-clear-search:hover {
+    background-color: #003d99;
+}
+
+.cs-clear-search:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
 /* Responsive grid for smaller screens */
 @media only screen and (max-width: 1800px) {
     #collection-1602 .cs-listing {
         grid-template-columns: repeat(5, minmax(280px, 1fr));
     }
 }
-
 @media only screen and (max-width: 1500px) {
     #collection-1602 .cs-listing {
         grid-template-columns: repeat(4, minmax(280px, 1fr));
     }
 }
-
 @media only screen and (max-width: 1200px) {
     #collection-1602 .cs-listing {
         grid-template-columns: repeat(3, minmax(280px, 1fr));
     }
 }
-
 @media only screen and (max-width: 900px) {
     #collection-1602 .cs-listing {
         grid-template-columns: repeat(2, minmax(280px, 1fr));
+    }
+}
+@media only screen and (max-width: 768px) {
+    .cs-mobile-toggle {
+        display: block;
+        background: #2a2a2a; /* Dark gray to match cards */
+        border-radius: 6px; /* Softer corners */
+        padding: 10px 14px; /* Larger tap target */
+        font-size: 1.3rem; /* Larger icon */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+        color: #e0e0e0; /* Light text for visibility */
+    }
+    .cs-mobile-toggle:hover {
+        background: #1e90ff; /* Primary blue on hover */
+        transform: scale(1.05); /* Slight scale effect */
+    }
+    .cs-button-group {
+        position: relative;
+        flex-direction: column;
+        align-items: stretch;
+        margin-bottom: 1rem;
+        gap: 10px; /* Increased gap for vertical stack */
+    }
+    .cs-button-group > * {
+        width: 100%; /* Full width for buttons and inputs on mobile */
+        max-width: none;
+    }
+    .cs-search-input, .cs-search-select, .cs-sort-select {
+        height: 44px; /* Touch-friendly height */
+        font-size: 1.2rem; /* Larger text for readability */
+        padding: 0.75rem 1.25rem; /* Larger padding for touch */
+    }
+    .cs-button {
+        height: 44px; /* Match height */
+        font-size: 1.2rem;
+        padding: 0.75rem 1.25rem;
+    }
+    .cs-clear-search {
+        height: 44px;
+        width: 44px;
+        font-size: 1.5rem;
+    }
+    .cs-select-wrapper {
+        width: 100%;
+    }
+    /* Ensure hamburger persists and is always visible on mobile */
+    .cs-mobile-toggle {
+        display: block !important; /* Force display to prevent disappearing */
+        z-index: 1200; /* Higher than modal */
+    }
+    body.cs-modal-open .cs-mobile-toggle {
+        display: block !important; /* Persist during modal */
     }
 }
 
@@ -249,27 +377,6 @@ body.cs-modal-open {
         grid-template-columns: 1fr;
         justify-items: center;
         padding: 0 0.5rem;
-    }
-    #collection-1602 .cs-button-group {
-        flex-direction: column;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    #collection-1602 .cs-button-subgroup,
-    #collection-1602 .cs-button,
-    #collection-1602 .cs-select-wrapper,
-    #collection-1602 .cs-search-input,
-    #collection-1602 .cs-sort-select {
-        width: 100%;
-        max-width: 280px;
-    }
-    #collection-1602 .cs-search-select,
-    #collection-1602 .cs-sort-select {
-        width: 100%;
-        max-width: 280px;
-    }
-    #collection-1602 .cs-dropdown-arrow {
-        right: 8px;
     }
     #collection-1602 .cs-series-logo-container {
         padding: 0.25rem 0;
@@ -280,6 +387,19 @@ body.cs-modal-open {
         width: 100%;
         height: auto;
         padding: 0.125rem;
+    }
+    .cs-clear-search {
+        margin: 8px auto;
+    }
+    #collection-1602 .cs-pinned-indicator {
+        font-size: 1.6rem;
+        top: 8px;
+        right: 8px;
+    }
+    #collection-1602 .cs-purchased-indicator {
+        font-size: 1.6rem;
+        top: 8px;
+        right: 32px;
     }
 }
 
@@ -304,7 +424,6 @@ body.cs-modal-open {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
-
 #collection-1602 .cs-item:hover {
     transform: scale(1.05);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
@@ -340,9 +459,9 @@ body.cs-modal-open {
     right: 8px;
     font-size: 2rem;
     color: #ffba43;
-    text-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
-    filter: drop-shadow(0 0 5px rgba(255, 186, 67, 0.7));
-    transition: transform 0.2s, opacity 0.3s;
+    text-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+    display: none;
+    transition: transform 0.2s ease-in-out;
 }
 
 #collection-1602 .cs-pinned-indicator.cs-pulse {
@@ -353,62 +472,62 @@ body.cs-modal-open {
 #collection-1602 .cs-purchased-indicator {
     position: absolute;
     top: 8px;
-    right: 38px;
+    right: 32px;
     font-size: 2rem;
     color: #4caf50;
-    text-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
-    filter: drop-shadow(0 0 5px rgba(76, 175, 80, 0.7));
-    transition: transform 0.2s, opacity 0.3s;
+    text-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+    display: none;
+    transition: transform 0.2s ease-in-out;
 }
 
 #collection-1602 .cs-purchased-indicator.cs-pulse {
     animation: pulse 0.7s ease-in-out;
 }
 
+/* Pulse animation */
 @keyframes pulse {
     0% { transform: scale(1); }
-    50% { transform: scale(1.4); }
+    50% { transform: scale(1.2); }
     100% { transform: scale(1); }
 }
 
-/* Overlay for card title and button */
+/* Overlay for card title and show more button */
 #collection-1602 .cs-overlay {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.7);
     color: var(--text-color);
     padding: 0.5rem;
     text-align: center;
-    z-index: 2;
+    transition: transform 0.3s ease-in-out;
 }
 
-/* Card title */
+/* Card name */
 #collection-1602 .cs-name {
-    font-size: 1.4rem;
-    margin: 0;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
 }
 
-/* Show More Info button */
+/* Show More button */
 #collection-1602 .cs-show-more {
     background: var(--primary);
-    color: var(--text-color);
     border: none;
-    padding: 0.5rem 1rem;
+    padding: 0.3rem 0.8rem;
     cursor: pointer;
-    font-size: 1.1rem;
-    margin-top: 0.5rem;
+    font-size: 0.9rem;
     border-radius: 0.25rem;
+    color: var(--text-color);
 }
 
 #collection-1602 .cs-show-more:hover {
     background: var(--primary-dark);
 }
 
-/* Buy Now button */
+/* Buy Now link/button */
 #collection-1602 .cs-buy-now {
-    display: none;
     background: var(--primary);
     color: var(--text-color);
     border: none;
@@ -447,7 +566,6 @@ body.cs-modal-open {
     opacity: 0;
     transition: opacity 0.2s ease-in-out;
 }
-
 #collection-1602 .cs-buy-now:hover:after {
     opacity: 1;
 }
@@ -473,7 +591,7 @@ body.cs-modal-open {
     background: rgba(0, 0, 0, 0.9);
     color: var(--text-color);
     transform: translateY(0);
-    transition: top 300ms ease-in-out;
+    transition: top 0.3s ease-in-out;
     z-index: 1;
     display: flex;
     flex-direction: column;
@@ -607,34 +725,8 @@ html body #myModal.modal .close:focus {
     }
 }
 
-/* Clear Search Button */
-#collection-1602 .cs-clear-search {
-    display: none;
-    margin-left: 8px;
-    padding: 0;
-    width: 30px;
-    height: 30px;
-    background-color: #0052cc;
-    color: var(--text-color);
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1.2rem;
-    line-height: 1;
-    vertical-align: middle;
-}
-
-#collection-1602 .cs-clear-search:hover {
-    background-color: #003d99;
-}
-
-#collection-1602 .cs-clear-search:focus {
-    outline: 2px solid var(--primary);
-    outline-offset: 2px;
-}
-
 /* Ensure no-results message remains styled */
-#collection-1602 .cs-no-results {
+.cs-no-results {
     grid-column: 1 / -1;
     text-align: center;
     padding: 20px;
@@ -643,25 +735,8 @@ html body #myModal.modal .close:focus {
     transition: opacity 0.3s ease;
 }
 
-#collection-1602 .cs-no-results.visible {
+.cs-no-results.visible {
     opacity: 1;
-}
-
-/* Responsive adjustments */
-@media (max-width: 600px) {
-    #collection-1602 .cs-clear-search {
-        margin: 8px auto;
-    }
-    #collection-1602 .cs-pinned-indicator {
-        font-size: 1.6rem;
-        top: 8px;
-        right: 8px;
-    }
-    #collection-1602 .cs-purchased-indicator {
-        font-size: 1.6rem;
-        top: 8px;
-        right: 32px;
-    }
 }
 
 /* Fade-In Animation for Cards */
